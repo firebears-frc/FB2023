@@ -96,7 +96,7 @@ differentialDrive.setMaxOutput(1.0);
 
 
 try { navX = new AHRS(SPI.Port.kMXP);} catch (RuntimeException ex ) {DriverStation.reportError( ex.getMessage(), true);} Timer.delay(1.0);
- LiveWindow.addSensor("Chassis", "navX", navX);
+ //LiveWindow.addSensor("Chassis", "navX", navX);
  
 
 
