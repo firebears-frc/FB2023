@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
@@ -25,13 +26,13 @@ public class Chassis extends SubsystemBase {
     private AHRS navX;
 
     public Chassis() {
-        rightFrontMotor = new CANSparkMax(1, MotorType.kBrushless);
+        rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
 
         rightFrontMotor.restoreFactoryDefaults();
         rightFrontMotor.setInverted(false);
         rightFrontMotor.setIdleMode(IdleMode.kCoast);
 
-        rightBackMotor = new CANSparkMax(0, MotorType.kBrushless);
+        rightBackMotor = new CANSparkMax(DriveConstants.kRightMotor2Port, MotorType.kBrushless);
 
         rightBackMotor.restoreFactoryDefaults();
         rightBackMotor.setInverted(false);
@@ -40,13 +41,13 @@ public class Chassis extends SubsystemBase {
         rightMotors = new MotorControllerGroup(rightFrontMotor, rightBackMotor);
         addChild("rightMotors", rightMotors);
 
-        leftFrontMotor = new CANSparkMax(18, MotorType.kBrushless);
+        leftFrontMotor = new CANSparkMax(DriveConstants.kLeftMotor1Port, MotorType.kBrushless);
 
         leftFrontMotor.restoreFactoryDefaults();
         leftFrontMotor.setInverted(true);
         leftFrontMotor.setIdleMode(IdleMode.kCoast);
 
-        leftBackMotor = new CANSparkMax(19, MotorType.kBrushless);
+        leftBackMotor = new CANSparkMax(DriveConstants.kLeftMotor2Port, MotorType.kBrushless);
 
         leftBackMotor.restoreFactoryDefaults();
         leftBackMotor.setInverted(true);
@@ -82,6 +83,7 @@ public class Chassis extends SubsystemBase {
     }
 
     public void arcadeDrive(double speed, double rotation) {
+        speed /= 2;
         differentialDrive.arcadeDrive(speed, rotation);
     }
 
