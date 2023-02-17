@@ -157,3 +157,4 @@ bin/
 
 # Git info
 src/main/deploy/branch.txt
+src/main/deploy/commit.txt
