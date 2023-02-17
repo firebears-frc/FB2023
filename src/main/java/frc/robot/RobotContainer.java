@@ -79,7 +79,7 @@ public class RobotContainer {
 
     // Get the commit hash and display on the dashboard
     String commitHash = getFileContents("commit.txt");
-    SmartDashboard.putString("Commit Hash", commitHash);
+    SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
   }
 
   public static RobotContainer getInstance() {
