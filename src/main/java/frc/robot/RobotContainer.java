@@ -6,8 +6,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -45,6 +50,36 @@ public class RobotContainer {
     m_chooser.setDefaultOption("Autonomous Command", new AutonomousCommand());
 
     SmartDashboard.putData("Auto Mode", m_chooser);
+
+    displayGitInfo();
+  }
+
+  private String getFileContents(String filename) {
+    // Create the file object
+    File file = new File(Filesystem.getDeployDirectory(), filename);
+    // Open the file stream
+    try (FileInputStream inputStream = new FileInputStream(file)) {
+      // Prepare the buffer
+      byte[] data = new byte[(int) file.length()];
+      // Read the data
+      data = inputStream.readAllBytes();
+      // Format into string and return
+      return new String(data, "UTF-8");
+    } catch (IOException e) {
+      // Print exception and return
+      e.printStackTrace();
+      return "Unknown";
+    }
+  }
+
+  private void displayGitInfo() {
+    // Get the branch name and display on the dashboard
+    String branchName = getFileContents("branch.txt");
+    SmartDashboard.putString("Branch Name", branchName);
+
+    // Get the commit hash and display on the dashboard
+    String commitHash = getFileContents("commit.txt");
+    SmartDashboard.putString("Commit Hash", commitHash);
   }
 
   public static RobotContainer getInstance() {
