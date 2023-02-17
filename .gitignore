@@ -154,3 +154,6 @@ bin/
 
 # IntelliJ
 .idea/
+
+# Git info
+src/main/deploy/branch.txt
