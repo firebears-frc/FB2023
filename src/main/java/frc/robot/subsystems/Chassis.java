@@ -89,8 +89,8 @@ public class Chassis extends SubsystemBase {
         }
         Timer.delay(1.0);
         // LiveWindow.addSensor("Chassis", "navX", navX);
-        Rotation2d rotation2d = Rotation2d.fromDegrees(getAngle());
-        m_odometry = new DifferentialDriveOdometry(rotation2d, 0.0, 0.0);
+        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
+        m_odometry = new DifferentialDriveOdometry(gyroAngleRadians, 0.0, 0.0);
 
     }
 
@@ -152,11 +152,11 @@ public class Chassis extends SubsystemBase {
         return navX.getAngle();
     }
 
-    public void tankDriveVolts(double leftFrontVolts, double leftBackVolts, double rightFrontVolts, double rightBackVolts) {
-        leftFrontMotor.setVoltage(leftFrontVolts);
-        leftBackMotor.setVoltage(leftBackVolts);
-        rightFrontMotor.setVoltage(rightFrontVolts);
-        rightBackMotor.setVoltage(rightBackVolts);
+    public void tankDriveVolts(double leftVolts, double rightVolts) {
+        leftFrontMotor.setVoltage(leftVolts);
+        leftBackMotor.setVoltage(leftVolts);
+        rightFrontMotor.setVoltage(rightVolts);
+        rightBackMotor.setVoltage(rightVolts);
         differentialDrive.feed();
       }
 
