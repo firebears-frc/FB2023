@@ -8,6 +8,10 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
@@ -33,6 +37,8 @@ public class Chassis extends SubsystemBase {
     private RelativeEncoder leftEncoder;
     private double leftOffSet = 0;
     private double rightOffSet = 0;
+
+    private final DifferentialDriveOdometry m_odometry;
 
     public Chassis() {
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
@@ -83,11 +89,19 @@ public class Chassis extends SubsystemBase {
         }
         Timer.delay(1.0);
         // LiveWindow.addSensor("Chassis", "navX", navX);
+        Rotation2d rotation2d = Rotation2d.fromDegrees(getAngle());
+        m_odometry = new DifferentialDriveOdometry(rotation2d, 0.0, 0.0);
 
     }
 
     @Override
     public void periodic() {
+
+        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
+        double leftDistanceMeters = leftDistanceTraveled();
+        double rightDistanceMeters = rightDistanceTraveled();
+        m_odometry.update(gyroAngleRadians, leftDistanceMeters, rightDistanceMeters);
+
         SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
         SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
         SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
@@ -138,4 +152,27 @@ public class Chassis extends SubsystemBase {
         return navX.getAngle();
     }
 
+    public void tankDriveVolts(double leftFrontVolts, double leftBackVolts, double rightFrontVolts, double rightBackVolts) {
+        leftFrontMotor.setVoltage(leftFrontVolts);
+        leftBackMotor.setVoltage(leftBackVolts);
+        rightFrontMotor.setVoltage(rightFrontVolts);
+        rightBackMotor.setVoltage(rightBackVolts);
+        differentialDrive.feed();
+      }
+
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        double leftMetersPerSecond = leftEncoder.getVelocity();
+        double rightMetersPerSecond = rightEncoder.getVelocity();
+        return new DifferentialDriveWheelSpeeds(leftMetersPerSecond, rightMetersPerSecond);
+      }
+
+    public Pose2d getPose() {
+        return m_odometry.getPoseMeters();
+      }
+
+    public void resetOdometry(Pose2d pose) {
+        resetEncoder();
+        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
+        m_odometry.resetPosition(gyroAngleRadians, 0.0, 0.0, pose);
+      }
 }
