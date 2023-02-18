@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -48,7 +49,7 @@ public final class Config {
                         outStream.printf("%s=%f%n", key, Preferences.getDouble(key, 0.0));
                         break;
                     case kString:
-                        outStream.printf("%s=%f%n", key, Preferences.getString(key, null));
+                        outStream.printf("%s=%s%n", key, Preferences.getString(key, null));
                         break;
                     default:
                         outStream.printf("%s=%s%n", key, Preferences.getString(key, "UNKNOWN"));
@@ -57,6 +58,16 @@ public final class Config {
                 System.out.println("ERROR: Config problem for property: " + key);
                 e.printStackTrace();
             }
+        }
+    }
+
+    /** Perform one action on each {@link Preferences} key/value pair. */
+    public static void forEach(BiConsumer<String, String> action) {
+        final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("Preferences");
+        SortedSet<String> sortedKeys = new TreeSet<>(Preferences.getKeys());
+        for (String key : sortedKeys) {
+            String value = networkTable.getEntry(key).getString("null");
+            action.accept(key, value);
         }
     }
 
@@ -73,7 +84,7 @@ public final class Config {
     }
 
     /**
-     * Read a sequence of property files into {@link Preferences} . If the files or
+     * Read a sequence of property files into {@link Preferences}. If the files or
      * resources don't exist, print an error message and gracefully move to the next
      * file.
      * 

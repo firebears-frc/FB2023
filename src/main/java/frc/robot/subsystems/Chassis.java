@@ -116,7 +116,6 @@ public class Chassis extends SubsystemBase {
     }
 
     public void arcadeDrive(double speed, double rotation) {
-        speed /= 2;
         differentialDrive.arcadeDrive(speed, rotation);
     }
 
