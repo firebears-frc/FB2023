@@ -18,17 +18,14 @@ import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot
- * (including subsystems, commands, and button mappings) should be declared
- * here.
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including subsystems,
+ * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
 
-  private static RobotContainer m_robotContainer = new RobotContainer();
+  private static RobotContainer m_robotContainer = null;
 
   public final Lights m_lights;
   public final Vision m_vision;
@@ -91,16 +88,17 @@ public class RobotContainer {
   }
 
   public static RobotContainer getInstance() {
+    if (m_robotContainer == null) {
+      m_robotContainer = new RobotContainer();
+    }
     return m_robotContainer;
   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-   * it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * created by instantiating a {@link GenericHID} or one of its subclasses
+   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
+   * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     JoystickButton yButton = new JoystickButton(xboxController1, XboxController.Button.kY.value);
