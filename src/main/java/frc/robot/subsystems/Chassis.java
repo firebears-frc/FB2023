@@ -13,6 +13,10 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import static frc.robot.Constants.*;
+
+import com.revrobotics.RelativeEncoder; 
 
 public class Chassis extends SubsystemBase {
 
@@ -24,6 +28,11 @@ public class Chassis extends SubsystemBase {
     private MotorControllerGroup leftMotors;
     private DifferentialDrive differentialDrive;
     private AHRS navX;
+
+    private RelativeEncoder rightEncoder;
+    private RelativeEncoder leftEncoder;
+    private double leftOffSet = 0;
+    private double rightOffSet = 0;
 
     public Chassis() {
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
@@ -62,6 +71,9 @@ public class Chassis extends SubsystemBase {
         differentialDrive.setExpiration(0.1);
         differentialDrive.setMaxOutput(1.0);
 
+        rightEncoder = rightFrontMotor.getEncoder();
+        leftEncoder = leftFrontMotor.getEncoder();
+        
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
@@ -74,7 +86,12 @@ public class Chassis extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
+        SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
+        SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
+        SmartDashboard.putNumber("getPitch", getPitch());
+        SmartDashboard.putNumber("getRoll", getRoll());
+        SmartDashboard.putNumber("getAngle", getAngle());
     }
 
     @Override
@@ -85,6 +102,38 @@ public class Chassis extends SubsystemBase {
     public void arcadeDrive(double speed, double rotation) {
         speed /= 2;
         differentialDrive.arcadeDrive(speed, rotation);
+    }
+
+    public double getEncoderDistance() {
+        double meters = ((leftEncoder.getPosition() - leftOffSet) + (rightEncoder.getPosition() * -1 - rightOffSet))
+                / 2;
+
+        return meters;
+    }
+
+    public double leftDistanceTraveled() {
+        return (leftEncoder.getPosition() - leftOffSet) / kFeetToMeterFactor;
+    }
+
+    public double rightDistanceTraveled() {
+        return (rightEncoder.getPosition() - rightOffSet) / kFeetToMeterFactor;
+    }
+
+    public void resetEncoder() {
+        leftOffSet = leftEncoder.getPosition();
+        rightOffSet = rightEncoder.getPosition();
+    }
+
+    public double getPitch(){
+        return (navX.getPitch()) * -1;
+    }
+
+    public double getRoll(){
+        return navX.getRoll();
+    }
+
+    public double getAngle(){
+        return navX.getAngle();
     }
 
 }

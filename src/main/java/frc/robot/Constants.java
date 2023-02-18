@@ -7,4 +7,5 @@ public class Constants {
         public static final int kRightMotor1Port = 15;
         public static final int kRightMotor2Port = 17;
     }
+    public static final int kFeetToMeterFactor = 25;
 }
