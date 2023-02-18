@@ -18,7 +18,7 @@ public class Constants {
         public static final int kRightMotor2Port = 17;
     }
 
-    public static final int kFeetToMeterFactor = 25;
+    public static int kFeetToMeterFactor = 25;
 
     public static void init(String... fileNames) {
         cleanAllPreferences();
@@ -27,5 +27,12 @@ public class Constants {
 
         DEBUG = Preferences.getBoolean("DEBUG", false);
         PRACTICE_ROBOT = Preferences.getBoolean("PRACTICE_ROBOT", true);
+
+        if (PRACTICE_ROBOT) {
+            kFeetToMeterFactor = 25;
+        } else { 
+            // Competition bot
+            kFeetToMeterFactor = 25;
+        }
     }
 }
