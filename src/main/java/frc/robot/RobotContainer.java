@@ -31,7 +31,7 @@ public class RobotContainer {
   private static RobotContainer m_robotContainer = new RobotContainer();
 
   public final Lights m_lights = new Lights();
-  public final Vision m_vision = new Vision();
+  public final Vision m_vision = new Vision("MainC");
   public final Schlucker m_schlucker = new Schlucker();
   public final Arm m_arm = new Arm();
   public final Chassis m_chassis = new Chassis();
