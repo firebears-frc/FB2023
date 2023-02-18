@@ -73,6 +73,8 @@ public class Chassis extends SubsystemBase {
 
         rightEncoder = rightFrontMotor.getEncoder();
         leftEncoder = leftFrontMotor.getEncoder();
+        leftEncoder.setPositionConversionFactor(1.0/kFeetToMeterFactor);
+        rightEncoder.setPositionConversionFactor(1.0/kFeetToMeterFactor);
         
         try {
             navX = new AHRS(SPI.Port.kMXP);
@@ -112,11 +114,11 @@ public class Chassis extends SubsystemBase {
     }
 
     public double leftDistanceTraveled() {
-        return (leftEncoder.getPosition() - leftOffSet) / kFeetToMeterFactor;
+        return (leftEncoder.getPosition() - leftOffSet);
     }
 
     public double rightDistanceTraveled() {
-        return (rightEncoder.getPosition() - rightOffSet) / kFeetToMeterFactor;
+        return (rightEncoder.getPosition() - rightOffSet);
     }
 
     public void resetEncoder() {
