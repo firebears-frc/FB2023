@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import static frc.robot.util.Config.cleanAllPreferences;
 import static frc.robot.util.Config.loadConfiguration;
 import static frc.robot.util.Config.printPreferences;
@@ -32,7 +34,9 @@ public class Constants {
             kFeetToMeterFactor = 25;
         } else { 
             // Competition bot
-            kFeetToMeterFactor = 25;
+            kFeetToMeterFactor = -20000;
+            
         }
+        System.out.println("kFeetToMeterFactor = " + kFeetToMeterFactor);
     }
 }

@@ -30,11 +30,11 @@ public class RobotContainer {
 
   private static RobotContainer m_robotContainer = new RobotContainer();
 
-  public final Lights m_lights = new Lights();
-  public final Vision m_vision = new Vision("MainC");
-  public final Schlucker m_schlucker = new Schlucker();
-  public final Arm m_arm = new Arm();
-  public final Chassis m_chassis = new Chassis();
+  public final Lights m_lights;
+  public final Vision m_vision;
+  public final Schlucker m_schlucker;
+  public final Arm m_arm;
+  public final Chassis m_chassis;
 
   private final XboxController xboxController2 = new XboxController(1);
   private final XboxController xboxController1 = new XboxController(0);
@@ -42,6 +42,12 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   private RobotContainer() {
+
+    m_lights = new Lights();
+    m_vision = new Vision("MainC");
+    m_schlucker = new Schlucker();
+    m_arm = new Arm();
+    m_chassis = new Chassis();
 
     SmartDashboard.putData("Autonomous Command", new AutonomousCommand());
 
