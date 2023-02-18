@@ -34,7 +34,7 @@ public class Constants {
             kFeetToMeterFactor = 25;
         } else { 
             // Competition bot
-            kFeetToMeterFactor = -20000;
+            kFeetToMeterFactor = 20;
             
         }
         System.out.println("kFeetToMeterFactor = " + kFeetToMeterFactor);
