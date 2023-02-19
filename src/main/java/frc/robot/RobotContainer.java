@@ -1,19 +1,15 @@
 package frc.robot;
 
-import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -27,34 +23,14 @@ public class RobotContainer {
 
   private static RobotContainer m_robotContainer = null;
 
-  public final Lights m_lights;
-  public final Vision m_vision;
-  public final Schlucker m_schlucker;
-  public final Arm m_arm;
   public final Chassis m_chassis;
-
-  private final XboxController xboxController2 = new XboxController(1);
-  private final XboxController xboxController1 = new XboxController(0);
 
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   private RobotContainer() {
-
-    m_lights = new Lights();
-    m_vision = new Vision("MainC");
-    m_schlucker = new Schlucker();
-    m_arm = new Arm();
     m_chassis = new Chassis();
 
-    SmartDashboard.putData("Autonomous Command", new AutonomousCommand());
-
     configureButtonBindings();
-
-    m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
-
-    m_chooser.setDefaultOption("Autonomous Command", new AutonomousCommand());
-
-    SmartDashboard.putData("Auto Mode", m_chooser);
 
     displayGitInfo();
   }
@@ -101,17 +77,6 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    JoystickButton yButton = new JoystickButton(xboxController1, XboxController.Button.kY.value);
-    yButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
-
-  }
-
-  public XboxController getxboxController1() {
-    return xboxController1;
-  }
-
-  public XboxController getxboxController2() {
-    return xboxController2;
   }
 
   /**
@@ -120,5 +85,4 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return m_chooser.getSelected();
   }
-
 }
