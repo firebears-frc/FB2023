@@ -31,7 +31,7 @@ public class Chassis extends SubsystemBase {
         private static double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
         private static double WHEEL_DIAMETER = 0.2032; // 8 inches
         private static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-        public static double CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
+        public static double CONVERSION_FACTOR = GEAR_RATIO / WHEEL_CIRCUMFERENCE;
         public static double TRACK_WIDTH = 0.96679; // Meters
 
         private static double P = 0.00036534;
