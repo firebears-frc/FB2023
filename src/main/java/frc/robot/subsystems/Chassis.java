@@ -31,7 +31,8 @@ public class Chassis extends SubsystemBase {
         private static double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
         private static double WHEEL_DIAMETER = 0.2032; // 8 inches
         private static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-        public static double CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
+        private static double METERS_PER_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
+        public static double CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // 60 seconds
         public static double TRACK_WIDTH = 0.96679; // Meters
 
         private static double P = 0.00036534;
@@ -53,7 +54,7 @@ public class Chassis extends SubsystemBase {
     public Chassis() {
         rightFrontMotor = new CANSparkMax(Constants.RIGHT_FRONT_PORT, MotorType.kBrushless);
         rightFrontMotor.restoreFactoryDefaults();
-        rightFrontMotor.setInverted(false);
+        rightFrontMotor.setInverted(true);
         rightFrontMotor.setIdleMode(IdleMode.kCoast);
         rightFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
@@ -67,7 +68,7 @@ public class Chassis extends SubsystemBase {
 
         rightBackMotor = new CANSparkMax(Constants.RIGHT_BACK_PORT, MotorType.kBrushless);
         rightBackMotor.restoreFactoryDefaults();
-        rightBackMotor.setInverted(false);
+        rightBackMotor.setInverted(true);
         rightBackMotor.setIdleMode(IdleMode.kCoast);
         rightBackMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         rightBackMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
@@ -76,7 +77,7 @@ public class Chassis extends SubsystemBase {
 
         leftFrontMotor = new CANSparkMax(Constants.LEFT_FRONT_PORT, MotorType.kBrushless);
         leftFrontMotor.restoreFactoryDefaults();
-        leftFrontMotor.setInverted(true);
+        leftFrontMotor.setInverted(false);
         leftFrontMotor.setIdleMode(IdleMode.kCoast);
         leftFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
@@ -90,7 +91,7 @@ public class Chassis extends SubsystemBase {
 
         leftBackMotor = new CANSparkMax(Constants.LEFT_BACK_PORT, MotorType.kBrushless);
         leftBackMotor.restoreFactoryDefaults();
-        leftBackMotor.setInverted(true);
+        leftBackMotor.setInverted(false);
         leftBackMotor.setIdleMode(IdleMode.kCoast);
         leftBackMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         leftBackMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
@@ -113,13 +114,13 @@ public class Chassis extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
-        SmartDashboard.putNumber("Forward", chassisSpeeds.vxMetersPerSecond);
-        SmartDashboard.putNumber("Rotation", chassisSpeeds.omegaRadiansPerSecond);
+        // SmartDashboard.putNumber("Forward", chassisSpeeds.vxMetersPerSecond);
+        // SmartDashboard.putNumber("Rotation", chassisSpeeds.omegaRadiansPerSecond);
 
         DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 
-        SmartDashboard.putNumber("Left", wheelSpeeds.leftMetersPerSecond);
-        SmartDashboard.putNumber("Right", wheelSpeeds.rightMetersPerSecond);
+        // SmartDashboard.putNumber("Left", wheelSpeeds.leftMetersPerSecond);
+        // SmartDashboard.putNumber("Right", wheelSpeeds.rightMetersPerSecond);
 
         // rightPID.setReference(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
         // leftPID.setReference(wheelSpeeds.leftMetersPerSecond, ControlType.kVelocity);
