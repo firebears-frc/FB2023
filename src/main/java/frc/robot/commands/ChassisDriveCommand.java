@@ -1,8 +1,7 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Chassis;
 
@@ -23,9 +22,9 @@ public class ChassisDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        XboxController xboxController = RobotContainer.getInstance().getxboxController1();
-        double speed = xboxController.getLeftY();
-        double rotation = xboxController.getRightX();
+        Joystick joystick = RobotContainer.getInstance().getJoystick();
+        double speed = joystick.getY();
+        double rotation = joystick.getX();
         m_chassis.arcadeDrive(speed, rotation);
     }
 
