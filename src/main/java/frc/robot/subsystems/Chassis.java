@@ -28,6 +28,10 @@ public class Chassis extends SubsystemBase {
         public static int FREE_CURRENT_LIMIT = 20;
         public static double SECONDARY_CURRENT_LIMIT = 60.0;
 
+        private static double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
+        private static double WHEEL_DIAMETER = 0.2032; // 8 inches
+        private static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
+        public static double CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
         public static double TRACK_WIDTH = 0.96679; // Meters
 
         private static double P = 0.00036534;
@@ -54,6 +58,7 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         rightEncoder = rightFrontMotor.getEncoder();
+        rightEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
         rightPID = rightFrontMotor.getPIDController();
         rightPID.setP(Constants.P);
         rightPID.setI(Constants.I);
@@ -76,6 +81,7 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         leftEncoder = leftFrontMotor.getEncoder();
+        leftEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
         leftPID = leftFrontMotor.getPIDController();
         leftPID.setP(Constants.P);
         leftPID.setI(Constants.I);
@@ -98,6 +104,12 @@ public class Chassis extends SubsystemBase {
         } catch (RuntimeException ex) {
             DriverStation.reportError(ex.getMessage(), true);
         }
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Left Velocity", leftEncoder.getVelocity());
+        SmartDashboard.putNumber("Right Velocity", rightEncoder.getVelocity());
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
