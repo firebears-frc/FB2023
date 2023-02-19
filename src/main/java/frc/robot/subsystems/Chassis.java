@@ -25,7 +25,7 @@ import com.revrobotics.RelativeEncoder;
 public class Chassis extends SubsystemBase {
     private static int STALL_CURRENT_LIMIT = 30;
     private static int FREE_CURRENT_LIMIT = 20;
-    private static int SECONDARY_CURRENT_LIMIT = 50;
+    private static int SECONDARY_CURRENT_LIMIT = 60;
 
     private CANSparkMax rightFrontMotor;
     private CANSparkMax rightBackMotor;
