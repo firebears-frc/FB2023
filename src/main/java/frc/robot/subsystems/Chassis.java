@@ -23,6 +23,9 @@ import static frc.robot.Constants.*;
 import com.revrobotics.RelativeEncoder; 
 
 public class Chassis extends SubsystemBase {
+    private static int STALL_CURRENT_LIMIT = 50;
+    private static int FREE_CURRENT_LIMIT = 20;
+    private static int SECONDARY_CURRENT_LIMIT = 60;
 
     private CANSparkMax rightFrontMotor;
     private CANSparkMax rightBackMotor;
@@ -46,12 +49,18 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor.restoreFactoryDefaults();
         rightFrontMotor.setInverted(false);
         rightFrontMotor.setIdleMode(IdleMode.kCoast);
+        rightFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
+        rightFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
+        rightFrontMotor.burnFlash();
 
         rightBackMotor = new CANSparkMax(DriveConstants.kRightMotor2Port, MotorType.kBrushless);
 
         rightBackMotor.restoreFactoryDefaults();
         rightBackMotor.setInverted(false);
         rightBackMotor.setIdleMode(IdleMode.kCoast);
+        rightBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
+        rightBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
+        rightBackMotor.burnFlash();
 
         rightMotors = new MotorControllerGroup(rightFrontMotor, rightBackMotor);
         addChild("rightMotors", rightMotors);
@@ -61,12 +70,18 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor.restoreFactoryDefaults();
         leftFrontMotor.setInverted(true);
         leftFrontMotor.setIdleMode(IdleMode.kCoast);
+        leftFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
+        leftFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
+        leftFrontMotor.burnFlash();
 
         leftBackMotor = new CANSparkMax(DriveConstants.kLeftMotor2Port, MotorType.kBrushless);
 
         leftBackMotor.restoreFactoryDefaults();
         leftBackMotor.setInverted(true);
         leftBackMotor.setIdleMode(IdleMode.kCoast);
+        leftBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
+        leftBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
+        leftBackMotor.burnFlash();
 
         leftMotors = new MotorControllerGroup(leftFrontMotor, leftBackMotor);
         addChild("leftMotors", leftMotors);
