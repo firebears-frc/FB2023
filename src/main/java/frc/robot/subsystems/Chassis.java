@@ -31,7 +31,7 @@ public class Chassis extends SubsystemBase {
         private static double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
         private static double WHEEL_DIAMETER = 0.2032; // 8 inches
         private static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-        public static double CONVERSION_FACTOR = GEAR_RATIO / WHEEL_CIRCUMFERENCE;
+        public static double CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
         public static double TRACK_WIDTH = 0.96679; // Meters
 
         private static double P = 0.00036534;
@@ -59,10 +59,10 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         rightEncoder = rightFrontMotor.getEncoder();
         rightEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
-        rightPID = rightFrontMotor.getPIDController();
-        rightPID.setP(Constants.P);
-        rightPID.setI(Constants.I);
-        rightPID.setD(Constants.D);
+        //rightPID = rightFrontMotor.getPIDController();
+        //rightPID.setP(Constants.P);
+        //rightPID.setI(Constants.I);
+        //rightPID.setD(Constants.D);
         rightFrontMotor.burnFlash();
 
         rightBackMotor = new CANSparkMax(Constants.RIGHT_BACK_PORT, MotorType.kBrushless);
@@ -82,10 +82,10 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         leftEncoder = leftFrontMotor.getEncoder();
         leftEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
-        leftPID = leftFrontMotor.getPIDController();
-        leftPID.setP(Constants.P);
-        leftPID.setI(Constants.I);
-        leftPID.setD(Constants.D);
+        //leftPID = leftFrontMotor.getPIDController();
+        //leftPID.setP(Constants.P);
+        //leftPID.setI(Constants.I);
+        //leftPID.setD(Constants.D);
         leftFrontMotor.burnFlash();
 
         leftBackMotor = new CANSparkMax(Constants.LEFT_BACK_PORT, MotorType.kBrushless);
@@ -121,14 +121,16 @@ public class Chassis extends SubsystemBase {
         SmartDashboard.putNumber("Left", wheelSpeeds.leftMetersPerSecond);
         SmartDashboard.putNumber("Right", wheelSpeeds.rightMetersPerSecond);
 
-        rightPID.setReference(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
-        leftPID.setReference(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
+        // rightPID.setReference(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
+        // leftPID.setReference(wheelSpeeds.leftMetersPerSecond, ControlType.kVelocity);
+        rightFrontMotor.set(wheelSpeeds.rightMetersPerSecond / OperatorInterface.Constants.MAX_VELOCITY);
+        leftFrontMotor.set(wheelSpeeds.leftMetersPerSecond / OperatorInterface.Constants.MAX_VELOCITY);
     }
 
     public static class OperatorInterface {
         private static class Constants {
             private static double MAX_VELOCITY = 3; // Meters per second
-            private static double MAX_ANGULAR_VELOCITY = 16; // Radians per second
+            private static double MAX_ANGULAR_VELOCITY = 1; // Radians per second
         }
 
         public static ChassisSpeeds toChassisSpeeds(double forward, double rotation) {
