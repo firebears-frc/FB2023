@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Chassis extends SubsystemBase {
     private static class Constants {
@@ -99,10 +100,17 @@ public class Chassis extends SubsystemBase {
         }
     }
 
-    public void drive(ChassisSpeeds chassisSpeed) {
-        DifferentialDriveWheelSpeeds wheelSpeed = kinematics.toWheelSpeeds(chassisSpeed);
-        rightPID.setReference(wheelSpeed.rightMetersPerSecond, ControlType.kVelocity);
-        leftPID.setReference(wheelSpeed.rightMetersPerSecond, ControlType.kVelocity);
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        SmartDashboard.putNumber("Forward", chassisSpeeds.vxMetersPerSecond);
+        SmartDashboard.putNumber("Rotation", chassisSpeeds.omegaRadiansPerSecond);
+
+        DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+
+        SmartDashboard.putNumber("Left", wheelSpeeds.leftMetersPerSecond);
+        SmartDashboard.putNumber("Right", wheelSpeeds.rightMetersPerSecond);
+
+        rightPID.setReference(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
+        leftPID.setReference(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
     }
 
     public static class OperatorInterface {
