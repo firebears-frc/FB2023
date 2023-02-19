@@ -2,23 +2,43 @@ package frc.robot;
 
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Joystick;
 
 public class RobotContainer {
-    private static RobotContainer m_robotContainer = null;
-    public final Chassis chassis;
+    private static class Constants {
+        public static int JOYSTICK_PORT = 0;
+    }
 
-    private RobotContainer() {
+    private final Chassis chassis;
+    private final Joystick joystick;
+
+    public RobotContainer() {
         chassis = new Chassis();
+        joystick = new Joystick(Constants.JOYSTICK_PORT);
 
         configureButtonBindings();
 
         displayGitInfo();
+    }
+
+    private void configureButtonBindings() {
+        chassis.setDefaultCommand(new RunCommand(() -> {
+            double forward = joystick.getY() * -1.0;
+            double rotation = joystick.getX() * -1.0;
+
+            ChassisSpeeds speeds = Chassis.OperatorInterface.toChassisSpeeds(
+                    forward, rotation);
+
+            chassis.drive(speeds);
+        }, chassis));
     }
 
     private String getFileContents(String filename) {
@@ -47,15 +67,5 @@ public class RobotContainer {
         // Get the commit hash and display on the dashboard
         String commitHash = getFileContents("commit.txt");
         SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
-    }
-
-    public static RobotContainer getInstance() {
-        if (m_robotContainer == null) {
-            m_robotContainer = new RobotContainer();
-        }
-        return m_robotContainer;
-    }
-
-    private void configureButtonBindings() {
     }
 }
