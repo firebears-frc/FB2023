@@ -36,8 +36,8 @@ public class Chassis extends SubsystemBase {
         private static double CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // The raw units are RPM
         private static double TRACK_WIDTH = 0.96679; // Meters
 
-        private static double MAX_VELOCITY = 3; // Meters per second
-        private static double MAX_ANGULAR_VELOCITY = 10; // Radians per second
+        private static double MAX_VELOCITY = 5; // Meters per second
+        private static double MAX_ANGULAR_VELOCITY = 4; // Radians per second
 
         // Values spit out of sysid
         private static double P = 0.0064971;
