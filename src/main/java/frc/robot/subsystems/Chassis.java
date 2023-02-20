@@ -37,7 +37,7 @@ public class Chassis extends SubsystemBase {
         private static double TRACK_WIDTH = 0.96679; // Meters
 
         private static double MAX_VELOCITY = 5; // Meters per second
-        private static double MAX_ANGULAR_VELOCITY = 4; // Radians per second
+        private static double MAX_ANGULAR_VELOCITY = 8; // Radians per second
 
         // Values spit out of sysid
         private static double P = 0.011179;
