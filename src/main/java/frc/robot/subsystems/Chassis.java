@@ -37,7 +37,7 @@ public class Chassis extends SubsystemBase {
         private static double MAX_VELOCITY = 3; // Meters per second
         private static double MAX_ANGULAR_VELOCITY = 10; // Radians per second
 
-        private static double P = 0.0064971;
+        private static double P = 0.01;
         private static double I = 0;
         private static double D = 0;
         private static double F = 1.0 / MAX_VELOCITY;
