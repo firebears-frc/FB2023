@@ -40,12 +40,12 @@ public class Chassis extends SubsystemBase {
         private static double MAX_ANGULAR_VELOCITY = 4; // Radians per second
 
         // Values spit out of sysid
-        private static double P = 0.0064971;
+        private static double P = 0.011179;
         private static double I = 0;
         private static double D = 0;
-        private static double S = 0.15413;
-        private static double V = 2.3095;
-        private static double A = 0.20914;
+        private static double S = 0.15473;
+        private static double V = 2.3007;
+        private static double A = 0.22029;
     }
 
     private CANSparkMax rightFrontMotor;
