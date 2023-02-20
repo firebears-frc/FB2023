@@ -8,6 +8,8 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -37,23 +39,31 @@ public class Chassis extends SubsystemBase {
         private static double MAX_VELOCITY = 3; // Meters per second
         private static double MAX_ANGULAR_VELOCITY = 10; // Radians per second
 
-        private static double P = 0.01;
+        // Values spit out of sysid
+        private static double P = 0.0064971;
         private static double I = 0;
         private static double D = 0;
-        private static double F = 1.0 / MAX_VELOCITY;
+        private static double S = 0.15413;
+        private static double V = 2.3095;
+        private static double A = 0.20914;
     }
 
     private CANSparkMax rightFrontMotor;
-    private SparkMaxPIDController rightPID;
-    private double rightSetpoint;
     private RelativeEncoder rightEncoder;
     private CANSparkMax rightBackMotor;
+    private double rightSetpoint;
+
     private CANSparkMax leftFrontMotor;
-    private SparkMaxPIDController leftPID;
-    private double leftSetpoint;
     private RelativeEncoder leftEncoder;
     private CANSparkMax leftBackMotor;
+    private double leftSetpoint;
+
+    private PIDController rightPID;
+    private SimpleMotorFeedforward rightFF;
+    private PIDController leftPID;
+    private SimpleMotorFeedforward leftFF;
     private DifferentialDriveKinematics kinematics;
+
     private AHRS navX;
 
     public Chassis() {
@@ -65,11 +75,6 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         rightEncoder = rightFrontMotor.getEncoder();
         rightEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
-        rightPID = rightFrontMotor.getPIDController();
-        rightPID.setP(Constants.P);
-        rightPID.setI(Constants.I);
-        rightPID.setD(Constants.D);
-        rightPID.setFF(Constants.F);
         rightFrontMotor.burnFlash();
 
         rightBackMotor = new CANSparkMax(Constants.RIGHT_BACK_PORT, MotorType.kBrushless);
@@ -89,11 +94,6 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         leftEncoder = leftFrontMotor.getEncoder();
         leftEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
-        leftPID = leftFrontMotor.getPIDController();
-        leftPID.setP(Constants.P);
-        leftPID.setI(Constants.I);
-        leftPID.setD(Constants.D);
-        leftPID.setFF(Constants.F);
         leftFrontMotor.burnFlash();
 
         leftBackMotor = new CANSparkMax(Constants.LEFT_BACK_PORT, MotorType.kBrushless);
@@ -105,6 +105,10 @@ public class Chassis extends SubsystemBase {
         leftBackMotor.follow(leftFrontMotor);
         leftBackMotor.burnFlash();
 
+        rightPID = new PIDController(Constants.P, Constants.I, Constants.D);
+        rightFF = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
+        leftPID = new PIDController(Constants.P, Constants.I, Constants.D);
+        leftFF = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
         kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
 
         try {
@@ -116,14 +120,27 @@ public class Chassis extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Left Setpoint", leftSetpoint);
         double leftVelocity = leftEncoder.getVelocity();
-        double rightVelocity = rightEncoder.getVelocity();
-
         SmartDashboard.putNumber("Left Velocity", leftVelocity);
-        SmartDashboard.putNumber("Right Velocity", rightVelocity);
+        double leftFFVoltage = leftFF.calculate(leftSetpoint);
+        SmartDashboard.putNumber("Left FF", leftFFVoltage);
+        double leftFBVoltage = leftPID.calculate(leftVelocity, leftSetpoint);
+        SmartDashboard.putNumber("Left FB", leftFBVoltage);
+        double leftVoltage = leftFFVoltage + leftFBVoltage;
+        SmartDashboard.putNumber("Left V", leftVoltage);
+        leftFrontMotor.setVoltage(leftVoltage);
 
-        SmartDashboard.putNumber("Left Error", leftVelocity - leftSetpoint);
-        SmartDashboard.putNumber("Right Error", rightVelocity - rightSetpoint);
+        SmartDashboard.putNumber("Right Setpoint", rightSetpoint);
+        double rightVelocity = rightEncoder.getVelocity();
+        SmartDashboard.putNumber("Right Velocity", rightVelocity);
+        double rightFFVoltage = rightFF.calculate(rightSetpoint);
+        SmartDashboard.putNumber("Right FF", rightFFVoltage);
+        double rightFBVoltage = rightPID.calculate(rightVelocity, rightSetpoint);
+        SmartDashboard.putNumber("Right FB", rightFBVoltage);
+        double rightVoltage = rightFFVoltage + rightFBVoltage;
+        SmartDashboard.putNumber("Right V", rightVoltage);
+        rightFrontMotor.setVoltage(rightVoltage);
     }
 
     public void drive(double forward, double rotation) {
@@ -140,11 +157,5 @@ public class Chassis extends SubsystemBase {
     public void drive(DifferentialDriveWheelSpeeds wheelSpeeds) {
         leftSetpoint = wheelSpeeds.leftMetersPerSecond;
         rightSetpoint = wheelSpeeds.rightMetersPerSecond;
-
-        SmartDashboard.putNumber("Left Setpoint", leftSetpoint);
-        SmartDashboard.putNumber("Right Setpoint", rightSetpoint);
-
-        rightPID.setReference(rightSetpoint, CANSparkMax.ControlType.kVelocity);
-        leftPID.setReference(leftSetpoint, CANSparkMax.ControlType.kVelocity);
     }
 }
