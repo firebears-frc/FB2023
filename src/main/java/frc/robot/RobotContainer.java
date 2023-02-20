@@ -34,10 +34,7 @@ public class RobotContainer {
             double forward = joystick.getY() * -1.0;
             double rotation = joystick.getX() * -1.0;
 
-            ChassisSpeeds speeds = Chassis.OperatorInterface.toChassisSpeeds(
-                    forward, rotation);
-
-            chassis.drive(speeds);
+            chassis.drive(forward, rotation);
         }, chassis));
     }
 
