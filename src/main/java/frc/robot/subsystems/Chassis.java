@@ -45,10 +45,12 @@ public class Chassis extends SubsystemBase {
 
     private CANSparkMax rightFrontMotor;
     private SparkMaxPIDController rightPID;
+    private double rightSetpoint;
     private RelativeEncoder rightEncoder;
     private CANSparkMax rightBackMotor;
     private CANSparkMax leftFrontMotor;
     private SparkMaxPIDController leftPID;
+    private double leftSetpoint;
     private RelativeEncoder leftEncoder;
     private CANSparkMax leftBackMotor;
     private DifferentialDriveKinematics kinematics;
@@ -114,8 +116,14 @@ public class Chassis extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Left Velocity", leftEncoder.getVelocity());
-        SmartDashboard.putNumber("Right Velocity", rightEncoder.getVelocity());
+        double leftVelocity = leftEncoder.getVelocity();
+        double rightVelocity = rightEncoder.getVelocity();
+
+        SmartDashboard.putNumber("Left Velocity", leftVelocity);
+        SmartDashboard.putNumber("Right Velocity", rightVelocity);
+
+        SmartDashboard.putNumber("Left Error", leftVelocity - leftSetpoint);
+        SmartDashboard.putNumber("Right Error", rightVelocity - rightSetpoint);
     }
 
     public void drive(double forward, double rotation) {
@@ -126,17 +134,17 @@ public class Chassis extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
-        SmartDashboard.putNumber("Forward", chassisSpeeds.vxMetersPerSecond);
-        SmartDashboard.putNumber("Rotation", chassisSpeeds.omegaRadiansPerSecond);
-
         drive(kinematics.toWheelSpeeds(chassisSpeeds));
     }
 
     public void drive(DifferentialDriveWheelSpeeds wheelSpeeds) {
-        SmartDashboard.putNumber("Left", wheelSpeeds.leftMetersPerSecond);
-        SmartDashboard.putNumber("Right", wheelSpeeds.rightMetersPerSecond);
+        leftSetpoint = wheelSpeeds.leftMetersPerSecond;
+        rightSetpoint = wheelSpeeds.rightMetersPerSecond;
 
-        rightPID.setReference(wheelSpeeds.rightMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-        leftPID.setReference(wheelSpeeds.leftMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+        SmartDashboard.putNumber("Left Setpoint", leftSetpoint);
+        SmartDashboard.putNumber("Right Setpoint", rightSetpoint);
+
+        rightPID.setReference(rightSetpoint, CANSparkMax.ControlType.kVelocity);
+        leftPID.setReference(leftSetpoint, CANSparkMax.ControlType.kVelocity);
     }
 }
