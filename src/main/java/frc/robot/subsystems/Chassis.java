@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Chassis extends SubsystemBase {
-    private static class Constants {
+    public static class Constants {
         private static int RIGHT_FRONT_PORT = 15;
         private static int RIGHT_BACK_PORT = 17;
         private static int LEFT_FRONT_PORT = 16;
@@ -38,7 +38,8 @@ public class Chassis extends SubsystemBase {
         private static double CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // The raw units are RPM
         private static double TRACK_WIDTH = 0.96679; // Meters
 
-        private static double MAX_VELOCITY = 5; // Meters per second
+        public static double MAX_VELOCITY = 5; // Meters per second
+        public static double MAX_ACCELERATION = 5; // Meters per second squared
         private static double MAX_ANGULAR_VELOCITY = 8; // Radians per second
 
         // Values spit out of sysid
