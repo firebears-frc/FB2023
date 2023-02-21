@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Chassis extends SubsystemBase {
@@ -66,6 +67,7 @@ public class Chassis extends SubsystemBase {
     private DifferentialDriveKinematics kinematics;
     private AHRS navX;
     private DifferentialDriveOdometry odometry;
+    private Field2d field;
 
     public Chassis() {
         rightFrontMotor = new CANSparkMax(Constants.RIGHT_FRONT_PORT, MotorType.kBrushless);
@@ -122,6 +124,7 @@ public class Chassis extends SubsystemBase {
                 navX.getRotation2d(),
                 leftEncoder.getPosition(),
                 rightEncoder.getPosition());
+        field = new Field2d();
     }
 
     @Override
@@ -154,6 +157,7 @@ public class Chassis extends SubsystemBase {
         SmartDashboard.putNumber("Right Distance", rightDistance);
 
         odometry.update(navX.getRotation2d(), leftDistance, rightDistance);
+        field.setRobotPose(odometry.getPoseMeters());
     }
 
     public void resetPose(Pose2d pose) {
