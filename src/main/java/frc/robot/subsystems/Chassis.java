@@ -125,6 +125,7 @@ public class Chassis extends SubsystemBase {
                 leftEncoder.getPosition(),
                 rightEncoder.getPosition());
         field = new Field2d();
+        SmartDashboard.putData(field);
     }
 
     @Override
