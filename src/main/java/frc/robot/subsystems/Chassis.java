@@ -4,14 +4,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import com.kauailabs.navx.frc.AHRS;
@@ -63,8 +64,8 @@ public class Chassis extends SubsystemBase {
     private PIDController leftPID;
     private SimpleMotorFeedforward leftFF;
     private DifferentialDriveKinematics kinematics;
-
     private AHRS navX;
+    private DifferentialDriveOdometry odometry;
 
     public Chassis() {
         rightFrontMotor = new CANSparkMax(Constants.RIGHT_FRONT_PORT, MotorType.kBrushless);
@@ -74,6 +75,7 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         rightEncoder = rightFrontMotor.getEncoder();
+        rightEncoder.setPositionConversionFactor(Constants.METERS_PER_MOTOR_ROTATION);
         rightEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
         rightFrontMotor.burnFlash();
 
@@ -93,6 +95,7 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         leftEncoder = leftFrontMotor.getEncoder();
+        leftEncoder.setPositionConversionFactor(Constants.METERS_PER_MOTOR_ROTATION);
         leftEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
         leftFrontMotor.burnFlash();
 
@@ -110,12 +113,15 @@ public class Chassis extends SubsystemBase {
         leftPID = new PIDController(Constants.P, Constants.I, Constants.D);
         leftFF = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
         kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
-
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
             DriverStation.reportError(ex.getMessage(), true);
         }
+        odometry = new DifferentialDriveOdometry(
+                navX.getRotation2d(),
+                leftEncoder.getPosition(),
+                rightEncoder.getPosition());
     }
 
     @Override
@@ -128,7 +134,7 @@ public class Chassis extends SubsystemBase {
         double leftFBVoltage = leftPID.calculate(leftVelocity, leftSetpoint);
         SmartDashboard.putNumber("Left FB", leftFBVoltage);
         double leftVoltage = leftFFVoltage + leftFBVoltage;
-        SmartDashboard.putNumber("Left V", leftVoltage);
+        SmartDashboard.putNumber("Left Voltage", leftVoltage);
         leftFrontMotor.setVoltage(leftVoltage);
 
         SmartDashboard.putNumber("Right Setpoint", rightSetpoint);
@@ -139,8 +145,26 @@ public class Chassis extends SubsystemBase {
         double rightFBVoltage = rightPID.calculate(rightVelocity, rightSetpoint);
         SmartDashboard.putNumber("Right FB", rightFBVoltage);
         double rightVoltage = rightFFVoltage + rightFBVoltage;
-        SmartDashboard.putNumber("Right V", rightVoltage);
+        SmartDashboard.putNumber("Right Voltage", rightVoltage);
         rightFrontMotor.setVoltage(rightVoltage);
+
+        double leftDistance = leftEncoder.getPosition();
+        SmartDashboard.putNumber("Left Distance", leftDistance);
+        double rightDistance = rightEncoder.getPosition();
+        SmartDashboard.putNumber("Right Distance", rightDistance);
+
+        odometry.update(navX.getRotation2d(), leftDistance, rightDistance);
+    }
+
+    public void resetPose(Pose2d pose) {
+        navX.reset();
+        leftEncoder.setPosition(0.0);
+        rightEncoder.setPosition(0.0);
+        odometry.resetPosition(
+                navX.getRotation2d(),
+                leftEncoder.getPosition(),
+                rightEncoder.getPosition(),
+                pose);
     }
 
     public void drive(double forward, double rotation) {
