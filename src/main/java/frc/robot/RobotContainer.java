@@ -34,7 +34,7 @@ public class RobotContainer {
             double forward = joystick.getY() * -1.0;
             double rotation = joystick.getX() * -1.0;
 
-            chassis.drive(forward, rotation);
+            chassis.arcadeDrive(forward, rotation);
         }, chassis));
     }
 

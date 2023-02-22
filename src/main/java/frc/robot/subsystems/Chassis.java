@@ -172,7 +172,7 @@ public class Chassis extends SubsystemBase {
                 pose);
     }
 
-    public void drive(double forward, double rotation) {
+    public void arcadeDrive(double forward, double rotation) {
         drive(new ChassisSpeeds(
                 forward * Constants.MAX_VELOCITY,
                 0, // "Driving sideways is a waste of time"
