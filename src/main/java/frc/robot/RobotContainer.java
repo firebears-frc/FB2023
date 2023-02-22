@@ -101,8 +101,20 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    JoystickButton yButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
-    yButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
+    JoystickButton twoButton = new JoystickButton(joystick, 2);
+    twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
+
+    JoystickButton threeButton = new JoystickButton(joystick, 3);
+    threeButton.onTrue(new ChassisRotateToAngleCommand (90, m_chassis ) );
+
+    JoystickButton fourButton = new JoystickButton(joystick, 4);
+    fourButton.onTrue(new ChassisRotateToAngleCommand (-90, m_chassis ) );
+
+    JoystickButton fiveButton = new JoystickButton(joystick, 5);
+    fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
+
+    JoystickButton sixButton = new JoystickButton(joystick, 6);
+    sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
 
   }
 
