@@ -33,8 +33,8 @@ public class RobotContainer {
   public final Arm m_arm;
   public final Chassis m_chassis;
 
-  private final XboxController xboxController2 = new XboxController(1);
-  private final XboxController xboxController1 = new XboxController(0);
+  private final XboxController xboxController = new XboxController(1);
+  private final Joystick joystick = new Joystick(0);
 
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
@@ -101,17 +101,17 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    JoystickButton yButton = new JoystickButton(xboxController1, XboxController.Button.kY.value);
+    JoystickButton yButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
     yButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
   }
 
-  public XboxController getxboxController1() {
-    return xboxController1;
+  public XboxController getXboxController() {
+    return xboxController;
   }
 
-  public XboxController getxboxController2() {
-    return xboxController2;
+  public Joystick getJoystick() {
+    return joystick;
   }
 
   /**
