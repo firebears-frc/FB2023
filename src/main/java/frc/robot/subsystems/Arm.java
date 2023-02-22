@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -39,11 +40,15 @@ public class Arm extends SubsystemBase {
     }
 
     public double getShoulderAngle() {
-        return shoulderEncoder.getPosition();
+        double angle = shoulderEncoder.getPosition();
+        SmartDashboard.putNumber("Shoulder Angle", angle);
+        return angle;
     }
 
     public double getElbowAngle() {
-        return elbowEncoder.getPosition();
+        double angle = elbowEncoder.getPosition();
+        SmartDashboard.putNumber("Elbow Angle", angle);
+        return angle;
     }
 
     public void setShoulderSetpoint(double setpoint) {
