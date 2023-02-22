@@ -11,7 +11,7 @@ public class Schlucker extends SubsystemBase {
     private CANSparkMax shluckerMotor;
 
     public Schlucker() {
-        shluckerMotor = new CANSparkMax(5, MotorType.kBrushed);
+        shluckerMotor = new CANSparkMax(6, MotorType.kBrushed);
 
         shluckerMotor.restoreFactoryDefaults();
         shluckerMotor.setInverted(false);
