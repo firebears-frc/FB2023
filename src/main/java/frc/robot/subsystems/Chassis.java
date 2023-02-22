@@ -172,6 +172,10 @@ public class Chassis extends SubsystemBase {
                 pose);
     }
 
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
+    }
+
     public void arcadeDrive(double forward, double rotation) {
         drive(new ChassisSpeeds(
                 forward * Constants.MAX_VELOCITY,
@@ -180,11 +184,16 @@ public class Chassis extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
-        drive(kinematics.toWheelSpeeds(chassisSpeeds));
+        tankDrive(kinematics.toWheelSpeeds(chassisSpeeds));
     }
 
-    public void drive(DifferentialDriveWheelSpeeds wheelSpeeds) {
+    public void tankDrive(DifferentialDriveWheelSpeeds wheelSpeeds) {
         leftSetpoint = wheelSpeeds.leftMetersPerSecond;
         rightSetpoint = wheelSpeeds.rightMetersPerSecond;
+    }
+
+    public void tankDrive(double leftSpeed, double rightSpeed) {
+        leftSetpoint = leftSpeed;
+        rightSetpoint = rightSpeed;
     }
 }
