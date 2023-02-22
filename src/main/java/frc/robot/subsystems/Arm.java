@@ -5,13 +5,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 public class Arm extends SubsystemBase {
 
     private CANSparkMax elbowMotor;
     private CANSparkMax shoulderMotor1;
     private CANSparkMax shoulderMotor2;
+    private SparkMaxAbsoluteEncoder elbowEncoder;
+    private SparkMaxAbsoluteEncoder shoulderEncoder;
 
     public Arm() {
         elbowMotor = new CANSparkMax(7, MotorType.kBrushless);
@@ -35,11 +39,11 @@ public class Arm extends SubsystemBase {
     }
 
     public double getShoulderAngle() {
-        return 0;
+        return shoulderEncoder.getPosition();
     }
 
     public double getElbowAngle() {
-        return 0;
+        return elbowEncoder.getPosition();
     }
 
     public void setShoulderSetpoint(double setpoint) {
