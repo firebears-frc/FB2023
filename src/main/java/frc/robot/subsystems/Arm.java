@@ -34,20 +34,18 @@ public class Arm extends SubsystemBase {
         shoulderMotor2 = new CANSparkMax(13, MotorType.kBrushless);
 
         shoulderMotor2.restoreFactoryDefaults();
-        shoulderMotor2.setInverted(false);
+        shoulderMotor2.setInverted(true);
         shoulderMotor2.setIdleMode(IdleMode.kBrake);
 
     }
 
     public double getShoulderAngle() {
         double angle = shoulderEncoder.getPosition();
-        SmartDashboard.putNumber("Shoulder Angle", angle);
         return angle;
     }
 
     public double getElbowAngle() {
         double angle = elbowEncoder.getPosition();
-        SmartDashboard.putNumber("Elbow Angle", angle);
         return angle;
     }
 
@@ -61,7 +59,8 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        SmartDashboard.putNumber("Shoulder Angle", getShoulderAngle());
+        SmartDashboard.putNumber("Elbow Angle", getElbowAngle());
     }
 
     @Override
