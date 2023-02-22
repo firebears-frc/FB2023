@@ -22,33 +22,33 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Chassis extends SubsystemBase {
     public static class Constants {
-        private static int RIGHT_FRONT_PORT = 15;
-        private static int RIGHT_BACK_PORT = 17;
-        private static int LEFT_FRONT_PORT = 16;
-        private static int LEFT_BACK_PORT = 18;
+        private static final int RIGHT_FRONT_PORT = 15;
+        private static final int RIGHT_BACK_PORT = 17;
+        private static final int LEFT_FRONT_PORT = 16;
+        private static final int LEFT_BACK_PORT = 18;
 
-        private static int STALL_CURRENT_LIMIT = 30;
-        private static int FREE_CURRENT_LIMIT = 20;
-        private static double SECONDARY_CURRENT_LIMIT = 60.0;
+        private static final int STALL_CURRENT_LIMIT = 30;
+        private static final int FREE_CURRENT_LIMIT = 20;
+        private static final double SECONDARY_CURRENT_LIMIT = 60.0;
 
-        private static double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
-        private static double WHEEL_DIAMETER = 0.2032; // 8 inches
-        private static double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-        private static double METERS_PER_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
-        private static double CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // The raw units are RPM
-        private static double TRACK_WIDTH = 0.96679; // Meters
+        private static final double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
+        private static final double WHEEL_DIAMETER = 0.2032; // 8 inches
+        private static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
+        private static final double METERS_PER_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
+        private static final double CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // The raw units are RPM
+        private static final double TRACK_WIDTH = 0.96679; // Meters
 
-        public static double MAX_VELOCITY = 5; // Meters per second
-        public static double MAX_ACCELERATION = 5; // Meters per second squared
-        private static double MAX_ANGULAR_VELOCITY = 8; // Radians per second
+        public static final double MAX_VELOCITY = 5; // Meters per second
+        public static final double MAX_ACCELERATION = 5; // Meters per second squared
+        private static final double MAX_ANGULAR_VELOCITY = 8; // Radians per second
 
         // Values spit out of sysid
-        private static double P = 0.011179;
-        private static double I = 0;
-        private static double D = 0;
-        private static double S = 0.15473;
-        private static double V = 2.3007;
-        private static double A = 0.22029;
+        private static final double P = 0.011179;
+        private static final double I = 0;
+        private static final double D = 0;
+        protected static final double S = 0.15473;
+        protected static final double V = 2.3007;
+        protected static final double A = 0.22029;
     }
 
     private CANSparkMax rightFrontMotor;
@@ -65,7 +65,7 @@ public class Chassis extends SubsystemBase {
     private SimpleMotorFeedforward rightFF;
     private PIDController leftPID;
     private SimpleMotorFeedforward leftFF;
-    private DifferentialDriveKinematics kinematics;
+    protected DifferentialDriveKinematics kinematics;
     private AHRS navX;
     private DifferentialDriveOdometry odometry;
     private Field2d field;
