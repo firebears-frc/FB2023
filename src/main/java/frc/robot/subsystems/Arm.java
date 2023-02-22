@@ -12,7 +12,6 @@ public class Arm extends SubsystemBase {
     private CANSparkMax elbowMotor;
     private CANSparkMax shoulderMotor1;
     private CANSparkMax shoulderMotor2;
-    private CANSparkMax shulkerMotor;
 
     public Arm() {
         elbowMotor = new CANSparkMax(7, MotorType.kBrushless);
@@ -33,12 +32,21 @@ public class Arm extends SubsystemBase {
         shoulderMotor2.setInverted(false);
         shoulderMotor2.setIdleMode(IdleMode.kBrake);
 
-        shulkerMotor = new CANSparkMax(6, MotorType.kBrushed);
+    }
 
-        shulkerMotor.restoreFactoryDefaults();
-        shulkerMotor.setInverted(false);
-        shulkerMotor.setIdleMode(IdleMode.kBrake);
+    public double getShoulderAngle() {
+        return 0;
+    }
 
+    public double getElbowAngle() {
+        return 0;
+    }
+
+    public void setShoulderSetpoint(double setpoint) {
+
+    }
+
+    public void setElbowSetpoint(double setpoint) {
 
     }
 
