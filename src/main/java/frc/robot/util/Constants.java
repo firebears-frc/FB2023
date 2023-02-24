@@ -31,4 +31,24 @@ public class Constants {
         public static final double V = 2.3007;
         public static final double A = 0.22029;
     }
+
+    public static class ArmConstants {
+        public static final int SHOULDER_1_PORT = 1;
+        public static final int SHOULDER_2_PORT = 1;
+        public static final int ELBOW_PORT = 1;
+
+        public static final int STALL_CURRENT_LIMIT = 30;
+        public static final int FREE_CURRENT_LIMIT = 20;
+        public static final double SECONDARY_CURRENT_LIMIT = 60.0;
+
+        public static final double SHOULDER_P = 0.0001;
+        public static final double SHOULDER_I = 0;
+        public static final double SHOULDER_D = 0;
+        public static final double SHOULDER_OFFSET = 0; // degrees
+
+        public static final double ELBOW_P = 0.0001;
+        public static final double ELBOW_I = 0;
+        public static final double ELBOW_D = 0;
+        public static final double ELBOW_OFFSET = 0; // degrees
+    }
 }

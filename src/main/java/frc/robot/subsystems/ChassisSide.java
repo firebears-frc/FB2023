@@ -29,6 +29,7 @@ public class ChassisSide implements Sendable {
         encoder.setPositionConversionFactor(ChassisConstants.METERS_PER_MOTOR_ROTATION);
         encoder.setVelocityConversionFactor(ChassisConstants.VELOCITY_CONVERSION_FACTOR);
         frontMotor.burnFlash();
+
         backMotor = new CANSparkMax(backID, MotorType.kBrushless);
         backMotor.restoreFactoryDefaults();
         backMotor.setInverted(true);
