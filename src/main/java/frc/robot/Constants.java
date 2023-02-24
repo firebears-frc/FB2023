@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.util.Config.cleanAllPreferences;
 import static frc.robot.util.Config.loadConfiguration;
@@ -12,6 +11,9 @@ public class Constants {
     public static boolean DEBUG = false;
 
     public static boolean PRACTICE_ROBOT = true;
+
+    public static double ELBOW_ENCODER_OFFSET;
+    public static double SHOULDER_ENCODER_OFFSET;
 
     public static final class DriveConstants {
         public static final int kLeftMotor1Port = 16;
@@ -27,8 +29,11 @@ public class Constants {
         loadConfiguration(fileNames);
         printPreferences(System.out);
 
+        // The following values should be pulled from a config.properties file:
         DEBUG = Preferences.getBoolean("DEBUG", false);
         PRACTICE_ROBOT = Preferences.getBoolean("PRACTICE_ROBOT", true);
+        ELBOW_ENCODER_OFFSET = Preferences.getDouble("ELBOW_ENCODER_OFFSET", 0.0);
+        SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);
 
         if (PRACTICE_ROBOT) {
             kFeetToMeterFactor = 25;
