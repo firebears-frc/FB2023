@@ -2,12 +2,16 @@ package frc.robot;
 
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -35,6 +39,14 @@ public class RobotContainer {
 
             chassis.arcadeDrive(forward, rotation);
         }, chassis));
+    }
+
+    public Command getAutonomousCommand() {
+        Trajectory trajectory = chassis.generateTrajectory(
+            new Pose2d(0, 0, new Rotation2d()),
+            new Pose2d(1.0, 0, new Rotation2d())
+        );
+        return chassis.generateRamseteCommand(trajectory);
     }
 
     private String getFileContents(String filename) {

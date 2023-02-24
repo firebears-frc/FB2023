@@ -1,13 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.math.controller.PIDController;
+import frc.robot.util.Constants.ChassisConstants;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,52 +23,9 @@ import java.util.List;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Chassis extends SubsystemBase {
-    private static class Constants {
-        private static final int RIGHT_FRONT_PORT = 15;
-        private static final int RIGHT_BACK_PORT = 17;
-        private static final int LEFT_FRONT_PORT = 16;
-        private static final int LEFT_BACK_PORT = 18;
-
-        private static final int STALL_CURRENT_LIMIT = 30;
-        private static final int FREE_CURRENT_LIMIT = 20;
-        private static final double SECONDARY_CURRENT_LIMIT = 60.0;
-
-        private static final double GEAR_RATIO = (52.0 / 10.0) * (68.0 / 30.0);
-        private static final double WHEEL_DIAMETER = 0.2032; // 8 inches
-        private static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
-        private static final double METERS_PER_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
-        private static final double CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // The raw units are RPM
-        private static final double TRACK_WIDTH = 0.96679; // Meters
-
-        private static final double MAX_VELOCITY = 5; // Meters per second
-        private static final double MAX_ANGULAR_VELOCITY = 8; // Radians per second
-        private static final double MAX_ACCELERATION = 5; // Meters per second squared
-        private static final double MAX_VOLTAGE = 10;
-
-        // Values spit out of sysid
-        private static final double P = 0.011179;
-        private static final double I = 0;
-        private static final double D = 0;
-        private static final double S = 0.15473;
-        private static final double V = 2.3007;
-        private static final double A = 0.22029;
-    }
-
-    private CANSparkMax rightFrontMotor;
-    private RelativeEncoder rightEncoder;
-    private CANSparkMax rightBackMotor;
-    private PIDController rightPID;
-    private double rightSetpoint;
-
-    private CANSparkMax leftFrontMotor;
-    private RelativeEncoder leftEncoder;
-    private CANSparkMax leftBackMotor;
-    private PIDController leftPID;
-    private double leftSetpoint;
-
+    private ChassisSide left, right;
     private AHRS navX;
 
     private SimpleMotorFeedforward feedforward;
@@ -85,109 +37,46 @@ public class Chassis extends SubsystemBase {
     private Field2d field;
 
     public Chassis() {
-        rightFrontMotor = new CANSparkMax(Constants.RIGHT_FRONT_PORT, MotorType.kBrushless);
-        rightFrontMotor.restoreFactoryDefaults();
-        rightFrontMotor.setInverted(true);
-        rightFrontMotor.setIdleMode(IdleMode.kCoast);
-        rightFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        rightFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-        rightEncoder = rightFrontMotor.getEncoder();
-        rightEncoder.setPositionConversionFactor(Constants.METERS_PER_MOTOR_ROTATION);
-        rightEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
-        rightFrontMotor.burnFlash();
-        rightBackMotor = new CANSparkMax(Constants.RIGHT_BACK_PORT, MotorType.kBrushless);
-        rightBackMotor.restoreFactoryDefaults();
-        rightBackMotor.setInverted(true);
-        rightBackMotor.setIdleMode(IdleMode.kCoast);
-        rightBackMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        rightBackMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-        rightBackMotor.follow(rightFrontMotor);
-        rightBackMotor.burnFlash();
-        rightSetpoint = 0;
+        feedforward = new SimpleMotorFeedforward(ChassisConstants.S, ChassisConstants.V, ChassisConstants.A);
+        kinematics = new DifferentialDriveKinematics(ChassisConstants.TRACK_WIDTH);
 
-        leftFrontMotor = new CANSparkMax(Constants.LEFT_FRONT_PORT, MotorType.kBrushless);
-        leftFrontMotor.restoreFactoryDefaults();
-        leftFrontMotor.setInverted(false);
-        leftFrontMotor.setIdleMode(IdleMode.kCoast);
-        leftFrontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        leftFrontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-        leftEncoder = leftFrontMotor.getEncoder();
-        leftEncoder.setPositionConversionFactor(Constants.METERS_PER_MOTOR_ROTATION);
-        leftEncoder.setVelocityConversionFactor(Constants.CONVERSION_FACTOR);
-        leftFrontMotor.burnFlash();
-        leftBackMotor = new CANSparkMax(Constants.LEFT_BACK_PORT, MotorType.kBrushless);
-        leftBackMotor.restoreFactoryDefaults();
-        leftBackMotor.setInverted(false);
-        leftBackMotor.setIdleMode(IdleMode.kCoast);
-        leftBackMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        leftBackMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-        leftBackMotor.follow(leftFrontMotor);
-        leftBackMotor.burnFlash();
-        leftSetpoint = 0;
-
-        rightPID = new PIDController(Constants.P, Constants.I, Constants.D);
-        leftPID = new PIDController(Constants.P, Constants.I, Constants.D);
-        feedforward = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
-        kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
+        left = new ChassisSide(ChassisConstants.LEFT_FRONT_PORT, ChassisConstants.LEFT_BACK_PORT, feedforward);
+        addChild("Left", left);
+        right = new ChassisSide(ChassisConstants.RIGHT_FRONT_PORT, ChassisConstants.RIGHT_BACK_PORT, feedforward);
+        addChild("Right", right);
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
             DriverStation.reportError(ex.getMessage(), true);
         }
+
         odometry = new DifferentialDriveOdometry(
-                navX.getRotation2d(),
-                leftEncoder.getPosition(),
-                rightEncoder.getPosition());
-        constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, Constants.MAX_VOLTAGE);
-        config = new TrajectoryConfig(Constants.MAX_VELOCITY, Constants.MAX_ACCELERATION);
+                navX.getRotation2d(), 0.0, 0.0);
+        field = new Field2d();
+        addChild("Field", field);
+
+        constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, ChassisConstants.MAX_VOLTAGE);
+        config = new TrajectoryConfig(ChassisConstants.MAX_VELOCITY, ChassisConstants.MAX_ACCELERATION);
         config.setKinematics(kinematics);
         config.addConstraint(constraint);
-        controller = new RamseteController();
-        field = new Field2d();
-        SmartDashboard.putData(field);
+        controller = new RamseteController(); // Uses default constants
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Left Setpoint", leftSetpoint);
-        double leftVelocity = leftEncoder.getVelocity();
-        SmartDashboard.putNumber("Left Velocity", leftVelocity);
-        double leftFFVoltage = feedforward.calculate(leftSetpoint);
-        SmartDashboard.putNumber("Left FF", leftFFVoltage);
-        double leftFBVoltage = leftPID.calculate(leftVelocity, leftSetpoint);
-        SmartDashboard.putNumber("Left FB", leftFBVoltage);
-        double leftVoltage = leftFFVoltage + leftFBVoltage;
-        SmartDashboard.putNumber("Left Voltage", leftVoltage);
-        leftFrontMotor.setVoltage(leftVoltage);
-
-        SmartDashboard.putNumber("Right Setpoint", rightSetpoint);
-        double rightVelocity = rightEncoder.getVelocity();
-        SmartDashboard.putNumber("Right Velocity", rightVelocity);
-        double rightFFVoltage = feedforward.calculate(rightSetpoint);
-        SmartDashboard.putNumber("Right FF", rightFFVoltage);
-        double rightFBVoltage = rightPID.calculate(rightVelocity, rightSetpoint);
-        SmartDashboard.putNumber("Right FB", rightFBVoltage);
-        double rightVoltage = rightFFVoltage + rightFBVoltage;
-        SmartDashboard.putNumber("Right Voltage", rightVoltage);
-        rightFrontMotor.setVoltage(rightVoltage);
-
-        double leftDistance = leftEncoder.getPosition();
-        SmartDashboard.putNumber("Left Distance", leftDistance);
-        double rightDistance = rightEncoder.getPosition();
-        SmartDashboard.putNumber("Right Distance", rightDistance);
+        double leftDistance = left.update();
+        double rightDistance = right.update();
 
         odometry.update(navX.getRotation2d(), leftDistance, rightDistance);
         field.setRobotPose(odometry.getPoseMeters());
     }
 
     public void resetPose(Pose2d pose) {
-        navX.reset();
-        leftEncoder.setPosition(0.0);
-        rightEncoder.setPosition(0.0);
+        left.resetDistance();
+        right.resetDistance();
         odometry.resetPosition(
                 navX.getRotation2d(),
-                leftEncoder.getPosition(),
-                rightEncoder.getPosition(),
+                0.0, 0.0,
                 pose);
     }
 
@@ -197,9 +86,9 @@ public class Chassis extends SubsystemBase {
 
     public void arcadeDrive(double forward, double rotation) {
         drive(new ChassisSpeeds(
-                forward * Constants.MAX_VELOCITY,
-                0, // "Driving sideways is a waste of time"
-                rotation * Constants.MAX_ANGULAR_VELOCITY));
+                forward * ChassisConstants.MAX_VELOCITY,
+                0, // No sideways
+                rotation * ChassisConstants.MAX_ANGULAR_VELOCITY));
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {
@@ -207,13 +96,12 @@ public class Chassis extends SubsystemBase {
     }
 
     public void tankDrive(DifferentialDriveWheelSpeeds wheelSpeeds) {
-        leftSetpoint = wheelSpeeds.leftMetersPerSecond;
-        rightSetpoint = wheelSpeeds.rightMetersPerSecond;
+        tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
     }
 
     public void tankDrive(double leftSpeed, double rightSpeed) {
-        leftSetpoint = leftSpeed;
-        rightSetpoint = rightSpeed;
+        left.setSetpoint(leftSpeed);
+        right.setSetpoint(rightSpeed);
     }
 
     public Trajectory generateTrajectory(Pose2d start, Pose2d end) {
@@ -222,5 +110,15 @@ public class Chassis extends SubsystemBase {
 
     public Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end) {
         return TrajectoryGenerator.generateTrajectory(start, interior, end, config);
+    }
+
+    public RamseteCommand generateRamseteCommand(Trajectory trajectory) {
+        return new RamseteCommand(
+                trajectory,
+                this::getPose,
+                controller,
+                kinematics,
+                this::tankDrive,
+                this);
     }
 }
