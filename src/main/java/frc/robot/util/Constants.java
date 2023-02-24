@@ -1,6 +1,9 @@
 package frc.robot.util;
 
 public class Constants {
+    public static final int JOYSTICK_PORT = 0;
+    public static final int CONTROLLER_PORT = 1;
+
     public static class ChassisConstants {
         public static final int RIGHT_FRONT_PORT = 15;
         public static final int RIGHT_BACK_PORT = 17;

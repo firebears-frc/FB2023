@@ -96,6 +96,11 @@ public class Arm extends SubsystemBase {
         return shoulderEncoder.getPosition();
     }
 
+    public void setAngles(double elbowAngle, double shoulderAngle) {
+        setElbowAngle(elbowAngle);
+        setShoulderAngle(shoulderAngle);
+    }
+
     @Override
     public void periodic() {
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);

@@ -1,10 +1,12 @@
 package frc.robot;
 
 import frc.robot.subsystems.*;
+import frc.robot.util.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,18 +16,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 
 public class RobotContainer {
-    private static class Constants {
-        public static int JOYSTICK_PORT = 0;
-    }
-
     private final Chassis chassis;
+    private final Arm arm;
     private final Joystick joystick;
+    private final XboxController controller;
 
     public RobotContainer() {
         chassis = new Chassis();
+        arm = new Arm();
         joystick = new Joystick(Constants.JOYSTICK_PORT);
+        controller = new XboxController(Constants.CONTROLLER_PORT);
 
         configureButtonBindings();
 
@@ -39,13 +42,17 @@ public class RobotContainer {
 
             chassis.arcadeDrive(forward, rotation);
         }, chassis));
+
+        JoystickButton aButton = new JoystickButton(controller, XboxController.Button.kA.value);
+        aButton.onTrue(new InstantCommand(() -> {
+            arm.setAngles(0, 0);
+        }, arm));
     }
 
     public Command getAutonomousCommand() {
         Trajectory trajectory = chassis.generateTrajectory(
-            new Pose2d(0, 0, new Rotation2d()),
-            new Pose2d(1.0, 0, new Rotation2d())
-        );
+                new Pose2d(0, 0, new Rotation2d()),
+                new Pose2d(1.0, 0, new Rotation2d()));
         return chassis.generateRamseteCommand(trajectory);
     }
 
