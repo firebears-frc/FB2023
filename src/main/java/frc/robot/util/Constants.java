@@ -70,4 +70,15 @@ public class Constants {
         public static final double ELBOW_SPEED = 0.1;
         public static final double SHOULDER_SPEED = 0.1;
     }
+
+    public static class SchluckerConstants {
+        public static final int MOTOR_PORT = 1;
+
+        public static final int STALL_CURRENT_LIMIT = 20;
+        public static final int FREE_CURRENT_LIMIT = 5;
+        public static final double SECONDARY_CURRENT_LIMIT = 30.0;
+
+        public static final double CONE_IN_CUBE_OUT_SPEED = 0.5;
+        public static final double CONE_OUT_CUBE_IN_SPEED = -0.5;
+    }
 }

@@ -24,12 +24,14 @@ import edu.wpi.first.wpilibj.XboxController;
 public class RobotContainer {
     private final Chassis chassis;
     private final Arm arm;
+    private final Schlucker schlucker;
     private final Joystick joystick;
     private final XboxController controller;
 
     public RobotContainer() {
         chassis = new Chassis();
         arm = new Arm();
+        schlucker = new Schlucker();
         joystick = new Joystick(Constants.JOYSTICK_PORT);
         controller = new XboxController(Constants.CONTROLLER_PORT);
 
@@ -67,6 +69,11 @@ public class RobotContainer {
         leftButton.onTrue(new ArmHighCommand(arm));
         JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);
         bButton.onTrue(new ArmStowCommand(arm));
+
+        JoystickButton aButton = new JoystickButton(controller, XboxController.Button.kA.value);
+        aButton.onTrue(new SchluckerConeInCubeOutCommand(schlucker));
+        JoystickButton xButton = new JoystickButton(controller, XboxController.Button.kX.value);
+        xButton.onTrue(new SchluckerConeOutCubeInCommand(schlucker));
     }
 
     public Command getAutonomousCommand() {
