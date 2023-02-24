@@ -44,14 +44,30 @@ public class Constants {
         public static final int FREE_CURRENT_LIMIT = 20;
         public static final double SECONDARY_CURRENT_LIMIT = 60.0;
 
+        public static final double ELBOW_P = 0.0001;
+        public static final double ELBOW_I = 0;
+        public static final double ELBOW_D = 0;
+        public static final double ELBOW_OFFSET = 0; // degrees
+
         public static final double SHOULDER_P = 0.0001;
         public static final double SHOULDER_I = 0;
         public static final double SHOULDER_D = 0;
         public static final double SHOULDER_OFFSET = 0; // degrees
 
-        public static final double ELBOW_P = 0.0001;
-        public static final double ELBOW_I = 0;
-        public static final double ELBOW_D = 0;
-        public static final double ELBOW_OFFSET = 0; // degrees
+        // Target points, in degrees
+        public static final double ELBOW_SUBSTATION = 0;
+        public static final double SHOULDER_SUBSTATION = 0;
+        public static final double ELBOW_STOW = 0;
+        public static final double SHOULDER_STOW = 0;
+        public static final double ELBOW_HIGH = 0;
+        public static final double SHOULDER_HIGH = 0;
+        public static final double ELBOW_MID = 0;
+        public static final double SHOULDER_MID = 0;
+        public static final double ELBOW_LOW = 0;
+        public static final double SHOULDER_LOW = 0;
+
+        // Adjustment speed of each joint in degrees per loop
+        public static final double ELBOW_SPEED = 0.1;
+        public static final double SHOULDER_SPEED = 0.1;
     }
 }

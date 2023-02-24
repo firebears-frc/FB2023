@@ -1,12 +1,15 @@
 package frc.robot;
 
+import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants;
+import frc.robot.util.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,10 +46,27 @@ public class RobotContainer {
             chassis.arcadeDrive(forward, rotation);
         }, chassis));
 
-        JoystickButton aButton = new JoystickButton(controller, XboxController.Button.kA.value);
-        aButton.onTrue(new InstantCommand(() -> {
-            arm.setAngles(0, 0);
+        arm.setDefaultCommand(new RunCommand(() -> {
+            double elbow = arm.getElbowTargetAngle();
+            elbow += controller.getLeftY() * ArmConstants.ELBOW_SPEED;
+
+            double shoulder = arm.getShoulderTargetAngle();
+            shoulder += controller.getRightY() * ArmConstants.SHOULDER_SPEED;
+
+            arm.setAngles(elbow, shoulder);
         }, arm));
+
+        // Arm target point commands
+        POVButton upButton = new POVButton(controller, 0);
+        upButton.onTrue(new ArmSubstationCommand(arm));
+        POVButton rightButton = new POVButton(controller, 90);
+        rightButton.onTrue(new ArmMidCommand(arm));
+        POVButton downButton = new POVButton(controller, 180);
+        downButton.onTrue(new ArmLowCommand(arm));
+        POVButton leftButton = new POVButton(controller, 270);
+        leftButton.onTrue(new ArmHighCommand(arm));
+        JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);
+        bButton.onTrue(new ArmStowCommand(arm));
     }
 
     public Command getAutonomousCommand() {
