@@ -103,19 +103,10 @@ public class Chassis extends SubsystemBase {
         Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
         m_odometry = new DifferentialDriveOdometry(gyroAngleRadians, 0.0, 0.0);
     
-        sleep(200);
         rightFrontMotor.burnFlash();
         rightBackMotor.burnFlash();
         leftFrontMotor.burnFlash();
         leftBackMotor.burnFlash();
-    }
-
-    private void sleep(int milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
