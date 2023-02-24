@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,8 +14,8 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 public class Arm extends SubsystemBase {
 
     private CANSparkMax elbowMotor;
-    private CANSparkMax shoulderMotor1;
-    private CANSparkMax shoulderMotor2;
+    private CANSparkMax shoulderMotorRight;
+    private CANSparkMax shoulderMotorLeft;
     private SparkMaxAbsoluteEncoder elbowEncoder;
     private SparkMaxAbsoluteEncoder shoulderEncoder;
 
@@ -25,17 +26,22 @@ public class Arm extends SubsystemBase {
         elbowMotor.setInverted(false);
         elbowMotor.setIdleMode(IdleMode.kBrake);
 
-        shoulderMotor1 = new CANSparkMax(12, MotorType.kBrushless);
+        shoulderMotorLeft = new CANSparkMax(12, MotorType.kBrushless);
 
-        shoulderMotor1.restoreFactoryDefaults();
-        shoulderMotor1.setInverted(false);
-        shoulderMotor1.setIdleMode(IdleMode.kBrake);
+        shoulderMotorLeft.restoreFactoryDefaults();
+        shoulderMotorLeft.setInverted(false);
+        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
 
-        shoulderMotor2 = new CANSparkMax(13, MotorType.kBrushless);
+        shoulderMotorRight = new CANSparkMax(13, MotorType.kBrushless);
 
-        shoulderMotor2.restoreFactoryDefaults();
-        shoulderMotor2.setInverted(true);
-        shoulderMotor2.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.restoreFactoryDefaults();
+        shoulderMotorRight.setInverted(true);
+        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
+
+        shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
+        elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
+        shoulderMotorLeft.follow(shoulderMotorRight);
 
     }
 
