@@ -23,7 +23,7 @@ import static frc.robot.Constants.*;
 import com.revrobotics.RelativeEncoder; 
 
 public class Chassis extends SubsystemBase {
-    private static int STALL_CURRENT_LIMIT = 30;
+    private static int STALL_CURRENT_LIMIT = 40;
     private static int FREE_CURRENT_LIMIT = 20;
     private static int SECONDARY_CURRENT_LIMIT = 60;
 
@@ -51,7 +51,6 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor.setIdleMode(IdleMode.kCoast);
         rightFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
-        rightFrontMotor.burnFlash();
 
         rightBackMotor = new CANSparkMax(DriveConstants.kRightMotor2Port, MotorType.kBrushless);
 
@@ -60,7 +59,6 @@ public class Chassis extends SubsystemBase {
         rightBackMotor.setIdleMode(IdleMode.kCoast);
         rightBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
-        rightBackMotor.burnFlash();
 
         rightMotors = new MotorControllerGroup(rightFrontMotor, rightBackMotor);
         addChild("rightMotors", rightMotors);
@@ -72,7 +70,6 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor.setIdleMode(IdleMode.kCoast);
         leftFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
-        leftFrontMotor.burnFlash();
 
         leftBackMotor = new CANSparkMax(DriveConstants.kLeftMotor2Port, MotorType.kBrushless);
 
@@ -81,7 +78,6 @@ public class Chassis extends SubsystemBase {
         leftBackMotor.setIdleMode(IdleMode.kCoast);
         leftBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
-        leftBackMotor.burnFlash();
 
         leftMotors = new MotorControllerGroup(leftFrontMotor, leftBackMotor);
         addChild("leftMotors", leftMotors);
@@ -106,7 +102,11 @@ public class Chassis extends SubsystemBase {
         // LiveWindow.addSensor("Chassis", "navX", navX);
         Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
         m_odometry = new DifferentialDriveOdometry(gyroAngleRadians, 0.0, 0.0);
-
+    
+        rightFrontMotor.burnFlash();
+        rightBackMotor.burnFlash();
+        leftFrontMotor.burnFlash();
+        leftBackMotor.burnFlash();
     }
 
     @Override

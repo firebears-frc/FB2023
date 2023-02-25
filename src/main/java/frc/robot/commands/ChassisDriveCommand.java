@@ -27,7 +27,7 @@ public class ChassisDriveCommand extends CommandBase {
     public void execute() {
         Joystick joystick = RobotContainer.getInstance().getJoystick();
         double speed = joystick.getY();
-        double rotation = joystick.getX();
+        double rotation = joystick.getTwist();
         m_chassis.arcadeDrive(speed, rotation);
     }
 
