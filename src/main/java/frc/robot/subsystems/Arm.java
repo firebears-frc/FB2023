@@ -71,14 +71,15 @@ public class Arm extends SubsystemBase {
 
         shoulderPID = shoulderMotorLeft.getPIDController();
         shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.01);
+        shoulderPID.setP(0.005);
         shoulderPID.setI(0.0);
         shoulderPID.setD(0.0005);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
         shoulderPID.setPositionPIDWrappingMaxInput(360);
-        shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
+        shoulderEncoder.setPositionConversionFactor(360);
+        shoulderEncoder.setZeroOffset(323);
         shoulderMotorLeft.burnFlash();
         shoulderMotorRight.burnFlash();
         elbowSetpoint = getElbowAngle();
@@ -103,12 +104,14 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        if(setpoint > 15 && setpoint < 180){
+        if(setpoint < 15 || setpoint > 280){
             System.out.println("Shoulder1: " + setpoint);
             setpoint = 15;
-        } else if (setpoint < 207 && setpoint > 180) {
+        } else if (setpoint > 110 && setpoint < 280) {
             System.out.println("Shoulder2: " + setpoint);
-            setpoint = 207;
+            setpoint = 110;
+        } else {
+            System.out.println("Shoudker 3");
         }
         shoulderSetpoint = setpoint;
     }
@@ -143,6 +146,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Shoulder Angle", getShoulderAngle());
         SmartDashboard.putNumber("Elbow Angle", getElbowAngle());
         SmartDashboard.putNumber("Setpoint", elbowSetpoint);
+        SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
+        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
     }
 }
