@@ -30,6 +30,7 @@ public class Arm extends SubsystemBase {
     private static SparkMaxAbsoluteEncoder shoulderEncoder;
     private static SparkMaxPIDController elbowPID;
     private SparkMaxPIDController shoulderPID;
+    private double elbowSetpoint = 330;
 
     Arm arm;
 
@@ -44,13 +45,13 @@ public class Arm extends SubsystemBase {
 
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        elbowPID.setP(1);
+        elbowPID.setP(.005);
         elbowPID.setI(0.0);
-        elbowPID.setD(0.0);
+        elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);
-        elbowPID.setPositionPIDWrappingEnabled(true);
-        elbowPID.setPositionPIDWrappingMinInput(0.0);
-        elbowPID.setPositionPIDWrappingMaxInput(1.0);
+       // elbowPID.setPositionPIDWrappingEnabled(true);
+       // elbowPID.setPositionPIDWrappingMinInput(0.0);
+       // elbowPID.setPositionPIDWrappingMaxInput(1.0);
         elbowEncoder.setPositionConversionFactor(360);
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowMotor.burnFlash();
@@ -66,42 +67,45 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
         shoulderMotorRight.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.follow(shoulderMotorLeft);
 
         shoulderPID = shoulderMotorLeft.getPIDController();
         shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.001);
+        shoulderPID.setP(0.1);
         shoulderPID.setI(0.0);
         shoulderPID.setD(0.0);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
-        shoulderPID.setPositionPIDWrappingEnabled(true);
-        shoulderPID.setPositionPIDWrappingMinInput(0.0);
-        shoulderPID.setPositionPIDWrappingMaxInput(1.0);
+        // shoulderPID.setPositionPIDWrappingEnabled(true);
+        // shoulderPID.setPositionPIDWrappingMinInput(0.0);
+        // shoulderPID.setPositionPIDWrappingMaxInput(1.0);
         shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
         shoulderMotorLeft.burnFlash();
         shoulderMotorRight.burnFlash();
     }
 
-    public static double getShoulderAngle() {
+    public double getShoulderAngle() {
         double angle = shoulderEncoder.getPosition();
         return angle;
     }
 
-    public static double getElbowAngle() {
+    public double getElbowAngle() {
         double angle = elbowEncoder.getPosition();
         return angle;
     }
 
     public void setShoulderSetpoint(double setpoint) {
-        elbowPID.setReference(setpoint, ControlType.kPosition);
     }
 
-    public static void setElbowSetpoint(double setpoint) {
-        elbowPID.setReference(setpoint, ControlType.kPosition);
+    public void setElbowSetpoint(double setpoint) {
+        System.out.println("Setting Elbow: " + setpoint);
+        elbowSetpoint = setpoint;
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shoulder Angle", getShoulderAngle());
         SmartDashboard.putNumber("Elbow Angle", getElbowAngle());
+        SmartDashboard.putNumber("Setpoint", elbowSetpoint);
+        elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
     }
 }
