@@ -53,8 +53,8 @@ public class RobotContainer {
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Autonomous Command", (new ChassisDriveToDistanceCommand(2,m_chassis))
-    .andThen(new ChassisDriveToDistanceCommand(-2, m_chassis)));
+    m_chooser.setDefaultOption("Autonomous Command", (new ChassisDriveToDistanceCommand(-2,m_chassis))
+    .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 

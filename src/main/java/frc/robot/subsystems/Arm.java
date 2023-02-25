@@ -49,9 +49,9 @@ public class Arm extends SubsystemBase {
         elbowPID.setI(0.0);
         elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);
-       // elbowPID.setPositionPIDWrappingEnabled(true);
-       // elbowPID.setPositionPIDWrappingMinInput(0.0);
-       // elbowPID.setPositionPIDWrappingMaxInput(1.0);
+        elbowPID.setPositionPIDWrappingEnabled(true);
+        elbowPID.setPositionPIDWrappingMinInput(0.0);
+        elbowPID.setPositionPIDWrappingMaxInput(360);
         elbowEncoder.setPositionConversionFactor(360);
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowMotor.burnFlash();
@@ -71,13 +71,13 @@ public class Arm extends SubsystemBase {
 
         shoulderPID = shoulderMotorLeft.getPIDController();
         shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.1);
+        shoulderPID.setP(0.01);
         shoulderPID.setI(0.0);
-        shoulderPID.setD(0.0);
+        shoulderPID.setD(0.0005);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
-        // shoulderPID.setPositionPIDWrappingEnabled(true);
-        // shoulderPID.setPositionPIDWrappingMinInput(0.0);
-        // shoulderPID.setPositionPIDWrappingMaxInput(1.0);
+        shoulderPID.setPositionPIDWrappingEnabled(true);
+        shoulderPID.setPositionPIDWrappingMinInput(0.0);
+        shoulderPID.setPositionPIDWrappingMaxInput(360);
         shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
         shoulderMotorLeft.burnFlash();
         shoulderMotorRight.burnFlash();
@@ -98,6 +98,11 @@ public class Arm extends SubsystemBase {
 
     public void setElbowSetpoint(double setpoint) {
         System.out.println("Setting Elbow: " + setpoint);
+        if(setpoint > 15 && setpoint < 180){
+         //   setpoint = 15;
+        } else if (setpoint < 207 && setpoint > 180) {
+          //  setpoint = 207;
+        }
         elbowSetpoint = setpoint;
     }
 

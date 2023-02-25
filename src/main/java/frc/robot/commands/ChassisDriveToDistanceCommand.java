@@ -44,6 +44,8 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+//return Math.abs(distance - m_chassis.getEncoderDistance()) < 0.1;
+
     if (distance > 0 && m_chassis.getEncoderDistance() > distance) {
       return true;
     } else if (distance < 0 && m_chassis.getEncoderDistance() < distance) {

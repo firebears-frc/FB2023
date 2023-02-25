@@ -135,10 +135,11 @@ public class Chassis extends SubsystemBase {
     }
 
     public double getEncoderDistance() {
-        double meters = ((leftEncoder.getPosition() - leftOffSet) + (rightEncoder.getPosition() * -1 - rightOffSet))
-                / 2;
+        // double meters = ((leftEncoder.getPosition() - leftOffSet) + (rightEncoder.getPosition() * -1 - rightOffSet))
+        //         / 2;
 
-        return meters;
+        // return meters;
+        return (leftDistanceTraveled() + rightDistanceTraveled()) / 2;
     }
 
     public double leftDistanceTraveled() {
