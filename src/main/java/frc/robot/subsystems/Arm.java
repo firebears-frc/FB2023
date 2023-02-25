@@ -97,11 +97,19 @@ public class Arm extends SubsystemBase {
     }
 
     public void setElbowSetpoint(double setpoint) {
-        System.out.println("Setting Elbow: " + setpoint);
+        while (setpoint > 360) {
+            setpoint -= 360;
+        }
+        while (setpoint < 0) {
+            setpoint += 360;
+        }
+
         if(setpoint > 15 && setpoint < 180){
-         //   setpoint = 15;
+            System.out.println("1: " + setpoint);
+            // setpoint = 15;
         } else if (setpoint < 207 && setpoint > 180) {
-          //  setpoint = 207;
+            System.out.println("2: " + setpoint);
+            // setpoint = 207;
         }
         elbowSetpoint = setpoint;
     }

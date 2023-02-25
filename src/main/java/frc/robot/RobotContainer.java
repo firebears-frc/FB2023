@@ -114,7 +114,7 @@ public class RobotContainer {
     
     //JoystickButton fiveButton = new JoystickButton(joystick, 5);
     //fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
-    
+
     //JoystickButton sixButton = new JoystickButton(joystick, 6);
     //sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
 
@@ -123,6 +123,11 @@ public class RobotContainer {
 
     //xboxController leftJoystick = new XboxController(1);
 
+    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
+    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
+
+    JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
+    xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
   }
 
   public XboxController getXboxController() {
