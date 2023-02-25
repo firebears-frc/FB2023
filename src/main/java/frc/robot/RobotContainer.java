@@ -117,10 +117,10 @@ public class RobotContainer {
     sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis));
 
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
-    xboxXButton.whileTrue(new ShluckerCommand(1, m_schlucker));
+    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
-    xboxAButton.whileTrue(new ShluckerCommand(-1, m_schlucker));
+    xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
   }
 
