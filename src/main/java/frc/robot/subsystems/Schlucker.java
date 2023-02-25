@@ -15,8 +15,12 @@ public class Schlucker extends SubsystemBase {
 
         shluckerMotor.restoreFactoryDefaults();
         shluckerMotor.setInverted(false);
-        shluckerMotor.setIdleMode(IdleMode.kCoast);
+        shluckerMotor.setIdleMode(IdleMode.kBrake);
 
+    }
+
+    public void setShluckerSpeed(double speed) {
+        shluckerMotor.set(speed);
     }
 
     @Override

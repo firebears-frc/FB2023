@@ -105,16 +105,22 @@ public class RobotContainer {
     twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
     JoystickButton threeButton = new JoystickButton(joystick, 3);
-    threeButton.onTrue(new ChassisRotateToAngleCommand (90, m_chassis ) );
+    threeButton.onTrue(new ChassisRotateToAngleCommand(90, m_chassis));
 
     JoystickButton fourButton = new JoystickButton(joystick, 4);
-    fourButton.onTrue(new ChassisRotateToAngleCommand (-90, m_chassis ) );
+    fourButton.onTrue(new ChassisRotateToAngleCommand(-90, m_chassis));
 
     JoystickButton fiveButton = new JoystickButton(joystick, 5);
-    fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
+    fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis));
 
     JoystickButton sixButton = new JoystickButton(joystick, 6);
-    sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
+    sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis));
+
+    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
+    xboxXButton.whileTrue(new ShluckerCommand(1, m_schlucker));
+
+    JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
+    xboxAButton.whileTrue(new ShluckerCommand(-1, m_schlucker));
 
   }
 
