@@ -51,6 +51,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
+    m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
     m_chooser.setDefaultOption("Autonomous Command", (new ChassisDriveToDistanceCommand(2,m_chassis))
     .andThen(new ChassisDriveToDistanceCommand(-2, m_chassis)));
@@ -118,9 +119,9 @@ public class RobotContainer {
     //sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
 
     JoystickButton oneButton = new JoystickButton(joystick, 1);
-    oneButton.onTrue(new ArmManualCommand(m_arm));
+    //oneButton.onTrue(new ArmManualCommand(m_arm));
 
-    
+    //xboxController leftJoystick = new XboxController(1);
 
   }
 

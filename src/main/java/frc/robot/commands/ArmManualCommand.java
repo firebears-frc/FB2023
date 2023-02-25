@@ -15,10 +15,12 @@ public class ArmManualCommand extends CommandBase {
   private final Arm m_arm;
   private double shoulderSetPoint = 0;
   private double elbowSetPoint = 0;
+  XboxController controller;
   
-  public ArmManualCommand(Arm subsystem) {
+  public ArmManualCommand(Arm subsystem, XboxController x) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_arm = subsystem;
+    controller = x;
     addRequirements(m_arm);
   }
 
@@ -28,7 +30,7 @@ public class ArmManualCommand extends CommandBase {
     //XboxController xboxController=RobotContainer.getInstance().getxbox();
     shoulderSetPoint = 0;
     elbowSetPoint = 330;
-    SmartDashboard.putBoolean("Runing Arm", true);
+    SmartDashboard.putBoolean("Running Arm", true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,9 +38,10 @@ public class ArmManualCommand extends CommandBase {
   public void execute() {
     //shoulderSetPoint = xboxController.getRightY();
     //elbowSetPoint = xboxController.getLeftY();
-    shoulderSetPoint = 0;
-    elbowSetPoint = 270;
+    shoulderSetPoint += controller.getRightY();
+    elbowSetPoint += controller.getLeftY();
     m_arm.setElbowSetpoint(elbowSetPoint);
+    System.out.println("Running Arm Command");
   }
 
   // Called once the command ends or is interrupted.
@@ -46,14 +49,15 @@ public class ArmManualCommand extends CommandBase {
   public void end(boolean interrupted) {
     shoulderSetPoint = 0;
     elbowSetPoint = 330;
-    SmartDashboard.putBoolean("Runing Arm", false);
+    SmartDashboard.putBoolean("Running Arm", false);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(elbowSetPoint - m_arm.getElbowAngle()) < 5;
+    return false;
 
+    //return Math.abs(elbowSetPoint - m_arm.getElbowAngle()) < 5;
     //return m_arm.getShoulderAngle() <= shoulderSetPoint + 5 & m_arm.getShoulderAngle() >= shoulderSetPoint - 5 || m_arm.getElbowAngle() <= elbowSetPoint + 5 & m_arm.getElbowAngle() >= elbowSetPoint - 5;
   }
 }
