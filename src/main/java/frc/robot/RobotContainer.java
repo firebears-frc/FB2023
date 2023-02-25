@@ -28,7 +28,7 @@ public class RobotContainer {
   private static RobotContainer m_robotContainer = null;
 
   public final Lights m_lights;
-  public final Vision m_vision;
+  //public final Vision m_vision;
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   public final Chassis m_chassis;
@@ -41,7 +41,7 @@ public class RobotContainer {
   private RobotContainer() {
 
     m_lights = new Lights();
-    m_vision = new Vision("MainC");
+    //m_vision = new Vision("MainC");
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
@@ -101,20 +101,25 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    JoystickButton twoButton = new JoystickButton(joystick, 2);
-    twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
+    //JoystickButton twoButton = new JoystickButton(joystick, 2);
+    //twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
+    
+    //JoystickButton threeButton = new JoystickButton(joystick, 3);
+    //threeButton.onTrue(new ChassisRotateToAngleCommand (90, m_chassis ) );
+    
+    //JoystickButton fourButton = new JoystickButton(joystick, 4);
+    //fourButton.onTrue(new ChassisRotateToAngleCommand (-90, m_chassis ) );
+    
+    //JoystickButton fiveButton = new JoystickButton(joystick, 5);
+    //fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
+    
+    //JoystickButton sixButton = new JoystickButton(joystick, 6);
+    //sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
 
-    JoystickButton threeButton = new JoystickButton(joystick, 3);
-    threeButton.onTrue(new ChassisRotateToAngleCommand (90, m_chassis ) );
+    JoystickButton oneButton = new JoystickButton(joystick, 1);
+    oneButton.onTrue(new ArmManualCommand(m_arm));
 
-    JoystickButton fourButton = new JoystickButton(joystick, 4);
-    fourButton.onTrue(new ChassisRotateToAngleCommand (-90, m_chassis ) );
-
-    JoystickButton fiveButton = new JoystickButton(joystick, 5);
-    fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
-
-    JoystickButton sixButton = new JoystickButton(joystick, 6);
-    sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
+    
 
   }
 

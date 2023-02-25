@@ -2,12 +2,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.SparkAbsoluteEncoder;
 import frc.robot.util.SparkEncoder;
 import frc.robot.util.SparkMotor;
 
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -20,39 +23,38 @@ import static frc.robot.Constants.*;
 
 public class Arm extends SubsystemBase {
 
-    private SparkMotor elbowMotorLeft;
-    private SparkMotor elbowMotorRight;
+    private SparkMotor elbowMotor;
     private SparkMotor shoulderMotorLeft;
     private SparkMotor shoulderMotorRight;
-    private SparkAbsoluteEncoder elbowEncoder;
-    private SparkAbsoluteEncoder shoulderEncoder;
-    private SparkMaxPIDController elbowPID;
+    private static SparkMaxAbsoluteEncoder elbowEncoder;
+    private static SparkMaxAbsoluteEncoder shoulderEncoder;
+    private static SparkMaxPIDController elbowPID;
     private SparkMaxPIDController shoulderPID;
+    private double elbowSetpoint = 330;
+
+    Arm arm;
 
     public Arm() {
 
-        elbowMotorLeft = new SparkMotor(12, MotorType.kBrushless);
+        elbowMotor = new SparkMotor(7, MotorType.kBrushless);
 
-        elbowMotorLeft.restoreFactoryDefaults();
-        elbowMotorLeft.setInverted(false);
-        elbowMotorLeft.setIdleMode(IdleMode.kBrake);
-
-        elbowMotorRight = new SparkMotor(12, MotorType.kBrushless);
-
-        elbowMotorRight.restoreFactoryDefaults();
-        elbowMotorRight.setInverted(false);
-        elbowMotorRight.setIdleMode(IdleMode.kBrake);
+        elbowMotor.restoreFactoryDefaults();
+        elbowMotor.setInverted(true);
+        elbowMotor.setIdleMode(IdleMode.kBrake);
 
 
-        elbowPID = elbowMotorLeft.getPIDController();
-        elbowEncoder = new SparkAbsoluteEncoder(elbowMotorLeft.getAbsoluteEncoder(Type.kDutyCycle));
-        elbowPID.setP(0.001);
+        elbowPID = elbowMotor.getPIDController();
+        elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        elbowPID.setP(.005);
         elbowPID.setI(0.0);
-        elbowPID.setD(0.0);
+        elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);
-        elbowPID.setPositionPIDWrappingEnabled(true);
-        elbowPID.setPositionPIDWrappingMinInput(0.0);
-        elbowPID.setPositionPIDWrappingMaxInput(1.0);
+       // elbowPID.setPositionPIDWrappingEnabled(true);
+       // elbowPID.setPositionPIDWrappingMinInput(0.0);
+       // elbowPID.setPositionPIDWrappingMaxInput(1.0);
+        elbowEncoder.setPositionConversionFactor(360);
+        elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
+        elbowMotor.burnFlash();
 
         shoulderMotorLeft = new SparkMotor(12, MotorType.kBrushless);
 
@@ -65,39 +67,20 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
         shoulderMotorRight.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.follow(shoulderMotorLeft);
 
-        shoulderPID = elbowMotorLeft.getPIDController();
-        shoulderEncoder = new SparkAbsoluteEncoder(elbowMotorLeft.getAbsoluteEncoder(Type.kDutyCycle));
-        shoulderPID.setP(0.001);
+        shoulderPID = shoulderMotorLeft.getPIDController();
+        shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
+        shoulderPID.setP(0.1);
         shoulderPID.setI(0.0);
         shoulderPID.setD(0.0);
-        shoulderPID.setFeedbackDevice(elbowEncoder);
-        shoulderPID.setPositionPIDWrappingEnabled(true);
-        shoulderPID.setPositionPIDWrappingMinInput(0.0);
-        shoulderPID.setPositionPIDWrappingMaxInput(1.0);
-
-        //shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
-        //elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-
-        shoulderMotorLeft.follow(shoulderMotorRight);
-        elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
-        addChild("elbowEncoder", elbowEncoder);
-
-        shoulderMotorLeft = new SparkMotor(12, MotorType.kBrushless);
-        shoulderMotorLeft.restoreFactoryDefaults();
-        shoulderMotorLeft.setInverted(false);
-        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
-        addChild("shoulderMotorLeft", shoulderMotorLeft);
-
-        shoulderMotorRight = new SparkMotor(13, MotorType.kBrushless);
-        shoulderMotorRight.restoreFactoryDefaults();
-        shoulderMotorRight.setInverted(true);
-        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
-        addChild("shoulderMotorRight", shoulderMotorRight);
-
-        shoulderEncoder = new SparkAbsoluteEncoder(shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle));
+        shoulderPID.setFeedbackDevice(shoulderEncoder);
+        // shoulderPID.setPositionPIDWrappingEnabled(true);
+        // shoulderPID.setPositionPIDWrappingMinInput(0.0);
+        // shoulderPID.setPositionPIDWrappingMaxInput(1.0);
         shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
-        addChild("shoulderEncoder", shoulderEncoder);
+        shoulderMotorLeft.burnFlash();
+        shoulderMotorRight.burnFlash();
     }
 
     public double getShoulderAngle() {
@@ -111,16 +94,18 @@ public class Arm extends SubsystemBase {
     }
 
     public void setShoulderSetpoint(double setpoint) {
-        // TODO : get PID to work here
     }
 
     public void setElbowSetpoint(double setpoint) {
-         // TODO : get PID to work here
+        System.out.println("Setting Elbow: " + setpoint);
+        elbowSetpoint = setpoint;
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shoulder Angle", getShoulderAngle());
         SmartDashboard.putNumber("Elbow Angle", getElbowAngle());
+        SmartDashboard.putNumber("Setpoint", elbowSetpoint);
+        elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
     }
 }
