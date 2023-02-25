@@ -38,15 +38,18 @@ public class ArmManualCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //shoulderSetPoint = xboxController.getRightY();
-    //elbowSetPoint = xboxController.getLeftY();
-    shoulderSetPoint += controller.getRightY();
+    shoulderSetPoint = m_arm.getShoulderSetpoint();
+    if (Math.abs(controller.getRightY()) > 0.1) {
+      shoulderSetPoint += controller.getRightY();
+    }
+    m_arm.setShoulderSetpoint(shoulderSetPoint);
+
     elbowSetPoint = m_arm.getElbowSetpoint();
     if (Math.abs(controller.getLeftY()) > 0.1) {
       elbowSetPoint += controller.getLeftY();
     }
     m_arm.setElbowSetpoint(elbowSetPoint);
-    //m_arm.setShoulderSetpoint(shoulderSetPoint);
+    
     System.out.println("Running Arm Command");
   }
 

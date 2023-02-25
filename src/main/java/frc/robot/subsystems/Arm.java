@@ -31,7 +31,7 @@ public class Arm extends SubsystemBase {
     private static SparkMaxPIDController elbowPID;
     private SparkMaxPIDController shoulderPID;
     private double elbowSetpoint = 330;
-
+    private double shoulderSetpoint = 330;
     Arm arm;
 
     public Arm() {
@@ -45,7 +45,7 @@ public class Arm extends SubsystemBase {
 
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        elbowPID.setP(.005);
+        elbowPID.setP(.01);
         elbowPID.setI(0.0);
         elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);
@@ -94,6 +94,21 @@ public class Arm extends SubsystemBase {
     }
 
     public void setShoulderSetpoint(double setpoint) {
+        while (setpoint > 360) {
+            setpoint -= 360;
+        }
+        while (setpoint < 0) {
+            setpoint += 360;
+        }
+
+        if(setpoint > 15 && setpoint < 180){
+            System.out.println("Shoulder1: " + setpoint);
+            setpoint = 15;
+        } else if (setpoint < 207 && setpoint > 180) {
+            System.out.println("Shoulder2: " + setpoint);
+            setpoint = 207;
+        }
+        shoulderSetpoint = setpoint;
     }
 
     public void setElbowSetpoint(double setpoint) {
@@ -105,10 +120,10 @@ public class Arm extends SubsystemBase {
         }
 
         if(setpoint > 15 && setpoint < 180){
-            System.out.println("1: " + setpoint);
+            System.out.println("Elbow1: " + setpoint);
             setpoint = 15;
         } else if (setpoint < 207 && setpoint > 180) {
-            System.out.println("2: " + setpoint);
+            System.out.println("Elbow2: " + setpoint);
             setpoint = 207;
         }
         elbowSetpoint = setpoint;
@@ -116,6 +131,9 @@ public class Arm extends SubsystemBase {
 
     public double getElbowSetpoint() {
         return elbowSetpoint;
+    }
+    public double getShoulderSetpoint() {
+        return shoulderSetpoint;
     }
 
     @Override

@@ -118,7 +118,6 @@ public class RobotContainer {
     //JoystickButton sixButton = new JoystickButton(joystick, 6);
     //sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
 
-    JoystickButton oneButton = new JoystickButton(joystick, 1);
     //oneButton.onTrue(new ArmManualCommand(m_arm));
 
     //xboxController leftJoystick = new XboxController(1);
