@@ -127,6 +127,9 @@ public class RobotContainer {
 
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
+
+    JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
+    xboxBButton.onTrue(new ArmAngleCommand(m_arm, 210));
   }
 
   public XboxController getXboxController() {
