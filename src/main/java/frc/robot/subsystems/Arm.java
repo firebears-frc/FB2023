@@ -30,8 +30,8 @@ public class Arm extends SubsystemBase {
     private static SparkMaxAbsoluteEncoder shoulderEncoder;
     private static SparkMaxPIDController elbowPID;
     private SparkMaxPIDController shoulderPID;
-    private double elbowSetpoint = 330;
-    private double shoulderSetpoint = 330;
+    private double elbowSetpoint;
+    private double shoulderSetpoint;
     Arm arm;
 
     public Arm() {
@@ -81,6 +81,8 @@ public class Arm extends SubsystemBase {
         shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
         shoulderMotorLeft.burnFlash();
         shoulderMotorRight.burnFlash();
+        elbowSetpoint = getElbowAngle();
+        shoulderSetpoint = getShoulderAngle();
     }
 
     public double getShoulderAngle() {
