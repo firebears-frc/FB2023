@@ -29,9 +29,9 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
   @Override
   public void execute() {
     if (distance > 0) {
-      m_chassis.arcadeDrive(-0.4, 0);
-    } else {
       m_chassis.arcadeDrive(0.4, 0);
+    } else {
+      m_chassis.arcadeDrive(-0.4, 0);
     }
   }
 

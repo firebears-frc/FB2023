@@ -47,7 +47,7 @@ public class Chassis extends SubsystemBase {
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
 
         rightFrontMotor.restoreFactoryDefaults();
-        rightFrontMotor.setInverted(false);
+        rightFrontMotor.setInverted(true);
         rightFrontMotor.setIdleMode(IdleMode.kCoast);
         rightFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
@@ -55,7 +55,7 @@ public class Chassis extends SubsystemBase {
         rightBackMotor = new CANSparkMax(DriveConstants.kRightMotor2Port, MotorType.kBrushless);
 
         rightBackMotor.restoreFactoryDefaults();
-        rightBackMotor.setInverted(false);
+        rightBackMotor.setInverted(true);
         rightBackMotor.setIdleMode(IdleMode.kCoast);
         rightBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
@@ -66,7 +66,7 @@ public class Chassis extends SubsystemBase {
         leftFrontMotor = new CANSparkMax(DriveConstants.kLeftMotor1Port, MotorType.kBrushless);
 
         leftFrontMotor.restoreFactoryDefaults();
-        leftFrontMotor.setInverted(true);
+        leftFrontMotor.setInverted(false);
         leftFrontMotor.setIdleMode(IdleMode.kCoast);
         leftFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
@@ -74,7 +74,7 @@ public class Chassis extends SubsystemBase {
         leftBackMotor = new CANSparkMax(DriveConstants.kLeftMotor2Port, MotorType.kBrushless);
 
         leftBackMotor.restoreFactoryDefaults();
-        leftBackMotor.setInverted(true);
+        leftBackMotor.setInverted(false);
         leftBackMotor.setIdleMode(IdleMode.kCoast);
         leftBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
