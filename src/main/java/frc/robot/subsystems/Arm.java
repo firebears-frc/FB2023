@@ -106,12 +106,16 @@ public class Arm extends SubsystemBase {
 
         if(setpoint > 15 && setpoint < 180){
             System.out.println("1: " + setpoint);
-            // setpoint = 15;
+            setpoint = 15;
         } else if (setpoint < 207 && setpoint > 180) {
             System.out.println("2: " + setpoint);
-            // setpoint = 207;
+            setpoint = 207;
         }
         elbowSetpoint = setpoint;
+    }
+
+    public double getElbowSetpoint() {
+        return elbowSetpoint;
     }
 
     @Override

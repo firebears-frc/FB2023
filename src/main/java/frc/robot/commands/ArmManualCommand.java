@@ -41,6 +41,7 @@ public class ArmManualCommand extends CommandBase {
     //shoulderSetPoint = xboxController.getRightY();
     //elbowSetPoint = xboxController.getLeftY();
     shoulderSetPoint += controller.getRightY();
+    elbowSetPoint = m_arm.getElbowSetpoint();
     if (Math.abs(controller.getLeftY()) > 0.1) {
       elbowSetPoint += controller.getLeftY();
     }
