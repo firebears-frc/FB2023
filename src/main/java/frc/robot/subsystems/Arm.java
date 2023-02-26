@@ -45,7 +45,7 @@ public class Arm extends SubsystemBase {
 
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        elbowPID.setP(.01);
+        elbowPID.setP(0.01);
         elbowPID.setI(0.0);
         elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);
@@ -59,29 +59,31 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft = new SparkMotor(12, MotorType.kBrushless);
 
         shoulderMotorLeft.restoreFactoryDefaults();
-        shoulderMotorLeft.setInverted(false);
+        shoulderMotorLeft.setInverted(true);
         shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
-
-        shoulderMotorRight = new SparkMotor(13, MotorType.kBrushless);
-
-        shoulderMotorRight.restoreFactoryDefaults();
-        shoulderMotorRight.setInverted(true);
-        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
-        shoulderMotorRight.follow(shoulderMotorLeft);
 
         shoulderPID = shoulderMotorLeft.getPIDController();
         shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderPID.setP(0.005);
-        shoulderPID.setI(0.0);
-        shoulderPID.setD(0.0005);
+        shoulderPID.setI(0);
+        shoulderPID.setD(0);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
-        shoulderPID.setPositionPIDWrappingEnabled(true);
+        shoulderPID.setPositionPIDWrappingEnabled(false);
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
         shoulderPID.setPositionPIDWrappingMaxInput(360);
         shoulderEncoder.setPositionConversionFactor(360);
         shoulderEncoder.setZeroOffset(196.6792846);
         shoulderMotorLeft.burnFlash();
+
+
+        shoulderMotorRight = new SparkMotor(13, MotorType.kBrushless);
+
+        shoulderMotorRight.restoreFactoryDefaults();
+        shoulderMotorRight.setInverted(false);
+        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.follow(shoulderMotorLeft);
         shoulderMotorRight.burnFlash();
+
         elbowSetpoint = getElbowAngle();
         shoulderSetpoint = getShoulderAngle();
     }
@@ -104,7 +106,7 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        if(setpoint < 15 || setpoint > 280){
+        /*if(setpoint < 15 || setpoint > 280){
             System.out.println("Shoulder1: " + setpoint);
             setpoint = 15;
         } else if (setpoint > 110 && setpoint < 280) {
@@ -112,7 +114,7 @@ public class Arm extends SubsystemBase {
             setpoint = 110;
         } else {
             System.out.println("Shoudker 3");
-        }
+        }*/
         shoulderSetpoint = setpoint;
     }
 
