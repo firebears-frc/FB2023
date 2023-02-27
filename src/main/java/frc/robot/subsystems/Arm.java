@@ -151,5 +151,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
+
+        SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorLeft.getAppliedOutput());
+        SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorRight.getAppliedOutput());
     }
 }
