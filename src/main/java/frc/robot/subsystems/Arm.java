@@ -24,8 +24,8 @@ import static frc.robot.Constants.*;
 public class Arm extends SubsystemBase {
 
     private SparkMotor elbowMotor;
-    private SparkMotor shoulderMotorLeft;
     private SparkMotor shoulderMotorRight;
+    private SparkMotor shoulderMotorLeft;
     private static SparkMaxAbsoluteEncoder elbowEncoder;
     private static SparkMaxAbsoluteEncoder shoulderEncoder;
     private static SparkMaxPIDController elbowPID;
@@ -56,14 +56,14 @@ public class Arm extends SubsystemBase {
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowMotor.burnFlash();
 
-        shoulderMotorLeft = new SparkMotor(12, MotorType.kBrushless);
+        shoulderMotorRight = new SparkMotor(12, MotorType.kBrushless);
 
-        shoulderMotorLeft.restoreFactoryDefaults();
-        shoulderMotorLeft.setInverted(true);
-        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.restoreFactoryDefaults();
+        shoulderMotorRight.setInverted(true);
+        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
 
-        shoulderPID = shoulderMotorLeft.getPIDController();
-        shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
+        shoulderPID = shoulderMotorRight.getPIDController();
+        shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderPID.setP(0.005);
         shoulderPID.setI(0);
         shoulderPID.setD(0);
@@ -73,16 +73,16 @@ public class Arm extends SubsystemBase {
         shoulderPID.setPositionPIDWrappingMaxInput(360);
         shoulderEncoder.setPositionConversionFactor(360);
         shoulderEncoder.setZeroOffset(196.6792846);
-        shoulderMotorLeft.burnFlash();
-
-
-        shoulderMotorRight = new SparkMotor(13, MotorType.kBrushless);
-
-        shoulderMotorRight.restoreFactoryDefaults();
-        shoulderMotorRight.setInverted(false);
-        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
-        shoulderMotorRight.follow(shoulderMotorLeft);
         shoulderMotorRight.burnFlash();
+
+
+        shoulderMotorLeft = new SparkMotor(13, MotorType.kBrushless);
+
+        shoulderMotorLeft.restoreFactoryDefaults();
+        shoulderMotorLeft.setInverted(false);
+        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
+        shoulderMotorLeft.follow(shoulderMotorRight, true);
+        shoulderMotorLeft.burnFlash();
 
         elbowSetpoint = getElbowAngle();
         shoulderSetpoint = getShoulderAngle();
@@ -152,7 +152,7 @@ public class Arm extends SubsystemBase {
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
 
-        SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorLeft.getAppliedOutput());
-        SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorRight.getAppliedOutput());
+        SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
+        SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
     }
 }

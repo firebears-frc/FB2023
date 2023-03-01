@@ -50,7 +50,7 @@ public class ArmManualCommand extends CommandBase {
     }
     m_arm.setElbowSetpoint(elbowSetPoint);
     
-    System.out.println("Running Arm Command");
+
   }
 
   // Called once the command ends or is interrupted.
