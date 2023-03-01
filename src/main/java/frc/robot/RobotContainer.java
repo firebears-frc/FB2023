@@ -32,6 +32,7 @@ public class RobotContainer {
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   public final Chassis m_chassis;
+ 
 
   private final XboxController xboxController = new XboxController(1);
   private final Joystick joystick = new Joystick(0);
@@ -78,6 +79,13 @@ public class RobotContainer {
       return "Unknown";
     }
   }
+public void armReset(){
+  m_arm.setElbowSetpoint(m_arm.getElbowAngle());
+m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());}
+
+
+
+
 
   private void displayGitInfo() {
     // Get the branch name and display on the dashboard

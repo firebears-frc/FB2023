@@ -84,8 +84,7 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.follow(shoulderMotorRight, true);
         shoulderMotorLeft.burnFlash();
 
-        elbowSetpoint = getElbowAngle();
-        shoulderSetpoint = getShoulderAngle();
+
     }
 
     public double getShoulderAngle() {
