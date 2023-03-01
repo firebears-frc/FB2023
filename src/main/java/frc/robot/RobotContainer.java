@@ -79,9 +79,10 @@ public class RobotContainer {
       return "Unknown";
     }
   }
-public void armReset(){
-  m_arm.setElbowSetpoint(m_arm.getElbowAngle());
-m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());}
+  public void armReset(){
+    m_arm.setElbowSetpoint(m_arm.getElbowAngle());
+    m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
+  }
 
 
 

@@ -22,6 +22,13 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import static frc.robot.Constants.*;
 
 public class Arm extends SubsystemBase {
+    private static int STALL_CURRENT_LIMIT_SHOULDER = 20;
+    private static int FREE_CURRENT_LIMIT_SHOULDER = 15;
+    private static int SECONDARY_CURRENT_LIMIT_SHOULDER = 30;
+
+    private static int STALL_CURRENT_LIMIT_ELBOW = 20;
+    private static int FREE_CURRENT_LIMIT_ELBOW = 15;
+    private static int SECONDARY_CURRENT_LIMIT_ELBOW = 30;
 
     private SparkMotor elbowMotor;
     private SparkMotor shoulderMotorRight;
@@ -41,6 +48,8 @@ public class Arm extends SubsystemBase {
         elbowMotor.restoreFactoryDefaults();
         elbowMotor.setInverted(true);
         elbowMotor.setIdleMode(IdleMode.kBrake);
+        elbowMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT_ELBOW, FREE_CURRENT_LIMIT_ELBOW);
+        elbowMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_ELBOW);
 
 
         elbowPID = elbowMotor.getPIDController();
@@ -61,6 +70,8 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
         shoulderMotorRight.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
+        shoulderMotorRight.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
 
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
@@ -81,6 +92,8 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.restoreFactoryDefaults();
         shoulderMotorLeft.setInverted(false);
         shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
+        shoulderMotorLeft.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
+        shoulderMotorLeft.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
         shoulderMotorLeft.follow(shoulderMotorRight, true);
         shoulderMotorLeft.burnFlash();
 
