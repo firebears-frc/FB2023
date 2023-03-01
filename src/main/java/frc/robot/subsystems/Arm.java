@@ -26,9 +26,9 @@ public class Arm extends SubsystemBase {
     private static int FREE_CURRENT_LIMIT_SHOULDER = 15;
     private static int SECONDARY_CURRENT_LIMIT_SHOULDER = 30;
 
-    private static int STALL_CURRENT_LIMIT_ELBOW = 20;
-    private static int FREE_CURRENT_LIMIT_ELBOW = 15;
-    private static int SECONDARY_CURRENT_LIMIT_ELBOW = 30;
+    private static int STALL_CURRENT_LIMIT_ELBOW = 30;
+    private static int FREE_CURRENT_LIMIT_ELBOW = 25;
+    private static int SECONDARY_CURRENT_LIMIT_ELBOW = 40;
 
     private SparkMotor elbowMotor;
     private SparkMotor shoulderMotorRight;
