@@ -75,7 +75,7 @@ public class Arm extends SubsystemBase {
 
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.005);
+        shoulderPID.setP(0.002);
         shoulderPID.setI(0);
         shoulderPID.setD(0);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
