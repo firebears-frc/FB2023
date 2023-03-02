@@ -24,10 +24,17 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import static frc.robot.Constants.*;
 
 public class Arm extends SubsystemBase {
+    private static int STALL_CURRENT_LIMIT_SHOULDER = 20;
+    private static int FREE_CURRENT_LIMIT_SHOULDER = 15;
+    private static int SECONDARY_CURRENT_LIMIT_SHOULDER = 30;
+
+    private static int STALL_CURRENT_LIMIT_ELBOW = 30;
+    private static int FREE_CURRENT_LIMIT_ELBOW = 25;
+    private static int SECONDARY_CURRENT_LIMIT_ELBOW = 40;
 
     private SparkMotor elbowMotor;
-    private SparkMotor shoulderMotorLeft;
     private SparkMotor shoulderMotorRight;
+    private SparkMotor shoulderMotorLeft;
     private static SparkMaxAbsoluteEncoder elbowEncoder;
     private static SparkMaxAbsoluteEncoder shoulderEncoder;
     private static SparkMaxPIDController elbowPID;
@@ -47,10 +54,13 @@ public class Arm extends SubsystemBase {
         elbowMotor.restoreFactoryDefaults();
         elbowMotor.setInverted(true);
         elbowMotor.setIdleMode(IdleMode.kBrake);
+        elbowMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT_ELBOW, FREE_CURRENT_LIMIT_ELBOW);
+        elbowMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_ELBOW);
+
 
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        elbowPID.setP(.01);
+        elbowPID.setP(0.01);
         elbowPID.setI(0.0);
         elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);
@@ -61,29 +71,36 @@ public class Arm extends SubsystemBase {
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowMotor.burnFlash();
 
-        shoulderMotorLeft = new SparkMotor(12, MotorType.kBrushless);
-
-        shoulderMotorLeft.restoreFactoryDefaults();
-        shoulderMotorLeft.setInverted(false);
-        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
-
-        shoulderMotorRight = new SparkMotor(13, MotorType.kBrushless);
+        shoulderMotorRight = new SparkMotor(12, MotorType.kBrushless);
 
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
         shoulderMotorRight.setIdleMode(IdleMode.kBrake);
-        shoulderMotorRight.follow(shoulderMotorLeft);
+        shoulderMotorRight.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
+        shoulderMotorRight.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
 
-        shoulderPID = shoulderMotorLeft.getPIDController();
-        shoulderEncoder = shoulderMotorLeft.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.01);
-        shoulderPID.setI(0.0);
-        shoulderPID.setD(0.0005);
+        shoulderPID = shoulderMotorRight.getPIDController();
+        shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
+        shoulderPID.setP(0.002);
+        shoulderPID.setI(0);
+        shoulderPID.setD(0);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
         shoulderPID.setPositionPIDWrappingMaxInput(360);
+        shoulderEncoder.setPositionConversionFactor(360);
         shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
+        shoulderMotorRight.burnFlash();
+
+
+        shoulderMotorLeft = new SparkMotor(13, MotorType.kBrushless);
+
+        shoulderMotorLeft.restoreFactoryDefaults();
+        shoulderMotorLeft.setInverted(false);
+        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
+        shoulderMotorLeft.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
+        shoulderMotorLeft.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
+        shoulderMotorLeft.follow(shoulderMotorRight, true);
         shoulderMotorLeft.burnFlash();
         shoulderMotorRight.burnFlash();
         elbowSetpoint = getElbowAngle();
@@ -113,13 +130,15 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        if (setpoint > 15 && setpoint < 180) {
+        /*if(setpoint < 15 || setpoint > 280){
             System.out.println("Shoulder1: " + setpoint);
             setpoint = 15;
-        } else if (setpoint < 207 && setpoint > 180) {
+        } else if (setpoint > 110 && setpoint < 280) {
             System.out.println("Shoulder2: " + setpoint);
-            setpoint = 207;
-        }
+            setpoint = 110;
+        } else {
+            System.out.println("Shoudker 3");
+        }*/
         shoulderSetpoint = setpoint;
     }
 
@@ -157,7 +176,11 @@ public class Arm extends SubsystemBase {
             SmartDashboard.putNumber("Shoulder Angle", shoulderAngle);
             SmartDashboard.putNumber("Elbow Angle", elbowAngle);
             SmartDashboard.putNumber("Setpoint", elbowSetpoint);
+            SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
+            SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
+            SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
         }
+        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         if (LOGGING && (shoulderAngle != prevShoulderAngle || elbowAngle != prevElbowAngle)) {
             shoulderLog.append(shoulderAngle);

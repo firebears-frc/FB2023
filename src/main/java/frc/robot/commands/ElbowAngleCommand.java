@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
 
-public class ArmAngleCommand extends CommandBase {
-  /** Creates a new ArmAngleCommand. */
+public class ElbowAngleCommand extends CommandBase {
+  /** Creates a new ElbowAngleCommand. */
   private double arm_angle;
   private final Arm m_arm;
 
-  public ArmAngleCommand(Arm subsystem, double a) {
+  public ElbowAngleCommand(Arm subsystem, double a) {
     m_arm=subsystem;
     arm_angle=a;
     addRequirements(m_arm);

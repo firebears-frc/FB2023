@@ -78,6 +78,14 @@ public class RobotContainer {
       return "Unknown";
     }
   }
+  public void armReset(){
+    m_arm.setElbowSetpoint(m_arm.getElbowAngle());
+    m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
+  }
+
+
+
+
 
   private void displayGitInfo() {
     // Get the branch name and display on the dashboard
@@ -129,7 +137,7 @@ public class RobotContainer {
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
-    xboxBButton.onTrue(new ArmAngleCommand(m_arm, 210));
+    xboxBButton.onTrue(new ElbowAngleCommand(m_arm, 210));
   }
 
   public XboxController getXboxController() {
