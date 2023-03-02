@@ -3,9 +3,13 @@ package frc.robot;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import static frc.robot.Constants.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,6 +35,10 @@ public class Robot extends TimedRobot {
                 "/u/config.properties");
         m_robotContainer = RobotContainer.getInstance();
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_RobotBuilder);
+        if (LOGGING) {
+            DataLogManager.start();
+            DriverStation.startDataLog(DataLogManager.getLog());
+        }
     }
 
     /**
@@ -57,6 +65,9 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
+        if (LOGGING) {
+            DataLogManager.getLog().flush();
+        }
     }
 
     @Override

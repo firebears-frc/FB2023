@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +35,10 @@ public class Arm extends SubsystemBase {
     private double elbowSetpoint;
     private double shoulderSetpoint;
     Arm arm;
+    private DoubleLogEntry elbowLog;
+    private DoubleLogEntry shoulderLog;
+    private double prevShoulderAngle;
+    private double prevElbowAngle;
 
     public Arm() {
 
@@ -41,7 +47,6 @@ public class Arm extends SubsystemBase {
         elbowMotor.restoreFactoryDefaults();
         elbowMotor.setInverted(true);
         elbowMotor.setIdleMode(IdleMode.kBrake);
-
 
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
@@ -83,6 +88,11 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.burnFlash();
         elbowSetpoint = getElbowAngle();
         shoulderSetpoint = getShoulderAngle();
+
+        if (LOGGING) {
+            elbowLog = new DoubleLogEntry(DataLogManager.getLog(), "/arm/elbow");
+            shoulderLog = new DoubleLogEntry(DataLogManager.getLog(), "/arm/shoulder");
+        }
     }
 
     public double getShoulderAngle() {
@@ -103,7 +113,7 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        if(setpoint > 15 && setpoint < 180){
+        if (setpoint > 15 && setpoint < 180) {
             System.out.println("Shoulder1: " + setpoint);
             setpoint = 15;
         } else if (setpoint < 207 && setpoint > 180) {
@@ -121,7 +131,7 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        if(setpoint > 15 && setpoint < 180){
+        if (setpoint > 15 && setpoint < 180) {
             System.out.println("Elbow1: " + setpoint);
             setpoint = 15;
         } else if (setpoint < 207 && setpoint > 180) {
@@ -134,15 +144,26 @@ public class Arm extends SubsystemBase {
     public double getElbowSetpoint() {
         return elbowSetpoint;
     }
+
     public double getShoulderSetpoint() {
         return shoulderSetpoint;
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shoulder Angle", getShoulderAngle());
-        SmartDashboard.putNumber("Elbow Angle", getElbowAngle());
-        SmartDashboard.putNumber("Setpoint", elbowSetpoint);
+        double shoulderAngle = getShoulderAngle();
+        double elbowAngle = getElbowAngle();
+        if (DEBUG) {
+            SmartDashboard.putNumber("Shoulder Angle", shoulderAngle);
+            SmartDashboard.putNumber("Elbow Angle", elbowAngle);
+            SmartDashboard.putNumber("Setpoint", elbowSetpoint);
+        }
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
+        if (LOGGING && (shoulderAngle != prevShoulderAngle || elbowAngle != prevElbowAngle)) {
+            shoulderLog.append(shoulderAngle);
+            elbowLog.append(elbowAngle);
+        }
+        prevElbowAngle = elbowAngle;
+        prevShoulderAngle = shoulderAngle;
     }
 }
