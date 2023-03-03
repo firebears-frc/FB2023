@@ -36,23 +36,24 @@ public class Constants {
     }
 
     public static class ArmConstants {
-        public static final int SHOULDER_1_PORT = 1;
-        public static final int SHOULDER_2_PORT = 1;
-        public static final int ELBOW_PORT = 1;
-
-        public static final int STALL_CURRENT_LIMIT = 30;
-        public static final int FREE_CURRENT_LIMIT = 20;
-        public static final double SECONDARY_CURRENT_LIMIT = 60.0;
-
-        public static final double ELBOW_P = 0.0001;
-        public static final double ELBOW_I = 0;
-        public static final double ELBOW_D = 0;
-        public static final double ELBOW_OFFSET = 0; // degrees
-
+        public static final int SHOULDER_RIGHT_PORT = 12;
+        public static final int SHOULDER_LEFT_PORT = 13;
+        public static final int SHOULDER_STALL_CURRENT_LIMIT = 35;
+        public static final int SHOULDER_FREE_CURRENT_LIMIT = 20;
+        public static final double SHOULDER_SECONDARY_CURRENT_LIMIT = 40.0;
         public static final double SHOULDER_P = 0.0001;
         public static final double SHOULDER_I = 0;
-        public static final double SHOULDER_D = 0;
-        public static final double SHOULDER_OFFSET = 0; // degrees
+        public static final double SHOULDER_D = 0.0005;
+        public static final double SHOULDER_OFFSET = 196; // degrees
+
+        public static final int ELBOW_PORT = 7;
+        public static final int ELBOW_STALL_CURRENT_LIMIT = 35;
+        public static final int ELBOW_FREE_CURRENT_LIMIT = 20;
+        public static final double ELBOW_SECONDARY_CURRENT_LIMIT = 40.0;
+        public static final double ELBOW_P = 0.01;
+        public static final double ELBOW_I = 0;
+        public static final double ELBOW_D = 0.0005;
+        public static final double ELBOW_OFFSET = 240; // degrees
 
         // Target points, in degrees
         public static final double ELBOW_SUBSTATION = 0;
@@ -67,18 +68,18 @@ public class Constants {
         public static final double SHOULDER_LOW = 0;
 
         // Adjustment speed of each joint in degrees per loop
-        public static final double ELBOW_SPEED = 0.1;
-        public static final double SHOULDER_SPEED = 0.1;
+        public static final double ELBOW_SPEED = 2.0;
+        public static final double SHOULDER_SPEED = 2.0;
     }
 
     public static class SchluckerConstants {
-        public static final int MOTOR_PORT = 1;
+        public static final int MOTOR_PORT = 6;
 
         public static final int STALL_CURRENT_LIMIT = 20;
         public static final int FREE_CURRENT_LIMIT = 5;
         public static final double SECONDARY_CURRENT_LIMIT = 30.0;
 
-        public static final double CONE_IN_CUBE_OUT_SPEED = 0.5;
-        public static final double CONE_OUT_CUBE_IN_SPEED = -0.5;
+        public static final double CONE_IN_CUBE_OUT_SPEED = 0.7;
+        public static final double CONE_OUT_CUBE_IN_SPEED = -0.7;
     }
 }

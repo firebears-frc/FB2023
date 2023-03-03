@@ -17,8 +17,8 @@ public class Arm extends SubsystemBase {
     private SparkMaxPIDController elbowPID;
     private double elbowSetpoint;
 
-    private CANSparkMax shoulderMotor1;
-    private CANSparkMax shoulderMotor2;
+    private CANSparkMax shoulderMotorRight;
+    private CANSparkMax shoulderMotorLeft;
     private SparkMaxAbsoluteEncoder shoulderEncoder;
     private SparkMaxPIDController shoulderPID;
     private double shoulderSetpoint;
@@ -26,10 +26,10 @@ public class Arm extends SubsystemBase {
     public Arm() {
         elbowMotor = new CANSparkMax(ArmConstants.ELBOW_PORT, MotorType.kBrushless);
         elbowMotor.restoreFactoryDefaults();
-        elbowMotor.setInverted(false);
+        elbowMotor.setInverted(true);
         elbowMotor.setIdleMode(IdleMode.kBrake);
-        elbowMotor.setSmartCurrentLimit(ArmConstants.STALL_CURRENT_LIMIT, ArmConstants.FREE_CURRENT_LIMIT);
-        elbowMotor.setSecondaryCurrentLimit(ArmConstants.SECONDARY_CURRENT_LIMIT);
+        elbowMotor.setSmartCurrentLimit(ArmConstants.ELBOW_STALL_CURRENT_LIMIT, ArmConstants.ELBOW_FREE_CURRENT_LIMIT);
+        elbowMotor.setSecondaryCurrentLimit(ArmConstants.ELBOW_SECONDARY_CURRENT_LIMIT);
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
         elbowEncoder.setPositionConversionFactor(360); // degrees
         elbowEncoder.setZeroOffset(ArmConstants.ELBOW_OFFSET);
@@ -43,16 +43,16 @@ public class Arm extends SubsystemBase {
         elbowPID.setD(ArmConstants.ELBOW_D);
         elbowMotor.burnFlash();
 
-        shoulderMotor1 = new CANSparkMax(ArmConstants.SHOULDER_1_PORT, MotorType.kBrushless);
-        shoulderMotor1.restoreFactoryDefaults();
-        shoulderMotor1.setInverted(false);
-        shoulderMotor1.setIdleMode(IdleMode.kBrake);
-        shoulderMotor1.setSmartCurrentLimit(ArmConstants.STALL_CURRENT_LIMIT, ArmConstants.FREE_CURRENT_LIMIT);
-        shoulderMotor1.setSecondaryCurrentLimit(ArmConstants.SECONDARY_CURRENT_LIMIT);
-        shoulderEncoder = shoulderMotor1.getAbsoluteEncoder(Type.kDutyCycle);
+        shoulderMotorRight = new CANSparkMax(ArmConstants.SHOULDER_RIGHT_PORT, MotorType.kBrushless);
+        shoulderMotorRight.restoreFactoryDefaults();
+        shoulderMotorRight.setInverted(true);
+        shoulderMotorRight.setIdleMode(IdleMode.kBrake);
+        shoulderMotorRight.setSmartCurrentLimit(ArmConstants.SHOULDER_STALL_CURRENT_LIMIT, ArmConstants.SHOULDER_FREE_CURRENT_LIMIT);
+        shoulderMotorRight.setSecondaryCurrentLimit(ArmConstants.SHOULDER_SECONDARY_CURRENT_LIMIT);
+        shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderEncoder.setPositionConversionFactor(360); // degrees
         shoulderEncoder.setZeroOffset(ArmConstants.SHOULDER_OFFSET);
-        shoulderPID = shoulderMotor1.getPIDController();
+        shoulderPID = shoulderMotorRight.getPIDController();
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0);
@@ -60,16 +60,16 @@ public class Arm extends SubsystemBase {
         shoulderPID.setP(ArmConstants.SHOULDER_P);
         shoulderPID.setI(ArmConstants.SHOULDER_I);
         shoulderPID.setD(ArmConstants.SHOULDER_D);
-        shoulderMotor1.burnFlash();
+        shoulderMotorRight.burnFlash();
 
-        shoulderMotor2 = new CANSparkMax(ArmConstants.SHOULDER_2_PORT, MotorType.kBrushless);
-        shoulderMotor2.restoreFactoryDefaults();
-        shoulderMotor2.setInverted(false);
-        shoulderMotor2.setIdleMode(IdleMode.kBrake);
-        shoulderMotor2.setSmartCurrentLimit(ArmConstants.STALL_CURRENT_LIMIT, ArmConstants.FREE_CURRENT_LIMIT);
-        shoulderMotor2.setSecondaryCurrentLimit(ArmConstants.SECONDARY_CURRENT_LIMIT);
-        shoulderMotor2.follow(shoulderMotor1);
-        shoulderMotor2.burnFlash();
+        shoulderMotorLeft = new CANSparkMax(ArmConstants.SHOULDER_LEFT_PORT, MotorType.kBrushless);
+        shoulderMotorLeft.restoreFactoryDefaults();
+        shoulderMotorLeft.setInverted(false);
+        shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
+        shoulderMotorLeft.setSmartCurrentLimit(ArmConstants.SHOULDER_STALL_CURRENT_LIMIT, ArmConstants.SHOULDER_FREE_CURRENT_LIMIT);
+        shoulderMotorLeft.setSecondaryCurrentLimit(ArmConstants.SHOULDER_SECONDARY_CURRENT_LIMIT);
+        shoulderMotorLeft.follow(shoulderMotorRight, true);
+        shoulderMotorLeft.burnFlash();
     }
 
     public void setElbowAngle(double angle) {
