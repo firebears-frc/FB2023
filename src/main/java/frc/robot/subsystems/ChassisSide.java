@@ -38,7 +38,7 @@ public class ChassisSide implements Sendable {
         backMotor.setSecondaryCurrentLimit(ChassisConstants.SECONDARY_CURRENT_LIMIT);
         backMotor.follow(frontMotor);
         backMotor.burnFlash();
-    
+
         pid = new PIDController(ChassisConstants.P, ChassisConstants.I, ChassisConstants.D);
 
         setSetpoint(0.0);
@@ -47,6 +47,7 @@ public class ChassisSide implements Sendable {
 
     /**
      * Set the target velocity of this side
+     * 
      * @param speed in meters per second
      */
     public void setSetpoint(double speed) {
@@ -55,6 +56,7 @@ public class ChassisSide implements Sendable {
 
     /**
      * Get the target velocity of this side
+     * 
      * @return meters per second
      */
     public double getSetpoint() {
@@ -70,6 +72,7 @@ public class ChassisSide implements Sendable {
 
     /**
      * Get the distance this side has traveled
+     * 
      * @return meters
      */
     public double getDistance() {
@@ -78,6 +81,7 @@ public class ChassisSide implements Sendable {
 
     /**
      * Get the velocity of this side
+     * 
      * @return meters per second
      */
     public double getVelocity() {

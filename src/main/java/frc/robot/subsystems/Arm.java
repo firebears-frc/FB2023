@@ -47,7 +47,8 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
         shoulderMotorRight.setIdleMode(IdleMode.kBrake);
-        shoulderMotorRight.setSmartCurrentLimit(ArmConstants.SHOULDER_STALL_CURRENT_LIMIT, ArmConstants.SHOULDER_FREE_CURRENT_LIMIT);
+        shoulderMotorRight.setSmartCurrentLimit(ArmConstants.SHOULDER_STALL_CURRENT_LIMIT,
+                ArmConstants.SHOULDER_FREE_CURRENT_LIMIT);
         shoulderMotorRight.setSecondaryCurrentLimit(ArmConstants.SHOULDER_SECONDARY_CURRENT_LIMIT);
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderEncoder.setPositionConversionFactor(360); // degrees
@@ -66,7 +67,8 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.restoreFactoryDefaults();
         shoulderMotorLeft.setInverted(false);
         shoulderMotorLeft.setIdleMode(IdleMode.kBrake);
-        shoulderMotorLeft.setSmartCurrentLimit(ArmConstants.SHOULDER_STALL_CURRENT_LIMIT, ArmConstants.SHOULDER_FREE_CURRENT_LIMIT);
+        shoulderMotorLeft.setSmartCurrentLimit(ArmConstants.SHOULDER_STALL_CURRENT_LIMIT,
+                ArmConstants.SHOULDER_FREE_CURRENT_LIMIT);
         shoulderMotorLeft.setSecondaryCurrentLimit(ArmConstants.SHOULDER_SECONDARY_CURRENT_LIMIT);
         shoulderMotorLeft.follow(shoulderMotorRight, true);
         shoulderMotorLeft.burnFlash();

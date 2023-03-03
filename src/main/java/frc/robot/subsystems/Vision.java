@@ -36,22 +36,21 @@ public class Vision extends SubsystemBase {
         AprilTagFieldLayout fieldLayout = null;
         try {
             fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Failed to load AprilTag layout!");
             e.printStackTrace();
             return;
         }
 
         poseEstimator = new PhotonPoseEstimator(
-            fieldLayout,
-            PoseStrategy.MULTI_TAG_PNP,
-            camera,
-            new Transform3d(new Translation3d(
-                    Units.inchesToMeters(0),
-                    Units.inchesToMeters(0),
-                    Units.inchesToMeters(0)),
-                    new Rotation3d()));
+                fieldLayout,
+                PoseStrategy.MULTI_TAG_PNP,
+                camera,
+                new Transform3d(new Translation3d(
+                        Units.inchesToMeters(0),
+                        Units.inchesToMeters(0),
+                        Units.inchesToMeters(0)),
+                        new Rotation3d()));
     }
 
     @Override
@@ -60,13 +59,13 @@ public class Vision extends SubsystemBase {
         SmartDashboard.putBoolean("Vision Connected", connected);
         if (!connected)
             return;
-    
+
         PhotonPipelineResult result = camera.getLatestResult();
         if (!result.hasTargets())
             return;
 
         Optional<EstimatedRobotPose> poseResult = poseEstimator.update();
-        if(!poseResult.isPresent())
+        if (!poseResult.isPresent())
             return;
 
         lastPose = poseResult.get().estimatedPose;
