@@ -23,6 +23,8 @@ public class Constants {
     }
 
     public static int kFeetToMeterFactor = 25;
+    public static int shoulderArmLength=30;
+    public static int elbowArmLength=33;
 
     public static void init(String... fileNames) {
         cleanAllPreferences();

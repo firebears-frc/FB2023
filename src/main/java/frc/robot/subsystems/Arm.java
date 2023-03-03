@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.SparkAbsoluteEncoder;
 import frc.robot.util.SparkEncoder;
 import frc.robot.util.SparkMotor;
@@ -154,6 +155,20 @@ public class Arm extends SubsystemBase {
     public double getShoulderSetpoint() {
         return shoulderSetpoint;
     }
+    public Translation2d getArmPosition(){
+        double elbowX=Math.cos(Math.toRadians(getShoulderAngle()));
+        double elbowY=Math.sin(Math.toRadians(getShoulderAngle()));
+        elbowX*=shoulderArmLength;
+        elbowY*=shoulderArmLength;
+
+        double shluckerX=Math.cos(Math.toRadians(getElbowAngle()+getShoulderAngle()));
+        double ShluckerY=Math.sin(Math.toRadians(getElbowAngle()+getShoulderAngle()));
+        shluckerX*=elbowArmLength;
+        ShluckerY*=elbowArmLength;
+
+        Translation2d output=new Translation2d(elbowX+shluckerX,elbowY+ShluckerY);
+        return output;
+    }
 
     @Override
     public void periodic() {
@@ -163,6 +178,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
+
+        SmartDashboard.putString("shlucker position",getArmPosition().getX()+"+"+getArmPosition().getY());
 
         SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
         SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
