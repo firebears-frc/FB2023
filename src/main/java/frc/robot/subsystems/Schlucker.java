@@ -11,7 +11,7 @@ public class Schlucker extends SubsystemBase {
     private CANSparkMax motor;
 
     public Schlucker() {
-        motor = new CANSparkMax(SchluckerConstants.MOTOR_PORT, MotorType.kBrushed);
+        motor = new CANSparkMax(SchluckerConstants.MOTOR_PORT, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kCoast);
