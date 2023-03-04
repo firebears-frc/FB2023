@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandGroupBase;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import java.io.File;
@@ -131,14 +133,18 @@ public class RobotContainer {
 
     //xboxController leftJoystick = new XboxController(1);
 
-    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
-    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
-    xboxBButton.onTrue(new ElbowAngleCommand(m_arm, 210));
+    xboxBButton.onTrue(new ArmShoulderSetpointCommand(135, m_arm));
+
+    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
+    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
+    
+    JoystickButton xboxYButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
+    xboxYButton.onTrue(new ArmShoulderSetpointCommand(0, m_arm));
   }
 
   public XboxController getXboxController() {
