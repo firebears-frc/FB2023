@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -134,6 +135,8 @@ public class RobotContainer {
     //xboxController leftJoystick = new XboxController(1);
 
 
+    //Buttons
+
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
@@ -145,6 +148,21 @@ public class RobotContainer {
     
     JoystickButton xboxYButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
     xboxYButton.onTrue(new ArmShoulderSetpointCommand(0, m_arm));
+
+    //Dpad
+
+    POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
+    xboxDpadUpButton.onTrue(new ArmElbowSetpointCommand(0, m_arm));
+
+    POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
+    xboxDpadRightButton.onTrue(new ArmElbowSetpointCommand(0, m_arm));
+
+    POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
+    xboxDpadDownButton.onTrue(new ArmElbowSetpointCommand(0, m_arm));
+
+    POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
+    xboxDpadLeftButton.onTrue(new ArmElbowSetpointCommand(0, m_arm));
+    
   }
 
   public XboxController getXboxController() {
