@@ -67,7 +67,7 @@ public class Arm extends SubsystemBase {
         elbowMotor.burnFlash();
 
 
-        shoulderMotorRight = new SparkMotor(12, MotorType.kBrushless);
+        shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
 
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
@@ -75,7 +75,7 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
         shoulderMotorRight.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
 
-        shoulderMotorLeft = new SparkMotor(13, MotorType.kBrushless);
+        shoulderMotorLeft = new SparkMotor(9, MotorType.kBrushless);
 
         shoulderMotorLeft.restoreFactoryDefaults();
         shoulderMotorLeft.setInverted(false);
