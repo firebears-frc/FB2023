@@ -23,12 +23,12 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import static frc.robot.Constants.*;
 
 public class Arm extends SubsystemBase {
-    private static int STALL_CURRENT_LIMIT_SHOULDER = 20;
-    private static int FREE_CURRENT_LIMIT_SHOULDER = 15;
+    private static int STALL_CURRENT_LIMIT_SHOULDER = 30;
+    private static int FREE_CURRENT_LIMIT_SHOULDER = 25;
     private static int SECONDARY_CURRENT_LIMIT_SHOULDER = 30;
 
-    private static int STALL_CURRENT_LIMIT_ELBOW = 30;
-    private static int FREE_CURRENT_LIMIT_ELBOW = 25;
+    private static int STALL_CURRENT_LIMIT_ELBOW = 40;
+    private static int FREE_CURRENT_LIMIT_ELBOW = 35;
     private static int SECONDARY_CURRENT_LIMIT_ELBOW = 40;
 
     private SparkMotor elbowMotor;
@@ -66,6 +66,7 @@ public class Arm extends SubsystemBase {
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowMotor.burnFlash();
 
+
         shoulderMotorRight = new SparkMotor(12, MotorType.kBrushless);
 
         shoulderMotorRight.restoreFactoryDefaults();
@@ -73,20 +74,6 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.setIdleMode(IdleMode.kBrake);
         shoulderMotorRight.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
         shoulderMotorRight.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
-
-        shoulderPID = shoulderMotorRight.getPIDController();
-        shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.002);
-        shoulderPID.setI(0);
-        shoulderPID.setD(0);
-        shoulderPID.setFeedbackDevice(shoulderEncoder);
-        shoulderPID.setPositionPIDWrappingEnabled(true);
-        shoulderPID.setPositionPIDWrappingMinInput(0.0);
-        shoulderPID.setPositionPIDWrappingMaxInput(360);
-        shoulderEncoder.setPositionConversionFactor(360);
-        shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
-        shoulderMotorRight.burnFlash();
-
 
         shoulderMotorLeft = new SparkMotor(13, MotorType.kBrushless);
 
@@ -97,6 +84,19 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
         shoulderMotorLeft.follow(shoulderMotorRight, true);
         shoulderMotorLeft.burnFlash();
+
+        shoulderPID = shoulderMotorRight.getPIDController();
+        shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
+        shoulderPID.setP(0.007);
+        shoulderPID.setI(0);
+        shoulderPID.setD(0);
+        shoulderPID.setFeedbackDevice(shoulderEncoder);
+        shoulderPID.setPositionPIDWrappingEnabled(true);
+        shoulderPID.setPositionPIDWrappingMinInput(0.0);
+        shoulderPID.setPositionPIDWrappingMaxInput(360);
+        shoulderEncoder.setPositionConversionFactor(360);
+        shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
+        shoulderMotorRight.burnFlash();
 
 
     }
@@ -119,15 +119,15 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        /*if(setpoint < 15 || setpoint > 280){
-            System.out.println("Shoulder1: " + setpoint);
-            setpoint = 15;
-        } else if (setpoint > 110 && setpoint < 280) {
-            System.out.println("Shoulder2: " + setpoint);
-            setpoint = 110;
+         if(setpoint < 0 || setpoint > 280){
+            System.out.println("Shoulder too far back " + setpoint);
+            setpoint = 0;
+        } else if (setpoint > 200 && setpoint < 280) {
+            System.out.println("Shoulder too far forward " + setpoint);
+            setpoint = 199;
         } else {
-            System.out.println("Shoudker 3");
-        }*/
+            System.out.println("Shoulder good");
+        }
         shoulderSetpoint = setpoint;
     }
 
@@ -140,11 +140,13 @@ public class Arm extends SubsystemBase {
         }
 
         if(setpoint > 15 && setpoint < 180){
-            System.out.println("Elbow1: " + setpoint);
-            setpoint = 15;
-        } else if (setpoint < 207 && setpoint > 180) {
-            System.out.println("Elbow2: " + setpoint);
-            setpoint = 207;
+            System.out.println("Elbow too far forward " + setpoint);
+            setpoint = 14;
+        } else if (setpoint < 200 && setpoint > 180) {
+            System.out.println("Elbow too far back " + setpoint);
+            setpoint = 201;
+        } else {
+            System.out.println("Elbow good");
         }
         elbowSetpoint = setpoint;
     }
