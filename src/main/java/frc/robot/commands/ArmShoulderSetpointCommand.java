@@ -23,6 +23,6 @@ public class ArmShoulderSetpointCommand extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_arm.setShoulderSetpoint(setPoint);
+    //m_arm.setShoulderSetpoint(setPoint);
   }
 }

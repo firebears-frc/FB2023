@@ -38,12 +38,11 @@ public class Constants {
         SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);
 
         if (PRACTICE_ROBOT) {
-            kFeetToMeterFactor = 25;
+            kFeetToMeterFactor = 20;
         } else { 
             // Competition bot
             kFeetToMeterFactor = 20;
             
         }
-        System.out.println("kFeetToMeterFactor = " + kFeetToMeterFactor);
     }
 }

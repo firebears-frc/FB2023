@@ -25,11 +25,11 @@ import static frc.robot.Constants.*;
 public class Arm extends SubsystemBase {
     private static int STALL_CURRENT_LIMIT_SHOULDER = 30;
     private static int FREE_CURRENT_LIMIT_SHOULDER = 25;
-    private static int SECONDARY_CURRENT_LIMIT_SHOULDER = 30;
+    private static int SECONDARY_CURRENT_LIMIT_SHOULDER = 35;
 
     private static int STALL_CURRENT_LIMIT_ELBOW = 40;
     private static int FREE_CURRENT_LIMIT_ELBOW = 35;
-    private static int SECONDARY_CURRENT_LIMIT_ELBOW = 40;
+    private static int SECONDARY_CURRENT_LIMIT_ELBOW = 45;
 
     private SparkMotor elbowMotor;
     private SparkMotor shoulderMotorRight;
@@ -87,9 +87,9 @@ public class Arm extends SubsystemBase {
 
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.007);
+        shoulderPID.setP(0.02);
         shoulderPID.setI(0);
-        shoulderPID.setD(0);
+        shoulderPID.setD(0.001);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
@@ -120,13 +120,13 @@ public class Arm extends SubsystemBase {
         }
 
          if(setpoint < 0 || setpoint > 280){
-            System.out.println("Shoulder too far back " + setpoint);
+
             setpoint = 0;
         } else if (setpoint > 200 && setpoint < 280) {
-            System.out.println("Shoulder too far forward " + setpoint);
+        
             setpoint = 199;
         } else {
-            System.out.println("Shoulder good");
+    
         }
         shoulderSetpoint = setpoint;
     }
@@ -140,13 +140,12 @@ public class Arm extends SubsystemBase {
         }
 
         if(setpoint > 15 && setpoint < 180){
-            System.out.println("Elbow too far forward " + setpoint);
+       
             setpoint = 14;
         } else if (setpoint < 200 && setpoint > 180) {
-            System.out.println("Elbow too far back " + setpoint);
+    
             setpoint = 201;
-        } else {
-            System.out.println("Elbow good");
+   
         }
         elbowSetpoint = setpoint;
     }
