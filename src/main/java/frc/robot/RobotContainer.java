@@ -136,7 +136,7 @@ public class RobotContainer {
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
-    xboxBButton.onTrue((new ArmShoulderSetpointCommand(15, m_arm))
+    xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
     .andThen(new ArmElbowSetpointCommand(220, m_arm)));
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
     xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
@@ -163,7 +163,7 @@ public class RobotContainer {
 
     //High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(107, m_arm))
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(95, m_arm))
         .andThen(new ArmElbowSetpointCommand(325, m_arm)));
 
   }
