@@ -184,5 +184,6 @@ public class Arm extends SubsystemBase {
 
         SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
         SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
+        SmartDashboard.putNumber("Elbow Output", elbowMotor.getAppliedOutput());
     }
 }
