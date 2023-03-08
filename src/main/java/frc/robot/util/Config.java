@@ -55,7 +55,6 @@ public final class Config {
                         outStream.printf("%s=%s%n", key, Preferences.getString(key, "UNKNOWN"));
                 }
             } catch (Exception e) {
-                System.out.println("ERROR: Config problem for property: " + key);
                 e.printStackTrace();
             }
         }
