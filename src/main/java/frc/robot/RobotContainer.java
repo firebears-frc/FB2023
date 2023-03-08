@@ -56,8 +56,20 @@ public class RobotContainer {
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Autonomous Command", (new ChassisDriveToDistanceCommand(-2, m_chassis))
+    m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-2, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
+    //m_chooser.addOption("Auto Balance", ());
+    m_chooser.addOption("Cone", ((new ArmShoulderSetpointCommand(95, m_arm))
+    .andThen(new ArmElbowSetpointCommand(270, m_arm))
+    .andThen(new ShluckerCommand(-1,m_schlucker))
+    .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+    .andThen(new ArmElbowSetpointCommand(205, m_arm))
+    .andThen(new ChassisDriveToDistanceCommand(-2,m_chassis))
+    .andThen(new ChassisDriveToDistanceCommand(2,m_chassis))));
+    //m_chooser.addOption("Cone + Balance", ());
+    //m_chooser.addOption("Cube", ());
+    //m_chooser.addOption("Cube + Balance", ());
+
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -136,7 +148,7 @@ public class RobotContainer {
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
-    xboxBButton.onTrue((new ArmShoulderSetpointCommand(2, m_arm))
+    xboxBButton.onTrue((new ArmShoulderSetpointCommand(135, m_arm))
     .andThen(new ArmElbowSetpointCommand(205, m_arm)));
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
     xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
