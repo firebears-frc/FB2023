@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -42,6 +44,9 @@ public class Chassis extends SubsystemBase {
     private double rightOffSet = 0;
 
     private final DifferentialDriveOdometry m_odometry;
+
+    private DoubleLogEntry leftMotorLog;
+    private DoubleLogEntry rightMotorLog;
 
     public Chassis() {
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
@@ -107,6 +112,11 @@ public class Chassis extends SubsystemBase {
         rightBackMotor.burnFlash();
         leftFrontMotor.burnFlash();
         leftBackMotor.burnFlash();
+
+        if (LOGGING) {
+            leftMotorLog = new DoubleLogEntry(DataLogManager.getLog(), "/chassis/leftMotors");
+            rightMotorLog = new DoubleLogEntry(DataLogManager.getLog(), "/chassis/rightMotors");
+        }
     }
 
     @Override
@@ -123,6 +133,11 @@ public class Chassis extends SubsystemBase {
         SmartDashboard.putNumber("getPitch", getPitch());
         SmartDashboard.putNumber("getRoll", getRoll());
         SmartDashboard.putNumber("getAngle", getAngle());
+
+        if (LOGGING) {
+            leftMotorLog.append(leftMotors.get());
+            rightMotorLog.append(rightMotors.get());
+        }
     }
 
     @Override
