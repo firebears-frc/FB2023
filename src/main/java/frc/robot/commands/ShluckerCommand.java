@@ -12,17 +12,26 @@ public class ShluckerCommand extends CommandBase {
   public ItemHeld _item_held;
   private final Schlucker m_schlucker;
   private double speed;
-
+                            
   public ShluckerCommand(double speed, Schlucker subsystem) {
 
     m_schlucker = subsystem;
     this.speed = speed;
     addRequirements(m_schlucker);
-
   }
 
   @Override
   public void initialize() {
+    // Check what item is being held by the robot
+    if (speed < 0) {
+      intakeCone();
+    }
+    else if (speed > 0) {
+      intakeCube(); 
+    }
+    else {
+      eject();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -50,14 +59,17 @@ public class ShluckerCommand extends CommandBase {
     NONE  
   }
 
+  // X button, positive speed
   public void intakeCube() {
     _item_held = ItemHeld.CUBE;
   }
   
+  // A button, negative speed
   public void intakeCone() {
     _item_held = ItemHeld.CONE;
   }
   
+  // TODO - Assign Button
   public void eject() {
     _item_held = ItemHeld.NONE;
   }
