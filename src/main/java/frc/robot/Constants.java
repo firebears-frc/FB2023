@@ -24,6 +24,8 @@ public class Constants {
     }
 
     public static int kFeetToMeterFactor = 25;
+    public static int shoulderArmLength=30;
+    public static int elbowArmLength=33;
 
     public static void init(String... fileNames) {
         cleanAllPreferences();
@@ -38,12 +40,11 @@ public class Constants {
         SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);
 
         if (PRACTICE_ROBOT) {
-            kFeetToMeterFactor = 25;
+            kFeetToMeterFactor = 20;
         } else { 
             // Competition bot
             kFeetToMeterFactor = 20;
             
         }
-        System.out.println("kFeetToMeterFactor = " + kFeetToMeterFactor);
     }
 }

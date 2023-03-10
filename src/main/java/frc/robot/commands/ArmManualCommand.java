@@ -40,17 +40,16 @@ public class ArmManualCommand extends CommandBase {
   public void execute() {
     shoulderSetPoint = m_arm.getShoulderSetpoint();
     if (Math.abs(controller.getRightY()) > 0.1) {
-      shoulderSetPoint += controller.getRightY();
+      shoulderSetPoint -= controller.getRightY();
     }
     m_arm.setShoulderSetpoint(shoulderSetPoint);
 
     elbowSetPoint = m_arm.getElbowSetpoint();
     if (Math.abs(controller.getLeftY()) > 0.1) {
-      elbowSetPoint += controller.getLeftY();
+      elbowSetPoint -= controller.getLeftY();
     }
     m_arm.setElbowSetpoint(elbowSetPoint);
     
-    System.out.println("Running Arm Command");
   }
 
   // Called once the command ends or is interrupted.
