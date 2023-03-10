@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Schlucker;
 
 public class ShluckerCommand extends CommandBase {
-
+  public ItemHeld _item_held;
   private final Schlucker m_schlucker;
   private double speed;
 
@@ -43,4 +43,23 @@ public class ShluckerCommand extends CommandBase {
   public boolean isFinished() {
     return false;
   }
+
+  enum ItemHeld {
+    CONE,
+    CUBE,
+    NONE  
+  }
+
+  public void intakeCube() {
+    _item_held = ItemHeld.CUBE;
+  }
+  
+  public void intakeCone() {
+    _item_held = ItemHeld.CONE;
+  }
+  
+  public void eject() {
+    _item_held = ItemHeld.NONE;
+  }
+
 }

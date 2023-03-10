@@ -132,15 +132,20 @@ public class RobotContainer {
 
     // Buttons
 
+    // A button = picks up cone and drops cube
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
     xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
 
+    // B button = reset position (stow)
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
     .andThen(new ArmElbowSetpointCommand(220, m_arm)));
+
+    // X button = picks up cube and drops cone
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
     xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
+    // Y button = N/A
     JoystickButton xboxYButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
     xboxYButton.onTrue(new ArmShoulderSetpointCommand(0, m_arm));
 
@@ -183,4 +188,5 @@ public class RobotContainer {
     return m_chooser.getSelected();
   }
 
+  
 }
