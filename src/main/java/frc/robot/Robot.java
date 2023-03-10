@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
         m_robotContainer = RobotContainer.getInstance();
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_RobotBuilder);
         if (LOGGING) {
-            DataLogManager.start();
+            DataLogManager.start(LOG_DIR);
             DriverStation.startDataLog(DataLogManager.getLog());
         }
     }

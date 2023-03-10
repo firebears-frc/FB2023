@@ -15,9 +15,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+
+import static frc.robot.Constants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -81,7 +84,8 @@ public class RobotContainer {
       return "Unknown";
     }
   }
-  public void armReset(){
+
+  public void armReset() {
     m_arm.setElbowSetpoint(m_arm.getElbowAngle());
     m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
   }
@@ -94,6 +98,11 @@ public class RobotContainer {
     // Get the commit hash and display on the dashboard
     String commitHash = getFileContents("commit.txt");
     SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
+
+    if (LOGGING) {
+      DataLogManager.log("branchName=" + branchName);
+      DataLogManager.log("commitHash=" + commitHash);
+    }
   }
 
   public static RobotContainer getInstance() {
@@ -136,7 +145,7 @@ public class RobotContainer {
 
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
-    .andThen(new ArmElbowSetpointCommand(220, m_arm)));
+        .andThen(new ArmElbowSetpointCommand(220, m_arm)));
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
     xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
@@ -150,17 +159,17 @@ public class RobotContainer {
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(84, m_arm))
         .andThen(new ArmElbowSetpointCommand(283, m_arm)));
 
-    //Mid level node
+    // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
     xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(76, m_arm))
         .andThen(new ArmElbowSetpointCommand(267, m_arm)));
 
-    //Ground pickup
+    // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
     xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(122, m_arm))
         .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
-    //High level mode
+    // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
     xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(95, m_arm))
         .andThen(new ArmElbowSetpointCommand(325, m_arm)));
@@ -179,7 +188,11 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_chooser.getSelected();
+    Command autoCommand = m_chooser.getSelected();
+    if (LOGGING) {
+      DataLogManager.log("autoCommand=" + autoCommand);
+    }
+    return autoCommand;
   }
 
 }
