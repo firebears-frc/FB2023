@@ -86,15 +86,6 @@ public class RobotContainer {
     m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
   }
 
-
-
-
-
-  public void armReset() {
-    m_arm.setElbowSetpoint(m_arm.getElbowAngle());
-    m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
-  }
-
   private void displayGitInfo() {
     // Get the branch name and display on the dashboard
     String branchName = getFileContents("branch.txt");
