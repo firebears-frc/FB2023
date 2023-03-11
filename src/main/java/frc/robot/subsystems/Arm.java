@@ -61,7 +61,7 @@ public class Arm extends SubsystemBase {
 
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        elbowPID.setP(0.01);
+        elbowPID.setP(0.03);
         elbowPID.setI(0.0);
         elbowPID.setD(0.0005);
         elbowPID.setFeedbackDevice(elbowEncoder);

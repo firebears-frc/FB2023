@@ -42,6 +42,8 @@ public class Chassis extends SubsystemBase {
     private RelativeEncoder leftEncoder;
     private double leftOffSet = 0;
     private double rightOffSet = 0;
+    private double lastPitch;
+    private double pitchVelocity;
 
     private final DifferentialDriveOdometry m_odometry;
 
@@ -53,7 +55,7 @@ public class Chassis extends SubsystemBase {
 
         rightFrontMotor.restoreFactoryDefaults();
         rightFrontMotor.setInverted(true);
-        rightFrontMotor.setIdleMode(IdleMode.kCoast);
+        rightFrontMotor.setIdleMode(IdleMode.kBrake);
         rightFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -61,7 +63,7 @@ public class Chassis extends SubsystemBase {
 
         rightBackMotor.restoreFactoryDefaults();
         rightBackMotor.setInverted(true);
-        rightBackMotor.setIdleMode(IdleMode.kCoast);
+        rightBackMotor.setIdleMode(IdleMode.kBrake);
         rightBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -72,7 +74,7 @@ public class Chassis extends SubsystemBase {
 
         leftFrontMotor.restoreFactoryDefaults();
         leftFrontMotor.setInverted(false);
-        leftFrontMotor.setIdleMode(IdleMode.kCoast);
+        leftFrontMotor.setIdleMode(IdleMode.kBrake);
         leftFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -80,7 +82,7 @@ public class Chassis extends SubsystemBase {
 
         leftBackMotor.restoreFactoryDefaults();
         leftBackMotor.setInverted(false);
-        leftBackMotor.setIdleMode(IdleMode.kCoast);
+        leftBackMotor.setIdleMode(IdleMode.kBrake);
         leftBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -122,11 +124,13 @@ public class Chassis extends SubsystemBase {
     @Override
     public void periodic() {
 
+        pitchVelocity = (getPitch() - lastPitch);
         Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
         double leftDistanceMeters = leftDistanceTraveled();
         double rightDistanceMeters = rightDistanceTraveled();
         m_odometry.update(gyroAngleRadians, leftDistanceMeters, rightDistanceMeters);
 
+        SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
         SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
         SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
         SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
@@ -138,6 +142,8 @@ public class Chassis extends SubsystemBase {
             leftMotorLog.append(leftMotors.get());
             rightMotorLog.append(rightMotors.get());
         }
+        lastPitch = getPitch();
+     
     }
 
     @Override
@@ -147,6 +153,10 @@ public class Chassis extends SubsystemBase {
 
     public void arcadeDrive(double speed, double rotation) {
         differentialDrive.arcadeDrive(speed, rotation);
+    }
+
+    public double getpitchVelocity(){
+        return pitchVelocity;
     }
 
     public double getEncoderDistance() {
