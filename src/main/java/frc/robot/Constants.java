@@ -21,21 +21,21 @@ public class Constants {
         public static final int kRightMotor1Port = 15;
         public static final int kRightMotor2Port = 17;
 
-        public static final float kP = 0.011179f;
-        public static final float kI = 0;
-        public static final float kD = 0;
+        public static final double kP = 0.011179d;
+        public static final double kI = 0;
+        public static final double kD = 0;
 
-        public static final float kS = 0.16084f;
-        public static final float kV = 2.2918f;
-        public static final float kA = 0.36793f;
+        public static final double kS = 0.15473d;
+        public static final double kV = 2.3007d;
+        public static final double kA = 0.22029d;
 
-        public static final float TrackWidth = 0;
+        public static final double TrackWidth = 0.96679d;
 
-        public static final float MaxVelocity = 5; // m/s
-        public static final float MaxAngularVelocity = 8; // radians per second
+        public static final double MaxVelocity = 5; // m/s
+        public static final double MaxAngularVelocity = 8; // radians per second
     }
 
-    public static float kFeetToMeterFactor = 0.638f / 11.79f;
+    public static final double kFeetToMeterFactor = 0.638f / 11.79f;
     public static int shoulderArmLength=30;
     public static int elbowArmLength=33;
 
@@ -50,6 +50,7 @@ public class Constants {
         ELBOW_ENCODER_OFFSET = Preferences.getDouble("ELBOW_ENCODER_OFFSET", 0.0);
         SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);
 
+        /*
         if (PRACTICE_ROBOT) {
             kFeetToMeterFactor = 20;
         } else { 
@@ -57,5 +58,6 @@ public class Constants {
             kFeetToMeterFactor = 20;
             
         }
+        */
     }
 }
