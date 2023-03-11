@@ -70,13 +70,30 @@ public class RobotContainer {
         .andThen(new ArmElbowSetpointCommand(350, m_arm))
         .andThen(new WaitCommand(0.5))
         .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
+        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+        .andThen(new ArmElbowSetpointCommand(220, m_arm))
+        .andThen(new WaitCommand(1))
+        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+    
+    m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
+        .andThen(new WaitCommand(1))
+        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+        .andThen(new ArmElbowSetpointCommand(338, m_arm))
+        .andThen(new WaitCommand(1))
+        .andThen(new ShluckerSetSpeedCommand(-0.5, m_schlucker))
+        .andThen(new ArmElbowSetpointCommand(350, m_arm))
+        .andThen(new WaitCommand(0.5))
+        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
         .andThen(new ArmShoulderSetpointCommand(20, m_arm))
         .andThen(new ArmElbowSetpointCommand(220, m_arm))
         .andThen(new WaitCommand(1))
         .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
     // m_chooser.addOption("Cone + Balance", ());
+    //m_chooser.addOption("Cube + Balance", ());y
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
