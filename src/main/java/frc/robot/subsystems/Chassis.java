@@ -55,6 +55,9 @@ public class Chassis extends SubsystemBase {
     private boolean Currentbrakemode = false;
     private final DifferentialDriveOdometry m_odometry;
 
+    private final PIDController leftPID, rightPID;
+    private final SimpleMotorFeedforward feedForward;
+
     private DoubleLogEntry leftMotorLog;
     private DoubleLogEntry rightMotorLog;
 
