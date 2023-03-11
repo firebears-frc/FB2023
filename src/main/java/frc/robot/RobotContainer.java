@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +38,7 @@ public class RobotContainer {
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   public final Chassis m_chassis;
-
+  private final  UsbCamera usbcamera;
   private final XboxController xboxController = new XboxController(1);
   private final Joystick joystick = new Joystick(0);
 
@@ -49,7 +51,8 @@ public class RobotContainer {
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
-
+    usbcamera = CameraServer.startAutomaticCapture();
+    usbcamera.setResolution(320, 240);
     configureButtonBindings();
 
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));

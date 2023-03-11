@@ -9,8 +9,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,10 +22,11 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import static frc.robot.Constants.*;
 
-import com.revrobotics.RelativeEncoder; 
+import com.revrobotics.RelativeEncoder;
 
 public class Chassis extends SubsystemBase {
     private static int STALL_CURRENT_LIMIT = 40;
@@ -34,8 +39,10 @@ public class Chassis extends SubsystemBase {
     private CANSparkMax leftFrontMotor;
     private CANSparkMax leftBackMotor;
     private MotorControllerGroup leftMotors;
-    private DifferentialDrive differentialDrive;
+    private DifferentialDriveKinematics differentialDriveKinematics;
     private AHRS navX;
+
+    private Field2d Field = new Field2d();
 
     private RelativeEncoder rightEncoder;
     private RelativeEncoder leftEncoder;
@@ -47,7 +54,12 @@ public class Chassis extends SubsystemBase {
 
     private final DifferentialDriveOdometry m_odometry;
 
+    private final PIDController leftPID, rightPID;
+    private final SimpleMotorFeedforward feedForward;
+
     public Chassis() {
+        SmartDashboard.putData("Odometry",Field);
+
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
 
         rightFrontMotor.restoreFactoryDefaults();
@@ -86,17 +98,25 @@ public class Chassis extends SubsystemBase {
         leftMotors = new MotorControllerGroup(leftFrontMotor, leftBackMotor);
         addChild("leftMotors", leftMotors);
 
-        differentialDrive = new DifferentialDrive(leftMotors, rightMotors);
-        addChild("differentialDrive", differentialDrive);
-        differentialDrive.setSafetyEnabled(true);
-        differentialDrive.setExpiration(0.1);
-        differentialDrive.setMaxOutput(1.0);
+        // Create PID Controllers
+        leftPID = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD);
+        rightPID = new PIDController(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD);
+        feedForward = new SimpleMotorFeedforward(DriveConstants.kS, DriveConstants.kV, DriveConstants.kA);
+
+        differentialDriveKinematics = new DifferentialDriveKinematics(DriveConstants.TrackWidth);
 
         rightEncoder = rightFrontMotor.getEncoder();
         leftEncoder = leftFrontMotor.getEncoder();
-        leftEncoder.setPositionConversionFactor(1.0/kFeetToMeterFactor);
-        rightEncoder.setPositionConversionFactor(1.0/kFeetToMeterFactor);
-        
+
+        leftEncoder.setPositionConversionFactor(kFeetToMeterFactor);
+        rightEncoder.setPositionConversionFactor(kFeetToMeterFactor);
+
+        leftEncoder.setVelocityConversionFactor(kFeetToMeterFactor / 60.f);
+        rightEncoder.setVelocityConversionFactor(kFeetToMeterFactor / 60.f);
+
+        leftEncoder.setPosition(0);
+        rightEncoder.setPosition(0);
+
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
@@ -104,9 +124,8 @@ public class Chassis extends SubsystemBase {
         }
         Timer.delay(1.0);
         // LiveWindow.addSensor("Chassis", "navX", navX);
-        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
-        m_odometry = new DifferentialDriveOdometry(gyroAngleRadians, 0.0, 0.0);
-    
+        m_odometry = new DifferentialDriveOdometry(navX.getRotation2d(), 0.0, 0.0);
+
         rightFrontMotor.burnFlash();
         rightBackMotor.burnFlash();
         leftFrontMotor.burnFlash();
@@ -115,6 +134,11 @@ public class Chassis extends SubsystemBase {
 
     @Override
     public void periodic() {
+        double leftDist = leftEncoder.getPosition();
+        double rightDist = rightEncoder.getPosition();
+
+        double leftVel = leftEncoder.getVelocity();
+        double rightVel = rightEncoder.getVelocity();
 
         pitchVelocity = pitchVelolcityFilter.calculate(getPitch() - lastPitch);
         Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
@@ -132,19 +156,34 @@ public class Chassis extends SubsystemBase {
 
         lastPitch = getPitch();
      
+        double leftFeedForwardVoltage = feedForward.calculate(leftPID.getSetpoint());
+        double rightFeedForwardVoltage = feedForward.calculate(rightPID.getSetpoint());
+
+        double leftFeedBackVoltage = leftPID.calculate(leftVel);
+        double rightFeedBackVoltage = rightPID.calculate(rightVel);
+
+        leftMotors.setVoltage(leftFeedForwardVoltage + leftFeedBackVoltage);
+        rightMotors.setVoltage(rightFeedForwardVoltage + rightFeedBackVoltage);
+        
+        m_odometry.update(navX.getRotation2d(), leftDist, rightDist);
+        Field.setRobotPose(m_odometry.getPoseMeters());
     }
 
-    @Override
-    public void simulationPeriodic() {
+    public void tankDrive(double left, double right){
+        leftPID.setSetpoint(left);
+        rightPID.setSetpoint(right);
+    }
 
+    public void tankDrive(DifferentialDriveWheelSpeeds speed){
+        tankDrive(speed.leftMetersPerSecond,speed.rightMetersPerSecond);
+    }
+
+    public void drive(ChassisSpeeds speed){
+        tankDrive(differentialDriveKinematics.toWheelSpeeds(speed));
     }
 
     public void arcadeDrive(double speed, double rotation) {
-        differentialDrive.arcadeDrive(speed, rotation);
-    }
-
-    public double getpitchVelocity(){
-        return pitchVelocity;
+        drive(new ChassisSpeeds(speed * DriveConstants.MaxVelocity,0,rotation * DriveConstants.MaxAngularVelocity));
     }
 
     public double getEncoderDistance() {
@@ -156,51 +195,40 @@ public class Chassis extends SubsystemBase {
     }
 
     public double leftDistanceTraveled() {
-        return (leftEncoder.getPosition() - leftOffSet);
+        return (leftEncoder.getPosition());
     }
 
     public double rightDistanceTraveled() {
-        return (rightEncoder.getPosition() - rightOffSet);
+        return (rightEncoder.getPosition());
     }
 
     public void resetEncoder() {
-        leftOffSet = leftEncoder.getPosition();
-        rightOffSet = rightEncoder.getPosition();
+        leftEncoder.setPosition(0);
+        rightEncoder.setPosition(0);
     }
 
     public double getPitch(){
         return (navX.getPitch()) * -1;
     }
 
-    public double getRoll(){
+    public double getRoll() {
         return navX.getRoll();
     }
 
-    public double getAngle(){
+    public double getAngle() {
         return navX.getAngle();
     }
 
-    public void tankDriveVolts(double leftVolts, double rightVolts) {
-        leftFrontMotor.setVoltage(leftVolts);
-        leftBackMotor.setVoltage(leftVolts);
-        rightFrontMotor.setVoltage(rightVolts);
-        rightBackMotor.setVoltage(rightVolts);
-        differentialDrive.feed();
-      }
-
-    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        double leftMetersPerSecond = leftEncoder.getVelocity();
-        double rightMetersPerSecond = rightEncoder.getVelocity();
-        return new DifferentialDriveWheelSpeeds(leftMetersPerSecond, rightMetersPerSecond);
-      }
+    public double getpitchVelocity(){
+        return pitchVelocity;
+    }
 
     public Pose2d getPose() {
         return m_odometry.getPoseMeters();
-      }
+    }
 
     public void resetOdometry(Pose2d pose) {
         resetEncoder();
-        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
-        m_odometry.resetPosition(gyroAngleRadians, 0.0, 0.0, pose);
-      }
+        m_odometry.resetPosition(navX.getRotation2d(), 0.0, 0.0, pose);
+    }
 }

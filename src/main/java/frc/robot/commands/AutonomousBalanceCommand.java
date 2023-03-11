@@ -38,7 +38,7 @@ public class AutonomousBalanceCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double pitchVelocity = m_chassis.getpitchVelocity();
+    double pitchVelocity = 0; //m_chassis.getpitchVelocity();
     double pitchSpeed = Math.abs(pitchVelocity);
 
     SmartDashboard.putNumber("Speed", speed);
