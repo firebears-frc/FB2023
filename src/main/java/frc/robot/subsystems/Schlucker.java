@@ -10,6 +10,15 @@ public class Schlucker extends SubsystemBase {
 
     private CANSparkMax shluckerMotor;
 
+    public enum ItemHeld {
+        CONE,
+        CUBE,
+        NONE  
+    }
+
+    // TODO: Define ItemHeld var (should it be public or private?)
+    public ItemHeld _item_held;
+    
     public Schlucker() {
         shluckerMotor = new CANSparkMax(6, MotorType.kBrushed);
 

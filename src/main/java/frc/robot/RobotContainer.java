@@ -166,7 +166,7 @@ public class RobotContainer {
 
     // A button = picks up cone and drops cube
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
-    xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
+    xboxAButton.onTrue(new IntakeConeCommand(-0.7, m_schlucker));
 
     // B button = reset position (stow)
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
@@ -175,11 +175,11 @@ public class RobotContainer {
 
     // X button = picks up cube and drops cone
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
-    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
+    xboxXButton.onTrue(new IntakeCubeCommand(0.7, m_schlucker));
 
-    // Y button = TODO
+    // Y button = eject button
     JoystickButton xboxYButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
-    xboxYButton.onTrue(new ArmShoulderSetpointCommand(0, m_arm));
+    xboxYButton.onTrue(new EjectCommand(0, m_schlucker));
 
     // Dpad
 
