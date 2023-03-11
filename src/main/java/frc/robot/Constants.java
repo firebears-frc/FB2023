@@ -20,9 +20,22 @@ public class Constants {
         public static final int kLeftMotor2Port = 18;
         public static final int kRightMotor1Port = 15;
         public static final int kRightMotor2Port = 17;
+
+        public static final float kP = 0.011179f;
+        public static final float kI = 0;
+        public static final float kD = 0;
+
+        public static final float kS = 0.16084f;
+        public static final float kV = 2.2918f;
+        public static final float kA = 0.36793f;
+
+        public static final float TrackWidth = 0;
+
+        public static final float MaxVelocity = 5; // m/s
+        public static final float MaxAngularVelocity = 8; // radians per second
     }
 
-    public static int kFeetToMeterFactor = 25;
+    public static float kFeetToMeterFactor = 0.638f / 11.79f;
     public static int shoulderArmLength=30;
     public static int elbowArmLength=33;
 
