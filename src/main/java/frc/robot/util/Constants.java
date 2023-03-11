@@ -67,6 +67,7 @@ public class Constants {
         public static final double SHOULDER_MID = 0; // degrees
         public static final double SHOULDER_LOW = 0; // degrees
 
+        public static final double ANGLE_TOLERANCE = 5; // degrees
     }
 
     public static class SchluckerConstants {

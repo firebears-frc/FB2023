@@ -16,10 +16,12 @@ public class ArmPositionCommand extends CommandBase {
     }
 
     @Override
-    public void initialize() {
+    public void execute() {
         arm.setAngles(elbowSetpoint, shoulderSetpoint);
     }
 
     @Override
-    public void 
+    public boolean isFinished() {
+        return arm.onTarget();
+    }
 }

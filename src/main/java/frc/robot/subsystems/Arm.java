@@ -86,6 +86,10 @@ public class Arm extends SubsystemBase {
         return elbowEncoder.getPosition();
     }
 
+    public double getElbowError() {
+        return getElbowAngle() - getElbowTargetAngle();
+    }
+
     public void setShoulderAngle(double angle) {
         shoulderSetpoint = angle;
     }
@@ -96,6 +100,15 @@ public class Arm extends SubsystemBase {
 
     public double getShoulderAngle() {
         return shoulderEncoder.getPosition();
+    }
+
+    public double getShoulderError() {
+        return getShoulderAngle() - getShoulderTargetAngle();
+    }
+
+    public boolean onTarget() {
+        return Math.abs(getShoulderError()) < ArmConstants.ANGLE_TOLERANCE
+                && Math.abs(getElbowError()) < ArmConstants.ANGLE_TOLERANCE;
     }
 
     public void setAngles(double elbowAngle, double shoulderAngle) {
