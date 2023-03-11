@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -28,7 +29,7 @@ public class ChassisDriveCommand extends CommandBase {
         Joystick joystick = RobotContainer.getInstance().getJoystick();
         double speed = joystick.getY();
         double rotation = joystick.getTwist();
-        m_chassis.arcadeDrive((speed*-1.0), (rotation*-1.0));
+        m_chassis.arcadeDrive((speed*-1.0) *  MathUtil.clamp((1 - joystick.getThrottle()), 0.25, 0.8), (rotation*-1.0) * MathUtil.clamp((1 - joystick.getThrottle()), 0.25, 0.8));
     }
 
     @Override
