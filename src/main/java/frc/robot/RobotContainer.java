@@ -7,10 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,11 +38,11 @@ public class RobotContainer {
   private static RobotContainer m_robotContainer = null;
 
   public final Lights m_lights;
-  // public final Vision m_vision;
+  public final Vision m_vision;
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   public final Chassis m_chassis;
-
+  private final UsbCamera usbcamera;
   private final XboxController xboxController = new XboxController(1);
   private final Joystick joystick = new Joystick(0);
 
@@ -48,11 +51,12 @@ public class RobotContainer {
   private RobotContainer() {
 
     m_lights = new Lights();
-    // m_vision = new Vision("MainC");
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
-
+    m_vision = new Vision("MainC",m_chassis);
+    usbcamera = CameraServer.startAutomaticCapture();
+    usbcamera.setResolution(320, 240);
     configureButtonBindings();
 
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
@@ -76,7 +80,7 @@ public class RobotContainer {
         .andThen(new WaitCommand(1))
         .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
-    
+
     m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
         .andThen(new WaitCommand(1))
         .andThen(new ArmShoulderSetpointCommand(122, m_arm))
@@ -93,7 +97,7 @@ public class RobotContainer {
         .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
     // m_chooser.addOption("Cone + Balance", ());
-    //m_chooser.addOption("Cube + Balance", ());y
+    // m_chooser.addOption("Cube + Balance", ());y
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -124,9 +128,9 @@ public class RobotContainer {
   }
 
   private void displayGitInfo() {
-    // Get the branch name and display on the dashboard
-    String branchName = getFileContents("branch.txt");
-    SmartDashboard.putString("Branch Name", branchName);
+      // Get the branch name and display on the dashboard
+      String branchName = getFileContents("branch.txt");
+      SmartDashboard.putString("Branch Name", branchName);
 
     // Get the commit hash and display on the dashboard
     String commitHash = getFileContents("commit.txt");
@@ -155,17 +159,10 @@ public class RobotContainer {
     // JoystickButton twoButton = new JoystickButton(joystick, 2);
     // twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
-    // JoystickButton threeButton = new JoystickButton(joystick, 3);
-    // threeButton.onTrue(new ChassisRotateToAngleCommand (90, m_chassis ) );
+    JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
+    fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-    // JoystickButton fourButton = new JoystickButton(joystick, 4);
-    // fourButton.onTrue(new ChassisRotateToAngleCommand (-90, m_chassis ) );
-
-    // JoystickButton fiveButton = new JoystickButton(joystick, 5);
-    // fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
-
-    // JoystickButton sixButton = new JoystickButton(joystick, 6);
-    // sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
+   
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 

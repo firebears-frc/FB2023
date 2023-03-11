@@ -32,7 +32,7 @@ public class ArmManualCommand extends CommandBase {
     //XboxController xboxController=RobotContainer.getInstance().getxbox();
     shoulderSetPoint = m_arm.getShoulderAngle();
     elbowSetPoint = m_arm.getElbowAngle();
-    SmartDashboard.putBoolean("Running Arm", true);
+    //SmartDashboard.putBoolean("Running Arm", true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -55,7 +55,7 @@ public class ArmManualCommand extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    SmartDashboard.putBoolean("Running Arm", false);
+    //SmartDashboard.putBoolean("Running Arm", false);
   }
 
   // Returns true when the command should end.

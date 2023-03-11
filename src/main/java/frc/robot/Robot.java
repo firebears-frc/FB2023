@@ -89,6 +89,7 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
+        m_robotContainer.m_chassis.setBrakemode(false);
         
     }
 
@@ -109,6 +110,7 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
         m_robotContainer.armReset();
+        m_robotContainer.m_chassis.setBrakemode(false);
     }
 
     /**
