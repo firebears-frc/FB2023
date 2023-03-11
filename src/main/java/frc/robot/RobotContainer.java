@@ -55,23 +55,25 @@ public class RobotContainer {
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-2, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
+    m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
     // m_chooser.addOption("Auto Balance", ());
-    m_chooser.addOption("Cone or Cube", (new ShluckerSetSpeedCommand(-0.5, m_schlucker))
-        .andThen(new WaitCommand(0.2))
-        .andThen(new ArmShoulderSetpointCommand(95, m_arm))
-        .andThen(new ArmElbowSetpointCommand(325, m_arm))
-        .andThen(new WaitCommand(3))
+    m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
+        .andThen(new WaitCommand(0.5))
+        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+        .andThen(new ArmElbowSetpointCommand(338, m_arm))
+        .andThen(new WaitCommand(1))
         .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
+        .andThen(new ArmElbowSetpointCommand(350, m_arm))
         .andThen(new WaitCommand(0.5))
         .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+        .andThen(new ChassisDriveToDistanceCommand(-0.5, m_chassis))
         .andThen(new ArmShoulderSetpointCommand(20, m_arm))
         .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(2))
-        .andThen(new ChassisDriveToDistanceCommand(-2, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
-    // m_chooser.addOption("Cone or Cube + Balance", ());
+        .andThen(new WaitCommand(1))
+        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+    // m_chooser.addOption("Cone + Balance", ());
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
