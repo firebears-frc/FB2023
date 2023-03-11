@@ -98,8 +98,7 @@ public class RobotContainer {
 
   public void armReset() {
     m_arm.setElbowSetpoint(m_arm.getElbowAngle());
-    //m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
-    m_arm.setShoulderSetpoint(76);
+    m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
   }
 
   private void displayGitInfo() {
