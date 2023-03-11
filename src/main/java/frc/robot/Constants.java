@@ -29,7 +29,7 @@ public class Constants {
         public static final float kV = 2.2918f;
         public static final float kA = 0.36793f;
 
-        public static final float TrackWidth = 0;
+        public static final double TrackWidth = 0.96679;
 
         public static final float MaxVelocity = 5; // m/s
         public static final float MaxAngularVelocity = 8; // radians per second

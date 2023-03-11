@@ -135,6 +135,9 @@ public class Chassis extends SubsystemBase {
 
         leftMotors.setVoltage(leftFeedForwardVoltage + leftFeedBackVoltage);
         rightMotors.setVoltage(rightFeedForwardVoltage + rightFeedBackVoltage);
+        SmartDashboard.putNumber("leftSetPoint", leftPID.getSetpoint());
+        SmartDashboard.putNumber("rightSetPoint", rightPID.getSetpoint());
+        
     }
 
     public void tankDrive(double left, double right){
