@@ -58,7 +58,7 @@ public class Chassis extends SubsystemBase {
 
         rightFrontMotor.restoreFactoryDefaults();
         rightFrontMotor.setInverted(true);
-        rightFrontMotor.setIdleMode(IdleMode.kCoast);
+        rightFrontMotor.setIdleMode(IdleMode.kBrake);
         rightFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -66,7 +66,7 @@ public class Chassis extends SubsystemBase {
 
         rightBackMotor.restoreFactoryDefaults();
         rightBackMotor.setInverted(true);
-        rightBackMotor.setIdleMode(IdleMode.kCoast);
+        rightBackMotor.setIdleMode(IdleMode.kBrake);
         rightBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -77,7 +77,7 @@ public class Chassis extends SubsystemBase {
 
         leftFrontMotor.restoreFactoryDefaults();
         leftFrontMotor.setInverted(false);
-        leftFrontMotor.setIdleMode(IdleMode.kCoast);
+        leftFrontMotor.setIdleMode(IdleMode.kBrake);
         leftFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -85,7 +85,7 @@ public class Chassis extends SubsystemBase {
 
         leftBackMotor.restoreFactoryDefaults();
         leftBackMotor.setInverted(false);
-        leftBackMotor.setIdleMode(IdleMode.kCoast);
+        leftBackMotor.setIdleMode(IdleMode.kBrake);
         leftBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -164,7 +164,28 @@ public class Chassis extends SubsystemBase {
         drive(new ChassisSpeeds(speed * DriveConstants.MaxVelocity,0,rotation * DriveConstants.MaxAngularVelocity));
     }
 
-    public double getPitch() {
+    public double getEncoderDistance() {
+        // double meters = ((leftEncoder.getPosition() - leftOffSet) + (rightEncoder.getPosition() * -1 - rightOffSet))
+        //         / 2;
+
+        // return meters;
+        return (leftDistanceTraveled() + rightDistanceTraveled()) / 2;
+    }
+
+    public double leftDistanceTraveled() {
+        return (leftEncoder.getPosition());
+    }
+
+    public double rightDistanceTraveled() {
+        return (rightEncoder.getPosition());
+    }
+
+    public void resetEncoder() {
+        leftEncoder.setPosition(0);
+        rightEncoder.setPosition(0);
+    }
+
+    public double getPitch(){
         return (navX.getPitch()) * -1;
     }
 
@@ -181,9 +202,7 @@ public class Chassis extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        leftEncoder.setPosition(0);
-        rightEncoder.setPosition(0);
-
+        resetEncoder();
         m_odometry.resetPosition(navX.getRotation2d(), 0.0, 0.0, pose);
     }
 }
