@@ -67,7 +67,7 @@ public class RobotContainer {
         POVButton rightButton = new POVButton(controller, 90);
         rightButton.onTrue(new ArmMidCommand(arm));
         POVButton downButton = new POVButton(controller, 180);
-        downButton.onTrue(new ArmLowCommand(arm));
+        downButton.onTrue(new ArmGroundCommand(arm));
         POVButton leftButton = new POVButton(controller, 270);
         leftButton.onTrue(new ArmHighCommand(arm));
         JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);

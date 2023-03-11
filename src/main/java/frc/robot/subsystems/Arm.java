@@ -75,6 +75,12 @@ public class Arm extends SubsystemBase {
     }
 
     public void setElbowAngle(double angle) {
+        while (angle > 360) {
+            angle -= 360;
+        }
+        while (angle < 0) {
+            angle += 360;
+        }
         elbowSetpoint = angle;
     }
 
@@ -91,6 +97,12 @@ public class Arm extends SubsystemBase {
     }
 
     public void setShoulderAngle(double angle) {
+        while (angle > 360) {
+            angle -= 360;
+        }
+        while (angle < 0) {
+            angle += 360;
+        }
         shoulderSetpoint = angle;
     }
 

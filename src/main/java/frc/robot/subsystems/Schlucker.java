@@ -49,7 +49,7 @@ public class Schlucker extends SubsystemBase {
                 pid.setReference(-1.0 * SchluckerConstants.HOLD_CURRENT, ControlType.kCurrent);
                 break;
             case CUBE:
-            default:
+            case NONE:
                 pid.setReference(SchluckerConstants.HOLD_CURRENT, ControlType.kCurrent);
                 break;
         }
@@ -61,7 +61,7 @@ public class Schlucker extends SubsystemBase {
                 motor.set(SchluckerConstants.INTAKE_SPEED);
                 break;
             case CUBE:
-            default:
+            case NONE:
                 motor.set(-1.0 * SchluckerConstants.INTAKE_SPEED);
                 break;
         }
