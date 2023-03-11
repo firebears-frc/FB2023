@@ -76,7 +76,7 @@ public class Constants {
         public static final int FREE_CURRENT_LIMIT = 5;
         public static final double SECONDARY_CURRENT_LIMIT = 30.0;
 
-        public static final double CONE_IN_CUBE_OUT_SPEED = 0.7;
-        public static final double CONE_OUT_CUBE_IN_SPEED = -0.7;
+        public static final double INTAKE_SPEED = 0.7;
+        public static final double HOLD_CURRENT = 1.0;
     }
 }

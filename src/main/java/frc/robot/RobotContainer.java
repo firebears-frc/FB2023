@@ -6,6 +6,7 @@ import frc.robot.util.Constants;
 import frc.robot.util.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -72,10 +73,16 @@ public class RobotContainer {
         JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);
         bButton.onTrue(new ArmStowCommand(arm));
 
+        // Schlucker commands
         JoystickButton aButton = new JoystickButton(controller, XboxController.Button.kA.value);
-        aButton.onTrue(new SchluckerConeInCubeOutCommand(schlucker));
+        aButton.onTrue(new InstantCommand(schlucker::intakeCone, schlucker));
+        aButton.onFalse(new InstantCommand(schlucker::hold, schlucker));
         JoystickButton xButton = new JoystickButton(controller, XboxController.Button.kX.value);
-        xButton.onTrue(new SchluckerConeOutCubeInCommand(schlucker));
+        xButton.onTrue(new InstantCommand(schlucker::intakeCube, schlucker));
+        xButton.onFalse(new InstantCommand(schlucker::hold, schlucker));
+        JoystickButton yButton = new JoystickButton(controller, XboxController.Button.kY.value);
+        yButton.onTrue(new InstantCommand(schlucker::eject, schlucker));
+        yButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
     }
 
     public Command getAutonomousCommand() {
