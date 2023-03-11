@@ -11,6 +11,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -143,13 +144,15 @@ public class Chassis extends SubsystemBase {
         double rightDistanceMeters = rightDistanceTraveled();
         m_odometry.update(gyroAngleRadians, leftDistanceMeters, rightDistanceMeters);
 
-        SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
-        SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
-        SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
-        SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
-        SmartDashboard.putNumber("getPitch", getPitch());
-        SmartDashboard.putNumber("getRoll", getRoll());
-        SmartDashboard.putNumber("getAngle", getAngle());
+        if (DEBUG) {
+            SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
+            SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
+            SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
+            SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
+            SmartDashboard.putNumber("getPitch", getPitch());
+            SmartDashboard.putNumber("getRoll", getRoll());
+            SmartDashboard.putNumber("getAngle", getAngle());
+        }
 
         lastPitch = getPitch();
 

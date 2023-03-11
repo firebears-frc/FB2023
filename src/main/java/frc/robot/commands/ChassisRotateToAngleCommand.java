@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Chassis;
 
 public class ChassisRotateToAngleCommand extends CommandBase {
@@ -27,8 +28,10 @@ public class ChassisRotateToAngleCommand extends CommandBase {
   @Override
   public void initialize() {
     initialangle = m_chassis.getAngle();
-    SmartDashboard.putNumber("INIT DIFF", initialangle - testangle);
-    
+    if (Constants.DEBUG) {
+      SmartDashboard.putNumber("INIT DIFF", initialangle - testangle);
+    }
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,9 +42,11 @@ public class ChassisRotateToAngleCommand extends CommandBase {
     } else {
       m_chassis.arcadeDrive(0, -0.35);
     }
-    SmartDashboard.putNumber("currentangle", m_chassis.getAngle());
-    SmartDashboard.putNumber("delta ang", rotation);
-    SmartDashboard.putNumber("dersired angle", initialangle+rotation);
+    if (Constants.DEBUG) {
+      SmartDashboard.putNumber("currentangle", m_chassis.getAngle());
+      SmartDashboard.putNumber("delta ang", rotation);
+      SmartDashboard.putNumber("dersired angle", initialangle + rotation);
+    }
   }
 
   // Called once the command ends or is interrupted.
