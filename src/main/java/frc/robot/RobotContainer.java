@@ -156,7 +156,9 @@ public class RobotContainer {
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-   
+ 
+    JoystickButton triggerButton = new JoystickButton(joystick, 1);
+    triggerButton.onTrue(new LightsTogglePin(m_lights));
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 
