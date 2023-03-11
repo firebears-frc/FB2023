@@ -181,8 +181,9 @@ public class Chassis extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        //resetEncoder();
-        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
-        m_odometry.resetPosition(gyroAngleRadians, 0.0, 0.0, pose);
+        leftEncoder.setPosition(0);
+        rightEncoder.setPosition(0);
+
+        m_odometry.resetPosition(navX.getRotation2d(), 0.0, 0.0, pose);
     }
 }
