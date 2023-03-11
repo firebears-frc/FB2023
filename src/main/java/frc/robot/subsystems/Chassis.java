@@ -21,6 +21,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import static frc.robot.Constants.*;
 
@@ -40,6 +41,8 @@ public class Chassis extends SubsystemBase {
     private DifferentialDriveKinematics differentialDriveKinematics;
     private AHRS navX;
 
+    private Field2d Field = new Field2d();
+
     private RelativeEncoder rightEncoder;
     private RelativeEncoder leftEncoder;
 
@@ -49,6 +52,8 @@ public class Chassis extends SubsystemBase {
     private final SimpleMotorFeedforward feedForward;
 
     public Chassis() {
+        SmartDashboard.putData("Odometry",Field);
+
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
 
         rightFrontMotor.restoreFactoryDefaults();
@@ -103,6 +108,9 @@ public class Chassis extends SubsystemBase {
         leftEncoder.setVelocityConversionFactor(kFeetToMeterFactor / 60.f);
         rightEncoder.setVelocityConversionFactor(kFeetToMeterFactor / 60.f);
 
+        leftEncoder.setPosition(0);
+        rightEncoder.setPosition(0);
+
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
@@ -110,8 +118,7 @@ public class Chassis extends SubsystemBase {
         }
         Timer.delay(1.0);
         // LiveWindow.addSensor("Chassis", "navX", navX);
-        Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
-        m_odometry = new DifferentialDriveOdometry(gyroAngleRadians, 0.0, 0.0);
+        m_odometry = new DifferentialDriveOdometry(navX.getRotation2d(), 0.0, 0.0);
 
         rightFrontMotor.burnFlash();
         rightBackMotor.burnFlash();
@@ -135,9 +142,9 @@ public class Chassis extends SubsystemBase {
 
         leftMotors.setVoltage(leftFeedForwardVoltage + leftFeedBackVoltage);
         rightMotors.setVoltage(rightFeedForwardVoltage + rightFeedBackVoltage);
-        SmartDashboard.putNumber("leftSetPoint", leftPID.getSetpoint());
-        SmartDashboard.putNumber("rightSetPoint", rightPID.getSetpoint());
         
+        m_odometry.update(navX.getRotation2d(), leftDist, rightDist);
+        Field.setRobotPose(m_odometry.getPoseMeters());
     }
 
     public void tankDrive(double left, double right){
