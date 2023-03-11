@@ -11,10 +11,19 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
   /** Creates a new DriveToPositionCommand. */
   private double distance;
   private Chassis m_chassis;
+  private double speed = 0.6;
 
   public ChassisDriveToDistanceCommand(double d, Chassis c) {
     distance = d;
     m_chassis = c;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_chassis);
+  }
+
+  public ChassisDriveToDistanceCommand(double d, double s, Chassis c) {
+    distance = d;
+    m_chassis = c;
+    speed = s;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_chassis);
   }
@@ -29,9 +38,9 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
   @Override
   public void execute() {
     if (distance > 0) {
-      m_chassis.arcadeDrive(0.4, 0);
+      m_chassis.arcadeDrive(speed, 0);
     } else {
-      m_chassis.arcadeDrive(-0.4, 0);
+      m_chassis.arcadeDrive(-1 * speed, 0);
     }
   }
 

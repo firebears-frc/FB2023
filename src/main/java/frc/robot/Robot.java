@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
                 "/u/config.properties");
         m_robotContainer = RobotContainer.getInstance();
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_RobotBuilder);
+        m_robotContainer.armReset();
     }
 
     /**
@@ -72,10 +73,12 @@ public class Robot extends TimedRobot {
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
+        //m_robotContainer.armReset();
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
-        m_robotContainer.armReset();
+        m_robotContainer.m_chassis.setBrakemode(false);
+        
     }
 
     /**
@@ -95,6 +98,7 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
         m_robotContainer.armReset();
+        m_robotContainer.m_chassis.setBrakemode(false);
     }
 
     /**

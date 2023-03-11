@@ -7,9 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,11 +35,11 @@ public class RobotContainer {
   private static RobotContainer m_robotContainer = null;
 
   public final Lights m_lights;
-  // public final Vision m_vision;
+  public final Vision m_vision;
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   public final Chassis m_chassis;
-
+  private final UsbCamera usbcamera;
   private final XboxController xboxController = new XboxController(1);
   private final Joystick joystick = new Joystick(0);
 
@@ -44,20 +48,53 @@ public class RobotContainer {
   private RobotContainer() {
 
     m_lights = new Lights();
-    // m_vision = new Vision("MainC");
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
-
-    SmartDashboard.putData("Autonomous Command", new AutonomousCommand());
-
+    m_vision = new Vision("MainC",m_chassis);
+    usbcamera = CameraServer.startAutomaticCapture();
+    usbcamera.setResolution(320, 240);
     configureButtonBindings();
 
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Autonomous Command", (new ChassisDriveToDistanceCommand(-2, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
+    m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
+    // m_chooser.addOption("Auto Balance", ());
+    m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
+        .andThen(new WaitCommand(0.5))
+        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+        .andThen(new ArmElbowSetpointCommand(338, m_arm))
+        .andThen(new WaitCommand(1))
+        .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
+        .andThen(new ArmElbowSetpointCommand(350, m_arm))
+        .andThen(new WaitCommand(0.5))
+        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
+        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+        .andThen(new ArmElbowSetpointCommand(220, m_arm))
+        .andThen(new WaitCommand(1))
+        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+
+    m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
+        .andThen(new WaitCommand(1))
+        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+        .andThen(new ArmElbowSetpointCommand(338, m_arm))
+        .andThen(new WaitCommand(1))
+        .andThen(new ShluckerSetSpeedCommand(-0.5, m_schlucker))
+        .andThen(new ArmElbowSetpointCommand(350, m_arm))
+        .andThen(new WaitCommand(0.5))
+        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
+        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+        .andThen(new ArmElbowSetpointCommand(220, m_arm))
+        .andThen(new WaitCommand(1))
+        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+    // m_chooser.addOption("Cone + Balance", ());
+    // m_chooser.addOption("Cube + Balance", ());y
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -88,13 +125,15 @@ public class RobotContainer {
   }
 
   private void displayGitInfo() {
-    // Get the branch name and display on the dashboard
-    String branchName = getFileContents("branch.txt");
-    SmartDashboard.putString("Branch Name", branchName);
+    if(Constants.DEBUG){
+      // Get the branch name and display on the dashboard
+      String branchName = getFileContents("branch.txt");
+      SmartDashboard.putString("Branch Name", branchName);
 
-    // Get the commit hash and display on the dashboard
-    String commitHash = getFileContents("commit.txt");
-    SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
+      // Get the commit hash and display on the dashboard
+      String commitHash = getFileContents("commit.txt");
+      SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
+    }
   }
 
   public static RobotContainer getInstance() {
@@ -114,17 +153,10 @@ public class RobotContainer {
     // JoystickButton twoButton = new JoystickButton(joystick, 2);
     // twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
-    // JoystickButton threeButton = new JoystickButton(joystick, 3);
-    // threeButton.onTrue(new ChassisRotateToAngleCommand (90, m_chassis ) );
+    JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
+    fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-    // JoystickButton fourButton = new JoystickButton(joystick, 4);
-    // fourButton.onTrue(new ChassisRotateToAngleCommand (-90, m_chassis ) );
-
-    // JoystickButton fiveButton = new JoystickButton(joystick, 5);
-    // fiveButton.onTrue(new ChassisDriveToDistanceCommand(2, m_chassis ) );
-
-    // JoystickButton sixButton = new JoystickButton(joystick, 6);
-    // sixButton.onTrue(new ChassisDriveToDistanceCommand(-2, m_chassis ) );
+   
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 
@@ -156,17 +188,17 @@ public class RobotContainer {
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(84, m_arm))
         .andThen(new ArmElbowSetpointCommand(283, m_arm)));
 
-    //Mid level node
+    // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
     xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(76, m_arm))
         .andThen(new ArmElbowSetpointCommand(267, m_arm)));
 
-    //Ground pickup
+    // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
     xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(122, m_arm))
         .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
-    //High level mode
+    // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
     xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(95, m_arm))
         .andThen(new ArmElbowSetpointCommand(325, m_arm)));
