@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.RobotContainer;
@@ -27,9 +28,13 @@ public class ChassisDriveCommand extends CommandBase {
     @Override
     public void execute() {
         Joystick joystick = RobotContainer.getInstance().getJoystick();
-        double speed = joystick.getY();
+
+        double speed = joystick.getRawButton(1) ? joystick.getY() * 0.20f : joystick.getY();
+        speed = Math.abs(speed) <= 0.12f ? 0 : speed;
+
         double rotation = joystick.getTwist();
-        m_chassis.arcadeDrive((speed*-1.0) *  MathUtil.clamp((1 - joystick.getThrottle()), 0.25, 0.8), (rotation*-1.0) * MathUtil.clamp((1 - joystick.getThrottle()), 0.25, 0.8));
+        double rotMultiplier = ((-joystick.getThrottle() / 2 + 0.5f) * 0.55f) + 0.25f;
+        m_chassis.arcadeDrive(-speed,(-rotation) * rotMultiplier);
     }
 
     @Override
