@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -38,7 +39,7 @@ public class RobotContainer {
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   public final Chassis m_chassis;
-  private final  UsbCamera usbcamera;
+  private final UsbCamera usbcamera;
   private final XboxController xboxController = new XboxController(1);
   private final Joystick joystick = new Joystick(0);
 
@@ -76,7 +77,7 @@ public class RobotContainer {
         .andThen(new WaitCommand(1))
         .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
-    
+
     m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
         .andThen(new WaitCommand(1))
         .andThen(new ArmShoulderSetpointCommand(122, m_arm))
@@ -93,7 +94,7 @@ public class RobotContainer {
         .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
     // m_chooser.addOption("Cone + Balance", ());
-    //m_chooser.addOption("Cube + Balance", ());y
+    // m_chooser.addOption("Cube + Balance", ());y
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -150,8 +151,10 @@ public class RobotContainer {
     // JoystickButton twoButton = new JoystickButton(joystick, 2);
     // twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
-    JoystickButton fiveButton = new JoystickButton(joystick, 5); //DO NOT DELETE 
-    fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis ) ); //DO NOT DELETE 
+    JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
+    fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
+
+   
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 

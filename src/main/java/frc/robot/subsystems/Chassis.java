@@ -51,20 +51,20 @@ public class Chassis extends SubsystemBase {
     private double lastPitch;
     private double pitchVelocity;
     private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
-
+    private boolean Currentbrakemode = false;
     private final DifferentialDriveOdometry m_odometry;
 
     private final PIDController leftPID, rightPID;
     private final SimpleMotorFeedforward feedForward;
 
     public Chassis() {
-        SmartDashboard.putData("Odometry",Field);
+        SmartDashboard.putData("Odometry", Field);
 
         rightFrontMotor = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
 
         rightFrontMotor.restoreFactoryDefaults();
         rightFrontMotor.setInverted(true);
-        rightFrontMotor.setIdleMode(IdleMode.kBrake);
+        rightFrontMotor.setIdleMode(IdleMode.kCoast);
         rightFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -72,7 +72,7 @@ public class Chassis extends SubsystemBase {
 
         rightBackMotor.restoreFactoryDefaults();
         rightBackMotor.setInverted(true);
-        rightBackMotor.setIdleMode(IdleMode.kBrake);
+        rightBackMotor.setIdleMode(IdleMode.kCoast);
         rightBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         rightBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -83,7 +83,7 @@ public class Chassis extends SubsystemBase {
 
         leftFrontMotor.restoreFactoryDefaults();
         leftFrontMotor.setInverted(false);
-        leftFrontMotor.setIdleMode(IdleMode.kBrake);
+        leftFrontMotor.setIdleMode(IdleMode.kCoast);
         leftFrontMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftFrontMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -91,7 +91,7 @@ public class Chassis extends SubsystemBase {
 
         leftBackMotor.restoreFactoryDefaults();
         leftBackMotor.setInverted(false);
-        leftBackMotor.setIdleMode(IdleMode.kBrake);
+        leftBackMotor.setIdleMode(IdleMode.kCoast);
         leftBackMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT, FREE_CURRENT_LIMIT);
         leftBackMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT);
 
@@ -155,7 +155,7 @@ public class Chassis extends SubsystemBase {
         SmartDashboard.putNumber("getAngle", getAngle());
 
         lastPitch = getPitch();
-     
+
         double leftFeedForwardVoltage = feedForward.calculate(leftPID.getSetpoint());
         double rightFeedForwardVoltage = feedForward.calculate(rightPID.getSetpoint());
 
@@ -164,31 +164,32 @@ public class Chassis extends SubsystemBase {
 
         leftMotors.setVoltage(leftFeedForwardVoltage + leftFeedBackVoltage);
         rightMotors.setVoltage(rightFeedForwardVoltage + rightFeedBackVoltage);
-        
+
         m_odometry.update(navX.getRotation2d(), leftDist, rightDist);
         Field.setRobotPose(m_odometry.getPoseMeters());
     }
 
-    public void tankDrive(double left, double right){
+    public void tankDrive(double left, double right) {
         leftPID.setSetpoint(left);
         rightPID.setSetpoint(right);
     }
 
-    public void tankDrive(DifferentialDriveWheelSpeeds speed){
-        tankDrive(speed.leftMetersPerSecond,speed.rightMetersPerSecond);
+    public void tankDrive(DifferentialDriveWheelSpeeds speed) {
+        tankDrive(speed.leftMetersPerSecond, speed.rightMetersPerSecond);
     }
 
-    public void drive(ChassisSpeeds speed){
+    public void drive(ChassisSpeeds speed) {
         tankDrive(differentialDriveKinematics.toWheelSpeeds(speed));
     }
 
     public void arcadeDrive(double speed, double rotation) {
-        drive(new ChassisSpeeds(speed * DriveConstants.MaxVelocity,0,rotation * DriveConstants.MaxAngularVelocity));
+        drive(new ChassisSpeeds(speed * DriveConstants.MaxVelocity, 0, rotation * DriveConstants.MaxAngularVelocity));
     }
 
     public double getEncoderDistance() {
-        // double meters = ((leftEncoder.getPosition() - leftOffSet) + (rightEncoder.getPosition() * -1 - rightOffSet))
-        //         / 2;
+        // double meters = ((leftEncoder.getPosition() - leftOffSet) +
+        // (rightEncoder.getPosition() * -1 - rightOffSet))
+        // / 2;
 
         // return meters;
         return (leftDistanceTraveled() + rightDistanceTraveled()) / 2;
@@ -207,7 +208,7 @@ public class Chassis extends SubsystemBase {
         rightEncoder.setPosition(0);
     }
 
-    public double getPitch(){
+    public double getPitch() {
         return (navX.getPitch()) * -1;
     }
 
@@ -219,12 +220,34 @@ public class Chassis extends SubsystemBase {
         return navX.getAngle();
     }
 
-    public double getpitchVelocity(){
+    public double getpitchVelocity() {
         return pitchVelocity;
     }
 
     public Pose2d getPose() {
         return m_odometry.getPoseMeters();
+    }
+
+    public void togglebrakemode() {
+        Currentbrakemode = !Currentbrakemode;
+        setBrakemode(Currentbrakemode);
+    }
+
+    public void setBrakemode(boolean DaBrake) {
+
+        if (DaBrake) {
+            leftBackMotor.setIdleMode(IdleMode.kBrake);
+            rightBackMotor.setIdleMode(IdleMode.kBrake);
+            leftFrontMotor.setIdleMode(IdleMode.kBrake);
+            rightFrontMotor.setIdleMode(IdleMode.kBrake);
+
+        } else {
+            leftBackMotor.setIdleMode(IdleMode.kCoast);
+            rightBackMotor.setIdleMode(IdleMode.kCoast);
+            leftFrontMotor.setIdleMode(IdleMode.kCoast);
+            rightFrontMotor.setIdleMode(IdleMode.kCoast);
+
+        }
     }
 
     public void resetOdometry(Pose2d pose) {
