@@ -53,15 +53,5 @@ public class Constants {
         PRACTICE_ROBOT = Preferences.getBoolean("PRACTICE_ROBOT", true);
         ELBOW_ENCODER_OFFSET = Preferences.getDouble("ELBOW_ENCODER_OFFSET", 0.0);
         SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);
-
-        /*
-        if (PRACTICE_ROBOT) {
-            kFeetToMeterFactor = 20;
-        } else {
-            // Competition bot
-            kFeetToMeterFactor = 20;
-
-        }
-        */
     }
 }

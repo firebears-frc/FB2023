@@ -5,10 +5,7 @@ import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandGroupBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -128,17 +125,19 @@ public class RobotContainer {
   }
 
   private void displayGitInfo() {
-      // Get the branch name and display on the dashboard
-      String branchName = getFileContents("branch.txt");
-      SmartDashboard.putString("Branch Name", branchName);
-
-    // Get the commit hash and display on the dashboard
+    String branchName = getFileContents("branch.txt");
     String commitHash = getFileContents("commit.txt");
-    SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
+
+    if(Constants.DEBUG) {
+      SmartDashboard.putString("Branch Name", branchName);
+      SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
+    }
 
     if (LOGGING) {
       DataLogManager.log("branchName=" + branchName);
       DataLogManager.log("commitHash=" + commitHash);
+    } else {
+      System.out.println("branchName=" + branchName + " #  " + commitHash);
     }
   }
 

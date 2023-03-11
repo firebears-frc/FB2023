@@ -1,11 +1,7 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -188,9 +184,9 @@ public class Arm extends SubsystemBase {
 
         //SmartDashboard.putString("shlucker position",getArmPosition().getX()+"+"+getArmPosition().getY());
 
-        SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
-        SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
-        SmartDashboard.putNumber("Elbow Output", elbowMotor.getAppliedOutput());
+        //SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
+        //SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
+        //SmartDashboard.putNumber("Elbow Output", elbowMotor.getAppliedOutput());
 
         double shoulderAngle = getShoulderAngle();
         double elbowAngle = getElbowAngle();
