@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -42,6 +43,7 @@ public class Chassis extends SubsystemBase {
     private double rightOffSet = 0;
     private double lastPitch;
     private double pitchVelocity;
+    private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
 
     private final DifferentialDriveOdometry m_odometry;
 
@@ -114,7 +116,7 @@ public class Chassis extends SubsystemBase {
     @Override
     public void periodic() {
 
-        pitchVelocity = (getPitch() - lastPitch);
+        pitchVelocity = pitchVelolcityFilter.calculate(getPitch() - lastPitch);
         Rotation2d gyroAngleRadians = Rotation2d.fromDegrees(-getAngle());
         double leftDistanceMeters = leftDistanceTraveled();
         double rightDistanceMeters = rightDistanceTraveled();
