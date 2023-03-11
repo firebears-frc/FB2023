@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
@@ -49,8 +50,6 @@ public class RobotContainer {
     m_arm = new Arm();
     m_chassis = new Chassis();
 
-    SmartDashboard.putData("Autonomous Command", new AutonomousCommand());
-
     configureButtonBindings();
 
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
@@ -58,18 +57,21 @@ public class RobotContainer {
 
     m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-2, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
-    //m_chooser.addOption("Auto Balance", ());
-    m_chooser.addOption("Cone", ((new ArmShoulderSetpointCommand(95, m_arm))
-    .andThen(new ArmElbowSetpointCommand(270, m_arm))
-    .andThen(new ShluckerCommand(-1,m_schlucker))
-    .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-    .andThen(new ArmElbowSetpointCommand(205, m_arm))
-    .andThen(new ChassisDriveToDistanceCommand(-2,m_chassis))
-    .andThen(new ChassisDriveToDistanceCommand(2,m_chassis))));
-    //m_chooser.addOption("Cone + Balance", ());
-    //m_chooser.addOption("Cube", ());
-    //m_chooser.addOption("Cube + Balance", ());
-
+    // m_chooser.addOption("Auto Balance", ());
+    m_chooser.addOption("Cone or Cube", (new ShluckerSetSpeedCommand(-0.5, m_schlucker))
+        .andThen(new WaitCommand(0.2))
+        .andThen(new ArmShoulderSetpointCommand(95, m_arm))
+        .andThen(new ArmElbowSetpointCommand(325, m_arm))
+        .andThen(new WaitCommand(3))
+        .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
+        .andThen(new WaitCommand(0.5))
+        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+        .andThen(new ArmElbowSetpointCommand(220, m_arm))
+        .andThen(new WaitCommand(2))
+        .andThen(new ChassisDriveToDistanceCommand(-2, m_chassis))
+        .andThen(new ChassisDriveToDistanceCommand(2, m_chassis)));
+    // m_chooser.addOption("Cone or Cube + Balance", ());
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -96,7 +98,8 @@ public class RobotContainer {
 
   public void armReset() {
     m_arm.setElbowSetpoint(m_arm.getElbowAngle());
-    m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
+    //m_arm.setShoulderSetpoint(m_arm.getShoulderAngle());
+    m_arm.setShoulderSetpoint(76);
   }
 
   private void displayGitInfo() {
@@ -149,7 +152,7 @@ public class RobotContainer {
 
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
-    .andThen(new ArmElbowSetpointCommand(220, m_arm)));
+        .andThen(new ArmElbowSetpointCommand(220, m_arm)));
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
     xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
@@ -163,17 +166,17 @@ public class RobotContainer {
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(84, m_arm))
         .andThen(new ArmElbowSetpointCommand(283, m_arm)));
 
-    //Mid level node
+    // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
     xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(76, m_arm))
         .andThen(new ArmElbowSetpointCommand(267, m_arm)));
 
-    //Ground pickup
+    // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
     xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(122, m_arm))
         .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
-    //High level mode
+    // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
     xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(95, m_arm))
         .andThen(new ArmElbowSetpointCommand(325, m_arm)));

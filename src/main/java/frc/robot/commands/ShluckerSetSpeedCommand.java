@@ -5,24 +5,26 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Schlucker;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ArmShoulderSetpointCommand extends InstantCommand {
-  Arm m_arm;
-  double setPoint;
-  public ArmShoulderSetpointCommand(double s, Arm arm) {
+public class ShluckerSetSpeedCommand extends InstantCommand {
+
+  private final Schlucker schlucker;
+  private double speed;
+  
+  public ShluckerSetSpeedCommand(double speed, Schlucker schlucker) {
+    this.schlucker = schlucker;
+    this.speed = speed;
     // Use addRequirements() here to declare subsystem dependencies.
-    m_arm = arm;
-    addRequirements(arm);
-    setPoint = s;
+    addRequirements(schlucker);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //m_arm.setShoulderSetpoint(setPoint);
+    schlucker.setShluckerSpeed(speed);
   }
 }
