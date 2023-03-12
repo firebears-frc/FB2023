@@ -7,22 +7,16 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Chassis;
 
-public class BalanceTake2Command extends CommandBase {
+public class ChassisDriveUntilPitch extends CommandBase {
+  /** Creates a new DriveToPositionCommand. */
+  private double pitch;
+  private double speed;
+  private Chassis m_chassis;
 
-  Chassis m_chassis;
-  double speed;
-  double lastPitch;
-
-  /** Creates a new BalanceTake2Command. */
-  public BalanceTake2Command(Chassis chassis) {
-    m_chassis = chassis;
-    speed = 0.07;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_chassis);
-  }
-  public BalanceTake2Command(double s, Chassis chassis) {
-    m_chassis = chassis;
+  public ChassisDriveUntilPitch(double p, double s, Chassis c) {
+    pitch = p;
     speed = s;
+    m_chassis = c;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_chassis);
   }
@@ -30,21 +24,13 @@ public class BalanceTake2Command extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    lastPitch = m_chassis.getPitch();
-    m_chassis.setBrakemode(true);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double pitchVelocity = m_chassis.getpitchVelocity();
-    double pitchSpeed = Math.abs(pitchVelocity);
-
-    if (pitchVelocity > -0.3 ){
-      m_chassis.arcadeDrive(speed, 0);
-    }else{
-      m_chassis.arcadeDrive(0, 0);
-    }
+    m_chassis.arcadeDrive(speed, 0);
   }
 
   // Called once the command ends or is interrupted.
@@ -56,6 +42,6 @@ public class BalanceTake2Command extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_chassis.getpitchVelocity() <= -0.5;
+    return m_chassis.getPitch() >= pitch;
   }
 }
