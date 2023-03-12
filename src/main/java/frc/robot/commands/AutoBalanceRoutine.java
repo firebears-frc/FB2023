@@ -22,9 +22,9 @@ public class AutoBalanceRoutine extends SequentialCommandGroup {
       new ChassisDriveToPitch(10, 0.2, m_chassis),
       new ChassisDriveToPitch(10, 0.2, m_chassis),
       new ChassisDriveToDistanceCommand(0.75, 0.2, m_chassis),
-      new BalanceTake2Command(0.06, m_chassis),
-      new ChassisDriveToDistanceCommand(-0.05, 0.15, m_chassis),
-      new WaitCommand(5)
+      new BalanceTake2Command(0.06, m_chassis)
+      //new ChassisDriveToDistanceCommand(-0.05, 0.15, m_chassis),
+      //new WaitCommand(5)
     );
   }
 }
