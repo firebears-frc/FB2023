@@ -7,13 +7,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Chassis;
 
-public class ChassisDriveUntilPitch extends CommandBase {
+public class ChassisDriveToPitch extends CommandBase {
   /** Creates a new DriveToPositionCommand. */
   private double pitch;
   private double speed;
   private Chassis m_chassis;
 
-  public ChassisDriveUntilPitch(double p, double s, Chassis c) {
+  public ChassisDriveToPitch(double p, double s, Chassis c) {
     pitch = p;
     speed = s;
     m_chassis = c;

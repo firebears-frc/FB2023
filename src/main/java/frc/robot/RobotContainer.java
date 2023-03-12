@@ -158,16 +158,10 @@ public class RobotContainer {
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
     JoystickButton threeButton = new JoystickButton(joystick,3);
-    threeButton.onTrue(new BalanceTake2Command(m_chassis)); 
+    threeButton.onTrue(new ChassisDriveToPitch(10,0.1,m_chassis)); 
 
     JoystickButton fourButton = new JoystickButton(joystick,4); 
-    fourButton.onTrue(new SequentialCommandGroup(
-      new ChassisSetBrakeMode(true, m_chassis),
-      new ChassisDriveUntilPitch(10, 0.2, m_chassis),
-      new ChassisDriveToDistanceCommand(0.75, 0.2, m_chassis),
-      new BalanceTake2Command(0.06, m_chassis),
-      new ChassisDriveToDistanceCommand(-0.05, 0.2, m_chassis)
-    )); 
+    fourButton.onTrue(new AutoBalanceRoutine(m_chassis)); 
 
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
