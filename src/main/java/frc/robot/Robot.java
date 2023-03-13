@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
                 "/u/config.properties");
         m_robotContainer = RobotContainer.getInstance();
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_RobotBuilder);
+        m_robotContainer.armReset();
         if (LOGGING) {
             DataLogManager.start(LOG_DIR);
             DriverStation.startDataLog(DataLogManager.getLog());

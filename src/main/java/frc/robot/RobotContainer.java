@@ -127,11 +127,8 @@ public class RobotContainer {
   private void displayGitInfo() {
     String branchName = getFileContents("branch.txt");
     String commitHash = getFileContents("commit.txt");
-
-    if(Constants.DEBUG) {
-      SmartDashboard.putString("Branch Name", branchName);
-      SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
-    }
+    SmartDashboard.putString("Branch Name", branchName);
+    SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
 
     if (LOGGING) {
       DataLogManager.log("branchName=" + branchName);
