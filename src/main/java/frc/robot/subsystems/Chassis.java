@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.util.LogEntryDouble;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
@@ -58,8 +59,8 @@ public class Chassis extends SubsystemBase {
     private final PIDController leftPID, rightPID;
     private final SimpleMotorFeedforward feedForward;
 
-    private DoubleLogEntry leftMotorLog;
-    private DoubleLogEntry rightMotorLog;
+    private LogEntryDouble leftMotorLog;
+    private LogEntryDouble rightMotorLog;
 
     public Chassis() {
         SmartDashboard.putData("Odometry", Field);
@@ -136,8 +137,8 @@ public class Chassis extends SubsystemBase {
         leftBackMotor.burnFlash();
 
         if (LOGGING) {
-            leftMotorLog = new DoubleLogEntry(DataLogManager.getLog(), "/chassis/leftMotors");
-            rightMotorLog = new DoubleLogEntry(DataLogManager.getLog(), "/chassis/rightMotors");
+            leftMotorLog = new LogEntryDouble(DataLogManager.getLog(), "/chassis/leftMotors");
+            rightMotorLog = new LogEntryDouble(DataLogManager.getLog(), "/chassis/rightMotors");
         }
     }
 
