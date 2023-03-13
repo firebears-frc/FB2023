@@ -165,12 +165,13 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //SmartDashboard.putNumber("Shoulder Angle", getShoulderAngle());
-        //SmartDashboard.putNumber("Elbow Angle", getElbowAngle());
-        //SmartDashboard.putNumber("Setpoint", elbowSetpoint);
-        //SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
+        if (DEBUG)
+        {SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
+        SmartDashboard.putNumber("elbow angle", getElbowAngle());
+        SmartDashboard.putNumber("setpoint", elbowSetpoint);
+        SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
-        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
+        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);}
 
         //SmartDashboard.putString("shlucker position",getArmPosition().getX()+"+"+getArmPosition().getY());
 
