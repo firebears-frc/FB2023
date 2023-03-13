@@ -63,7 +63,7 @@ public class RobotContainer {
     m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
     // m_chooser.addOption("Auto Balance", ());
-    m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
+    /*m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
         .andThen(new WaitCommand(0.5))
         .andThen(new ArmShoulderSetpointCommand(122, m_arm))
         .andThen(new ArmElbowSetpointCommand(338, m_arm))
@@ -93,7 +93,7 @@ public class RobotContainer {
         .andThen(new ArmElbowSetpointCommand(220, m_arm))
         .andThen(new WaitCommand(1))
         .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));*/
     // m_chooser.addOption("Cone + Balance", ());
     // m_chooser.addOption("Cube + Balance", ());y
 
@@ -166,17 +166,25 @@ public class RobotContainer {
 
     // Buttons
 
+    // A button = picks up cone and drops cube
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
-    xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
+    xboxAButton.onTrue(new InstantCommand(m_schlucker::intakecone, m_schlucker));
+    xboxAButton.onFalse(new InstantCommand(m_schlucker::hold, m_schlucker));
 
+    // B button = reset position (stow)
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
         .andThen(new ArmElbowSetpointCommand(220, m_arm)));
-    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
-    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
+    // X button = picks up cube and drops cone
+    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
+    xboxXButton.onTrue(new InstantCommand(m_schlucker::intakecube, m_schlucker));
+    xboxXButton.onFalse(new InstantCommand(m_schlucker::hold, m_schlucker));
+
+    // Y button = eject button
     JoystickButton xboxYButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
-    xboxYButton.onTrue(new ArmShoulderSetpointCommand(0, m_arm));
+    xboxYButton.onTrue(new InstantCommand(m_schlucker::eject, m_schlucker));
+    xboxYButton.onFalse(new InstantCommand(m_schlucker::stop, m_schlucker));
 
     // Dpad
 
@@ -217,4 +225,5 @@ public class RobotContainer {
     return m_chooser.getSelected();
   }
 
+  
 }
