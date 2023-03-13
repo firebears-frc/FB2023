@@ -27,6 +27,7 @@ public class RobotContainer {
     private final Arm arm;
     private final Schlucker schlucker;
     private final Vision vision;
+    private final Lights lights;
     private final Joystick joystick;
     private final XboxController controller;
 
@@ -35,6 +36,7 @@ public class RobotContainer {
         arm = new Arm();
         schlucker = new Schlucker();
         vision = new Vision(chassis::resetPose);
+        lights = new Lights(schlucker::getHeldItem);
         joystick = new Joystick(Constants.JOYSTICK_PORT);
         controller = new XboxController(Constants.CONTROLLER_PORT);
 

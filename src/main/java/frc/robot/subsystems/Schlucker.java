@@ -7,18 +7,13 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.GamePiece;
 import frc.robot.util.Constants.SchluckerConstants;
 
 public class Schlucker extends SubsystemBase {
-    public enum HeldItem {
-        NONE,
-        CUBE,
-        CONE
-    }
-
     private final CANSparkMax motor;
     private final SparkMaxPIDController pid;
-    private HeldItem item = HeldItem.NONE;
+    private GamePiece item = GamePiece.NONE;
 
     public Schlucker() {
         motor = new CANSparkMax(SchluckerConstants.MOTOR_PORT, MotorType.kBrushless);
@@ -35,12 +30,12 @@ public class Schlucker extends SubsystemBase {
 
     public void intakeCone() {
         pid.setReference(SchluckerConstants.INTAKE_SPEED, ControlType.kDutyCycle);
-        item = HeldItem.CONE;
+        item = GamePiece.CONE;
     }
 
     public void intakeCube() {
         pid.setReference(-1.0 * SchluckerConstants.INTAKE_SPEED, ControlType.kDutyCycle);
-        item = HeldItem.CUBE;
+        item = GamePiece.CUBE;
     }
 
     public void hold() {
@@ -65,7 +60,7 @@ public class Schlucker extends SubsystemBase {
                 motor.set(-1.0 * SchluckerConstants.INTAKE_SPEED);
                 break;
         }
-        item = HeldItem.NONE;
+        item = GamePiece.NONE;
     }
 
     public void stop() {
