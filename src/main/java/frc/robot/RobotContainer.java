@@ -56,6 +56,7 @@ public class RobotContainer {
     usbcamera.setResolution(320, 240);
     configureButtonBindings();
 
+    m_chassis.setBrakemode(false);
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
@@ -156,7 +157,8 @@ public class RobotContainer {
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-   
+   JoystickButton twobutton = new JoystickButton(joystick, 2);
+  
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 
