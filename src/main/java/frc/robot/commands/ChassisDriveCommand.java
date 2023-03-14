@@ -17,7 +17,6 @@ public class ChassisDriveCommand extends CommandBase {
 
         m_chassis = subsystem;
         addRequirements(m_chassis);
-
     }
 
     @Override
@@ -28,9 +27,11 @@ public class ChassisDriveCommand extends CommandBase {
     @Override
     public void execute() {
         Joystick joystick = RobotContainer.getInstance().getJoystick();
-
-        double speed = joystick.getRawButton(1) ? joystick.getY() * 0.20f : joystick.getY();
-        speed = Math.abs(speed) <= 0.12f ? 0 : speed;
+        double speed = joystick.getY();
+        if (Math.abs(speed) < 0.12)
+            speed = 0;
+        if (m_chassis.getSlowMode())
+            speed *= 0.2;
 
         double rotation = joystick.getTwist();
         double rotMultiplier = ((-joystick.getThrottle() / 2 + 0.5f) * 0.55f) + 0.25f;
@@ -49,6 +50,5 @@ public class ChassisDriveCommand extends CommandBase {
     @Override
     public boolean runsWhenDisabled() {
         return false;
-
     }
 }
