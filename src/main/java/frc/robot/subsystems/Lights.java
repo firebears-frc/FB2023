@@ -3,19 +3,42 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
+/*
+ * Both low = Fire
+ * One low = Cone / Cube
+ * Two high = Rainbow
+ */
 public class Lights extends SubsystemBase {
-    DigitalOutput togglePin;
+    DigitalOutput conePin;
+    DigitalOutput cubePin;
+ 
     public Lights() {
-        togglePin = new DigitalOutput(10);
-        togglePin.set(false);        
+        conePin = new DigitalOutput(10);
+        cubePin = new DigitalOutput(11);
+        conePin.set(false);
+        cubePin.set(false);
     }
 
-    public void setPin(boolean value) {
-        togglePin.set(value);
+    public void showFire() {
+        conePin.set(false);
+        cubePin.set(false);
     }
-    public boolean getPin() {
-        return togglePin.get();
+
+    public void showCone() {
+        conePin.set(true);
+        cubePin.set(false);
     }
+
+    public void showCube() {
+        conePin.set(false);
+        cubePin.set(true);
+    }
+    public void showRainbow() {
+        conePin.set(true);
+        cubePin.set(true);
+    }
+    
     @Override
     public void periodic() {
 

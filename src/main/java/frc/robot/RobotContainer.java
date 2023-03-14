@@ -157,8 +157,19 @@ public class RobotContainer {
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
  
-    JoystickButton triggerButton = new JoystickButton(joystick, 1);
-    triggerButton.onTrue(new LightsTogglePin(m_lights));
+    /* Lights Controls */
+
+    JoystickButton sixButton = new JoystickButton(joystick, 6);
+    sixButton.onTrue(new InstantCommand(m_lights::showFire, m_lights));
+
+    JoystickButton sevenButton = new JoystickButton(joystick, 7);
+    sevenButton.onTrue(new InstantCommand(m_lights::showCone, m_lights));
+
+    JoystickButton eightButton = new JoystickButton(joystick, 8);
+    eightButton.onTrue(new InstantCommand(m_lights::showCube, m_lights));
+
+    JoystickButton nineButton = new JoystickButton(joystick, 9);
+    nineButton.onTrue(new InstantCommand(m_lights::showRainbow, m_lights));
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 
