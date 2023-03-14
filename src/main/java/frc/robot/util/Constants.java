@@ -47,11 +47,6 @@ public class Constants {
         public static final double ELBOW_I = 0;
         public static final double ELBOW_D = 0.0005;
         public static final double ELBOW_OFFSET = 240; // degrees
-        public static final double ELBOW_SUBSTATION = 283; // degrees
-        public static final double ELBOW_STOW = 220; // degrees
-        public static final double ELBOW_GROUND = 264; // degrees
-        public static final double ELBOW_HIGH = 325; // degrees
-        public static final double ELBOW_MID = 267; // degrees
 
         public static final int SHOULDER_RIGHT_PORT = 12;
         public static final int SHOULDER_LEFT_PORT = 13;
@@ -63,11 +58,17 @@ public class Constants {
         public static final double SHOULDER_I = 0;
         public static final double SHOULDER_D = 0.001;
         public static final double SHOULDER_OFFSET = 196; // degrees
-        public static final double SHOULDER_SUBSTATION = 84; // degrees
+
+        public static final double SHOULDER_SUBSTATION = 89; // degrees
+        public static final double ELBOW_SUBSTATION = 295; // degrees
         public static final double SHOULDER_STOW = 20; // degrees
-        public static final double SHOULDER_GROUND = 122; // degrees
-        public static final double SHOULDER_HIGH = 95; // degrees
+        public static final double ELBOW_STOW = 220; // degrees
+        public static final double SHOULDER_GROUND = 130; // degrees
+        public static final double ELBOW_GROUND = 288; // degrees
+        public static final double SHOULDER_HIGH = 106; // degrees
+        public static final double ELBOW_HIGH = 319; // degrees
         public static final double SHOULDER_MID = 76; // degrees
+        public static final double ELBOW_MID = 267; // degrees
 
         public static final double ANGLE_TOLERANCE = 5; // degrees
     }
@@ -81,5 +82,9 @@ public class Constants {
 
         public static final double INTAKE_SPEED = 0.7;
         public static final double HOLD_CURRENT = 1.0;
+
+        public static final double P = 1;
+        public static final double I = 0;
+        public static final double D = 0;
     }
 }
