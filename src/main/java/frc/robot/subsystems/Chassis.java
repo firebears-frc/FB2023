@@ -89,13 +89,6 @@ public class Chassis extends SubsystemBase {
         return odometry.getPoseMeters();
     }
 
-    public void arcadeDrive(double forward, double rotation) {
-        drive(new ChassisSpeeds(
-                forward * ChassisConstants.MAX_VELOCITY,
-                0, // No sideways
-                rotation * ChassisConstants.MAX_ANGULAR_VELOCITY));
-    }
-
     public void drive(ChassisSpeeds chassisSpeeds) {
         tankDrive(kinematics.toWheelSpeeds(chassisSpeeds));
     }

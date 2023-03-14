@@ -22,7 +22,9 @@ public class Constants {
         public static final double VELOCITY_CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60; // The raw units are RPM
 
         public static final double MAX_VELOCITY = 5; // Meters per second
+        public static final double SLOW_VELOCITY = 1; // Meters per second
         public static final double MAX_ANGULAR_VELOCITY = 8; // Radians per second
+        public static final double SLOW_ANGULAR_VELOCITY = 2; // Radians per second
         public static final double MAX_ACCELERATION = 5; // Meters per second squared: TODO!
         public static final double MAX_VOLTAGE = 10;
 
@@ -40,7 +42,7 @@ public class Constants {
         public static final int ELBOW_STALL_CURRENT_LIMIT = 35;
         public static final int ELBOW_FREE_CURRENT_LIMIT = 20;
         public static final double ELBOW_SECONDARY_CURRENT_LIMIT = 40.0;
-        public static final double ELBOW_SPEED = 1.0; // degrees per loop
+        public static final double ELBOW_MANUAL_SPEED = 1.0; // degrees per loop
         public static final double ELBOW_P = 0.03;
         public static final double ELBOW_I = 0;
         public static final double ELBOW_D = 0.0005;
@@ -56,7 +58,7 @@ public class Constants {
         public static final int SHOULDER_STALL_CURRENT_LIMIT = 35;
         public static final int SHOULDER_FREE_CURRENT_LIMIT = 20;
         public static final double SHOULDER_SECONDARY_CURRENT_LIMIT = 40.0;
-        public static final double SHOULDER_SPEED = 1.0; // degrees per loop
+        public static final double SHOULDER_MANUAL_SPEED = 1.0; // degrees per loop
         public static final double SHOULDER_P = 0.02;
         public static final double SHOULDER_I = 0;
         public static final double SHOULDER_D = 0.001;

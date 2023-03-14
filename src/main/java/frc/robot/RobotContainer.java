@@ -4,6 +4,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.Constants;
 import frc.robot.util.Constants.ArmConstants;
+import frc.robot.util.Constants.ChassisConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,6 +18,7 @@ import java.io.IOException;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
@@ -50,15 +52,24 @@ public class RobotContainer {
             double forward = joystick.getY() * -1.0;
             double rotation = joystick.getX() * -1.0;
 
-            chassis.arcadeDrive(forward, rotation);
+            if (joystick.getRawButton(1)) {
+                forward *= ChassisConstants.SLOW_VELOCITY;
+                rotation *= ChassisConstants.SLOW_ANGULAR_VELOCITY;
+            }
+            else {
+                forward *= ChassisConstants.MAX_VELOCITY;
+                rotation *= ChassisConstants.MAX_ANGULAR_VELOCITY;
+            }
+
+            chassis.drive(new ChassisSpeeds(forward, 0, rotation));
         }, chassis));
 
         arm.setDefaultCommand(new RunCommand(() -> {
             double elbow = arm.getElbowTargetAngle();
-            elbow += controller.getLeftY() * ArmConstants.ELBOW_SPEED;
+            elbow += controller.getLeftY() * ArmConstants.ELBOW_MANUAL_SPEED;
 
             double shoulder = arm.getShoulderTargetAngle();
-            shoulder += controller.getRightY() * ArmConstants.SHOULDER_SPEED;
+            shoulder += controller.getRightY() * ArmConstants.SHOULDER_MANUAL_SPEED;
 
             arm.setAngles(elbow, shoulder);
         }, arm));
@@ -67,11 +78,13 @@ public class RobotContainer {
         POVButton upButton = new POVButton(controller, 0);
         upButton.onTrue(new ArmSubstationCommand(arm));
         POVButton rightButton = new POVButton(controller, 90);
-        rightButton.onTrue(new ArmMidCommand(arm));
+        rightButton.onTrue(new ArmMidCommand(arm).andThen(new InstantCommand(schlucker::eject, schlucker)));
+        rightButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
         POVButton downButton = new POVButton(controller, 180);
         downButton.onTrue(new ArmGroundCommand(arm));
         POVButton leftButton = new POVButton(controller, 270);
-        leftButton.onTrue(new ArmHighCommand(arm));
+        leftButton.onTrue(new ArmHighCommand(arm).andThen(new InstantCommand(schlucker::eject, schlucker)));
+        leftButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
         JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);
         bButton.onTrue(new ArmStowCommand(arm));
 
