@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.ChargeStationStatus;
 import frc.robot.util.Constants.ChassisConstants;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -69,6 +70,10 @@ public class Chassis extends SubsystemBase {
 
         odometry.update(navX.getRotation2d(), leftDistance, rightDistance);
         field.setRobotPose(odometry.getPoseMeters());
+    }
+
+    public ChargeStationStatus getChargeStationStatus() {
+        return ChargeStationStatus.NONE;
     }
 
     public void resetPose(Pose2d pose) {
