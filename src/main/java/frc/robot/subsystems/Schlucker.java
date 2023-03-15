@@ -13,7 +13,10 @@ public class Schlucker extends SubsystemBase {
     private CANSparkMax shluckerMotor;
     private SparkMaxPIDController pid;
 
-    private final int HOLD_CURRENT = 5;
+    private final double HOLD_POSITIVE_SPEED = 0.5; 
+    private final double HOLD_NEGATIVE_SPEED = -HOLD_POSITIVE_SPEED; 
+    // var to hold if wasEjected so can be used by lights
+
     public enum ItemHeld {
         CONE,
         CUBE,
@@ -29,6 +32,7 @@ public class Schlucker extends SubsystemBase {
         shluckerMotor.setInverted(false);
         shluckerMotor.setIdleMode(IdleMode.kBrake);
         pid = shluckerMotor.getPIDController();
+        // set p value of pid to 1
     }
 
 
@@ -50,16 +54,22 @@ public class Schlucker extends SubsystemBase {
         case CUBE:
             pid.setReference(-0.7, ControlType.kDutyCycle);
             break;
+        default:
+            break;
         }
+        // flag that wasEjected
     }
 
     public void hold() {
         switch(item_held) {
         case CONE:
-            pid.setReference(-0.2, ControlType.kDutyCycle);
+            pid.setReference(HOLD_NEGATIVE_SPEED, ControlType.kDutyCycle);
+            // replace with kCurrent
             break;
         case CUBE:
-            pid.setReference(0.2, ControlType.kDutyCycle);
+            pid.setReference(HOLD_POSITIVE_SPEED, ControlType.kDutyCycle);
+            break;
+        default:
             break;
         }
     }
