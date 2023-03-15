@@ -20,7 +20,6 @@ public class Schlucker extends SubsystemBase {
         NONE  
     }
 
-    // TODO: Define ItemHeld var (should it be public or private?)
     private ItemHeld item_held;
     
     public Schlucker() {
@@ -33,14 +32,16 @@ public class Schlucker extends SubsystemBase {
     }
 
 
-    public void intakecone(){
+    public void intakeCone(){
         pid.setReference(-0.7, ControlType.kDutyCycle);
         item_held = ItemHeld.CONE;
     }
-    public void intakecube(){
+
+    public void intakeCube(){
         pid.setReference(0.7, ControlType.kDutyCycle);
         item_held = ItemHeld.CUBE;
     }
+
     public void eject(){
         switch(item_held) {
         case CONE:
@@ -51,6 +52,7 @@ public class Schlucker extends SubsystemBase {
             break;
         }
     }
+
     public void hold() {
         switch(item_held) {
         case CONE:
@@ -61,6 +63,7 @@ public class Schlucker extends SubsystemBase {
             break;
         }
     }
+
     public void stop() {
         pid.setReference(0, ControlType.kDutyCycle);
     }
@@ -74,5 +77,4 @@ public class Schlucker extends SubsystemBase {
     public void simulationPeriodic() {
 
     }
-
 }
