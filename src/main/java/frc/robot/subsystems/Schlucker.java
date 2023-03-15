@@ -13,8 +13,8 @@ public class Schlucker extends SubsystemBase {
     private CANSparkMax shluckerMotor;
     private SparkMaxPIDController pid;
 
-    private final double HOLD_POSITIVE_SPEED = 0.5; 
-    private final double HOLD_NEGATIVE_SPEED = -HOLD_POSITIVE_SPEED; 
+    private final double HOLD_POSITIVE_CURRENT = 0.5; 
+    private final double HOLD_NEGATIVE_CURRENT = -HOLD_POSITIVE_CURRENT; 
     // variable to hold if an item was Ejected by the robot. variable needs to be used by lights
     public boolean ejectPushed;
     // should it be initially set to true or false? do we need to set it?
@@ -36,6 +36,7 @@ public class Schlucker extends SubsystemBase {
         shluckerMotor.setIdleMode(IdleMode.kBrake);
         pid = shluckerMotor.getPIDController();
         // set p value of pid to 1
+        pid.setP(1.0);
     }
 
 
@@ -66,11 +67,10 @@ public class Schlucker extends SubsystemBase {
     public void hold() {
         switch(item_held) {
         case CONE:
-            pid.setReference(HOLD_NEGATIVE_SPEED, ControlType.kDutyCycle);
-            // replace with kCurrent
+            pid.setReference(HOLD_NEGATIVE_CURRENT, ControlType.kCurrent);
             break;
         case CUBE:
-            pid.setReference(HOLD_POSITIVE_SPEED, ControlType.kDutyCycle);
+            pid.setReference(HOLD_POSITIVE_CURRENT, ControlType.kCurrent);
             break;
         default:
             break;
