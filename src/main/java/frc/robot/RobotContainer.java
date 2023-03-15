@@ -159,6 +159,8 @@ public class RobotContainer {
 
    JoystickButton twobutton = new JoystickButton(joystick, 2);
   
+    JoystickButton triggerButton = new JoystickButton(joystick, 1);
+    triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 
@@ -190,8 +192,8 @@ public class RobotContainer {
 
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
-    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(84, m_arm))
-        .andThen(new ArmElbowSetpointCommand(283, m_arm)));
+    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(89, m_arm))
+        .andThen(new ArmElbowSetpointCommand(295, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
@@ -200,14 +202,13 @@ public class RobotContainer {
 
     // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
-    xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(264, m_arm)));
+    xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(130, m_arm))
+        .andThen(new ArmElbowSetpointCommand(288, m_arm)));
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(95, m_arm))
-        .andThen(new ArmElbowSetpointCommand(325, m_arm)));
-
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(106, m_arm))
+        .andThen(new ArmElbowSetpointCommand(319, m_arm)));
   }
 
   public XboxController getXboxController() {

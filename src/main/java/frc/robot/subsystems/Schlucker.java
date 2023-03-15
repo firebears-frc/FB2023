@@ -50,7 +50,6 @@ public class Schlucker extends SubsystemBase {
             pid.setReference(-0.7, ControlType.kDutyCycle);
             break;
         }
-        item_held = ItemHeld.NONE;
     }
     public void hold() {
         switch(item_held) {
