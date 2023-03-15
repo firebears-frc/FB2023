@@ -15,7 +15,10 @@ public class Schlucker extends SubsystemBase {
 
     private final double HOLD_POSITIVE_SPEED = 0.5; 
     private final double HOLD_NEGATIVE_SPEED = -HOLD_POSITIVE_SPEED; 
-    // var to hold if wasEjected so can be used by lights
+    // variable to hold if an item was Ejected by the robot. variable needs to be used by lights
+    public boolean ejectPushed;
+    // should it be initially set to true or false? do we need to set it?
+    // should it be private or public?
 
     public enum ItemHeld {
         CONE,
@@ -57,7 +60,7 @@ public class Schlucker extends SubsystemBase {
         default:
             break;
         }
-        // flag that wasEjected
+        ejectPushed = true;
     }
 
     public void hold() {
