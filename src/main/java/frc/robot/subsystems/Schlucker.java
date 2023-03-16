@@ -35,6 +35,7 @@ public class Schlucker extends SubsystemBase {
         shluckerMotor.setInverted(false);
         shluckerMotor.setIdleMode(IdleMode.kBrake);
         pid = shluckerMotor.getPIDController();
+        shluckerMotor.burnFlash();
         // set p value of pid to 1
         pid.setP(1.0);
     }
