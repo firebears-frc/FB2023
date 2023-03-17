@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.chassis;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;

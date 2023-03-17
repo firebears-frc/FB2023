@@ -1,17 +1,17 @@
 package frc.robot;
 
-import frc.robot.commands.ArmGroundCommand;
-import frc.robot.commands.ArmHighCommand;
-import frc.robot.commands.ArmMidCommand;
-import frc.robot.commands.ArmStowCommand;
-import frc.robot.commands.ArmSubstationCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chassis;
+import frc.robot.arm.Arm;
+import frc.robot.arm.ArmGroundCommand;
+import frc.robot.arm.ArmHighCommand;
+import frc.robot.arm.ArmMidCommand;
+import frc.robot.arm.ArmStowCommand;
+import frc.robot.arm.ArmSubstationCommand;
+import frc.robot.arm.Arm.ArmConstants;
+import frc.robot.chassis.Chassis;
+import frc.robot.chassis.Chassis.ChassisConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Arm.ArmConstants;
-import frc.robot.subsystems.Chassis.ChassisConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;

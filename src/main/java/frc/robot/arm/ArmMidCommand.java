@@ -1,7 +1,6 @@
-package frc.robot.commands;
+package frc.robot.arm;
 
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ArmConstants;
+import frc.robot.arm.Arm.ArmConstants;
 
 public class ArmMidCommand extends ArmPositionCommand {
     public ArmMidCommand(Arm arm) {

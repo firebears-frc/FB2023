@@ -1,7 +1,6 @@
-package frc.robot.commands;
+package frc.robot.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Arm;
 
 public class ArmPositionCommand extends CommandBase {
     private final Arm arm;
