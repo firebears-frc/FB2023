@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax.ControlType;
@@ -13,7 +14,7 @@ public class Schlucker extends SubsystemBase {
     private CANSparkMax shluckerMotor;
     private SparkMaxPIDController pid;
 
-    private final double HOLD_POSITIVE_CURRENT = 0.5; 
+    private final double HOLD_POSITIVE_CURRENT = 0.3; 
     private final double HOLD_NEGATIVE_CURRENT = -HOLD_POSITIVE_CURRENT; 
     // variable to hold if an item was Ejected by the robot. variable needs to be used by lights
     public boolean ejectPushed;
@@ -30,14 +31,18 @@ public class Schlucker extends SubsystemBase {
     
     public Schlucker() {
         shluckerMotor = new CANSparkMax(6, MotorType.kBrushed);
-
+        shluckerMotor.setSmartCurrentLimit(10, 10);
+        shluckerMotor.setSecondaryCurrentLimit(20);
         shluckerMotor.restoreFactoryDefaults();
         shluckerMotor.setInverted(false);
         shluckerMotor.setIdleMode(IdleMode.kBrake);
         pid = shluckerMotor.getPIDController();
-        shluckerMotor.burnFlash();
+        
         // set p value of pid to 1
         pid.setP(1.0);
+        pid.setI(0);
+        pid.setD(0);
+        shluckerMotor.burnFlash();
     }
 
 
@@ -68,10 +73,10 @@ public class Schlucker extends SubsystemBase {
     public void hold() {
         switch(item_held) {
         case CONE:
-            pid.setReference(HOLD_NEGATIVE_CURRENT, ControlType.kCurrent);
+            pid.setReference(HOLD_NEGATIVE_CURRENT, ControlType.kDutyCycle);
             break;
         case CUBE:
-            pid.setReference(HOLD_POSITIVE_CURRENT, ControlType.kCurrent);
+            pid.setReference(HOLD_POSITIVE_CURRENT, ControlType.kDutyCycle);
             break;
         default:
             break;
@@ -84,7 +89,7 @@ public class Schlucker extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        SmartDashboard.putNumber("shluckerOutput", shluckerMotor.getAppliedOutput());
     }
 
     @Override
