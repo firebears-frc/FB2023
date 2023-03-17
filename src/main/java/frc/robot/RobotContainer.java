@@ -1,6 +1,5 @@
 package frc.robot;
 
-import frc.robot.util.Constants;
 import frc.robot.commands.ArmGroundCommand;
 import frc.robot.commands.ArmHighCommand;
 import frc.robot.commands.ArmMidCommand;
@@ -12,7 +11,7 @@ import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Arm.ArmConstants;
-import frc.robot.util.Constants.ChassisConstants;
+import frc.robot.subsystems.Chassis.ChassisConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -33,6 +32,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 
 public class RobotContainer {
+    public class RobotConstants {
+        public static final int JOYSTICK_PORT = 0;
+        public static final int CONTROLLER_PORT = 1;
+    }
+
     private final Chassis chassis;
     private final Arm arm;
     private final Schlucker schlucker;
@@ -47,8 +51,8 @@ public class RobotContainer {
         schlucker = new Schlucker();
         vision = new Vision(chassis::resetPose);
         lights = new Lights(chassis::getChargeStationStatus, schlucker::getHeldItem, schlucker::getWantedItem);
-        joystick = new Joystick(Constants.JOYSTICK_PORT);
-        controller = new XboxController(Constants.CONTROLLER_PORT);
+        joystick = new Joystick(RobotConstants.JOYSTICK_PORT);
+        controller = new XboxController(RobotConstants.CONTROLLER_PORT);
 
         configureButtonBindings();
 
