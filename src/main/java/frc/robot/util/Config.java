@@ -14,6 +14,7 @@ import java.util.function.BiConsumer;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.Preferences;
 
 /**
@@ -33,7 +34,7 @@ public final class Config {
     /**
      * Print out all key/value pairs in {@link Preferences}, with the keys in
      * alphabetical order.
-     * 
+     *
      * @param outStream Outputstream, such as {@code System.out}.
      */
     public static void printPreferences(PrintStream outStream) {
@@ -41,22 +42,24 @@ public final class Config {
         SortedSet<String> sortedKeys = new TreeSet<>(Preferences.getKeys());
         for (String key : sortedKeys) {
             try {
-                switch (networkTable.getEntry(key).getType()) {
-                    case kBoolean:
-                        outStream.printf("%s=%b%n", key, Preferences.getBoolean(key, false));
-                        break;
-                    case kDouble:
-                        outStream.printf("%s=%f%n", key, Preferences.getDouble(key, 0.0));
-                        break;
-                    case kString:
-                        outStream.printf("%s=%s%n", key, Preferences.getString(key, null));
-                        break;
-                    default:
-                        outStream.printf("%s=%s%n", key, Preferences.getString(key, "UNKNOWN"));
-                }
+                outStream.printf("%s=%s%n", key, toString(key, networkTable.getEntry(key).getType()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /** Return a {@link Preferences} value as a {@code String}. */
+    private static String toString(String key, NetworkTableType type) {
+        switch (type) {
+            case kBoolean:
+                return Boolean.toString(Preferences.getBoolean(key, false));
+            case kDouble:
+                return Double.toString(Preferences.getDouble(key, 0.0));
+            case kString:
+                return Preferences.getString(key, null);
+            default:
+                return Preferences.getString(key, "UNKNOWN");
         }
     }
 
@@ -65,7 +68,7 @@ public final class Config {
         final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("Preferences");
         SortedSet<String> sortedKeys = new TreeSet<>(Preferences.getKeys());
         for (String key : sortedKeys) {
-            String value = networkTable.getEntry(key).getString("null");
+            String value = toString(key, networkTable.getEntry(key).getType());
             action.accept(key, value);
         }
     }
@@ -86,7 +89,7 @@ public final class Config {
      * Read a sequence of property files into {@link Preferences}. If the files or
      * resources don't exist, print an error message and gracefully move to the next
      * file.
-     * 
+     *
      * @param fileNames File names or resource names.
      */
     public static void loadConfiguration(String... fileNames) {
@@ -119,6 +122,7 @@ public final class Config {
         }
     }
 
+    /** Open a Properties text file and return an {@link InputStream}. */
     protected static InputStream openStream(String fileName) throws IOException {
         if (fileName.startsWith("/")) {
             File file = new File(fileName);
@@ -135,6 +139,7 @@ public final class Config {
         return null;
     }
 
+    /** Load a Properties text file into a new {@link Properties} object. */
     protected static Properties loadProperties(InputStream inStream) throws IOException {
         Properties properties = new Properties();
         if (inStream != null) {
