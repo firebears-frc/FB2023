@@ -26,36 +26,44 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class Chassis extends SubsystemBase {
     public static class ChassisConstants {
+        // Driving
         public static final int RIGHT_FRONT_PORT = 15;
         public static final int RIGHT_BACK_PORT = 17;
         public static final int LEFT_FRONT_PORT = 16;
         public static final int LEFT_BACK_PORT = 18;
 
         public static final double TRACK_WIDTH = 0.96679; // Meters
-
         public static final double MAX_VELOCITY = 5.0; // Meters per second
         public static final double SLOW_VELOCITY = 1.0; // Meters per second
         public static final double MAX_ANGULAR_VELOCITY = 8.0; // Radians per second
         public static final double SLOW_ANGULAR_VELOCITY = 2.0; // Radians per second
-        public static final double MAX_ACCELERATION = 5.0; // Meters per second squared: TODO!
-        public static final double MAX_VOLTAGE = 10.0;
-
-        // Values spit out of sysid
         public static final double S = 0.15473;
         public static final double V = 2.3007;
         public static final double A = 0.22029;
+
+        // Trajectories
+        public static final double MAX_ACCELERATION = 5.0; // Meters per second squared: TODO!
+        public static final double MAX_VOLTAGE = 10.0;
     }
 
+    // Driving
     private ChassisSide left, right;
-    private AHRS navX;
-
     private SimpleMotorFeedforward feedforward;
     private DifferentialDriveKinematics kinematics;
+
+    // Localization
+    private AHRS navX;
     private DifferentialDrivePoseEstimator poseEstimator;
+    private Field2d field;
+
+    // Trajectories
     private DifferentialDriveVoltageConstraint constraint;
     private TrajectoryConfig config;
     private RamseteController controller;
-    private Field2d field;
+
+    // Charge Station
+    private double lastPitch = 0;
+    private double pitchVelocity = 0;
 
     public Chassis() {
         feedforward = new SimpleMotorFeedforward(ChassisConstants.S, ChassisConstants.V, ChassisConstants.A);
@@ -90,20 +98,13 @@ public class Chassis extends SubsystemBase {
 
         poseEstimator.update(navX.getRotation2d(), leftDistance, rightDistance);
         field.setRobotPose(getPose());
+
+        double currentPitch = getPitch();
+        pitchVelocity = currentPitch - lastPitch;
+        lastPitch = currentPitch;
     }
 
-    public ChargeStationStatus getChargeStationStatus() {
-        return ChargeStationStatus.NONE;
-    }
-
-    public void visionPose(Pose2d pose, double timestampSeconds) {
-        poseEstimator.addVisionMeasurement(pose, timestampSeconds);
-    }
-
-    public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
-    }
-
+    /****************** DRIVING ******************/
     public void drive(ChassisSpeeds chassisSpeeds) {
         tankDrive(kinematics.toWheelSpeeds(chassisSpeeds));
     }
@@ -117,6 +118,21 @@ public class Chassis extends SubsystemBase {
         right.setSetpoint(rightSpeed);
     }
 
+    public void setBrakeMode(boolean brakeMode) {
+        left.setBrakeMode(brakeMode);
+        right.setBrakeMode(brakeMode);
+    }
+
+    /****************** LOCALIZATION ******************/
+    public void visionPose(Pose2d pose, double timestampSeconds) {
+        poseEstimator.addVisionMeasurement(pose, timestampSeconds);
+    }
+
+    public Pose2d getPose() {
+        return poseEstimator.getEstimatedPosition();
+    }
+
+    /****************** TRAJECTORIES ******************/
     public Trajectory generateTrajectory(Pose2d start, Pose2d end) {
         return generateTrajectory(start, new ArrayList<>(), end);
     }
@@ -133,5 +149,14 @@ public class Chassis extends SubsystemBase {
                 kinematics,
                 this::tankDrive,
                 this);
+    }
+
+    /****************** CHARGE STATION ******************/
+    public double getPitch() {
+        return navX.getPitch();
+    }
+
+    public double getPitchVelocity() {
+        return pitchVelocity;
     }
 }

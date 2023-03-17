@@ -20,7 +20,8 @@ public class ChassisSide implements Sendable {
         public static final double WHEEL_DIAMETER = 0.2032; // 8 inches
         public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER;
         public static final double METERS_PER_MOTOR_ROTATION = WHEEL_CIRCUMFERENCE / GEAR_RATIO;
-        public static final double VELOCITY_CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60.0; // The raw units are RPM
+        public static final double VELOCITY_CONVERSION_FACTOR = METERS_PER_MOTOR_ROTATION / 60.0; // The raw units are
+                                                                                                  // RPM
 
         // Values spit out of sysid
         public static final double P = 0.011179;
@@ -39,7 +40,8 @@ public class ChassisSide implements Sendable {
         frontMotor.restoreFactoryDefaults();
         frontMotor.setInverted(true);
         frontMotor.setIdleMode(IdleMode.kCoast);
-        frontMotor.setSmartCurrentLimit(ChassisSideConstants.STALL_CURRENT_LIMIT, ChassisSideConstants.FREE_CURRENT_LIMIT);
+        frontMotor.setSmartCurrentLimit(ChassisSideConstants.STALL_CURRENT_LIMIT,
+                ChassisSideConstants.FREE_CURRENT_LIMIT);
         frontMotor.setSecondaryCurrentLimit(ChassisSideConstants.SECONDARY_CURRENT_LIMIT);
         encoder = frontMotor.getEncoder();
         encoder.setPositionConversionFactor(ChassisSideConstants.METERS_PER_MOTOR_ROTATION);
@@ -50,7 +52,8 @@ public class ChassisSide implements Sendable {
         backMotor.restoreFactoryDefaults();
         backMotor.setInverted(true);
         backMotor.setIdleMode(IdleMode.kCoast);
-        backMotor.setSmartCurrentLimit(ChassisSideConstants.STALL_CURRENT_LIMIT, ChassisSideConstants.FREE_CURRENT_LIMIT);
+        backMotor.setSmartCurrentLimit(ChassisSideConstants.STALL_CURRENT_LIMIT,
+                ChassisSideConstants.FREE_CURRENT_LIMIT);
         backMotor.setSecondaryCurrentLimit(ChassisSideConstants.SECONDARY_CURRENT_LIMIT);
         backMotor.follow(frontMotor);
         backMotor.burnFlash();
@@ -102,6 +105,17 @@ public class ChassisSide implements Sendable {
      */
     public double getVelocity() {
         return encoder.getVelocity();
+    }
+
+    /**
+     * Set the brake mode of this side
+     * 
+     * @param brakeMode true for brake mode, false for coast
+     */
+    public void setBrakeMode(boolean brakeMode) {
+        IdleMode mode = brakeMode ? IdleMode.kBrake : IdleMode.kCoast;
+        frontMotor.setIdleMode(mode);
+        backMotor.setIdleMode(mode);
     }
 
     public double update() {

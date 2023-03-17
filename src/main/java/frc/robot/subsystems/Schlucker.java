@@ -106,6 +106,14 @@ public class Schlucker extends SubsystemBase {
         return itemHeld;
     }
 
+    public void wantCone() {
+        itemWanted = GamePiece.CONE;
+    }
+
+    public void wantCube() {
+        itemWanted = GamePiece.CUBE;
+    }
+
     public GamePiece getWantedItem() {
         return itemWanted;
     }
