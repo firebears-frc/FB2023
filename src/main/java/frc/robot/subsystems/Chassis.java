@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.ChargeStationStatus;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -51,7 +51,7 @@ public class Chassis extends SubsystemBase {
 
     private SimpleMotorFeedforward feedforward;
     private DifferentialDriveKinematics kinematics;
-    private DifferentialDriveOdometry odometry;
+    private DifferentialDrivePoseEstimator poseEstimator;
     private DifferentialDriveVoltageConstraint constraint;
     private TrajectoryConfig config;
     private RamseteController controller;
@@ -71,8 +71,8 @@ public class Chassis extends SubsystemBase {
             DriverStation.reportError(ex.getMessage(), true);
         }
 
-        odometry = new DifferentialDriveOdometry(
-                navX.getRotation2d(), 0.0, 0.0);
+        poseEstimator = new DifferentialDrivePoseEstimator(kinematics,
+                navX.getRotation2d(), 0, 0, new Pose2d());
         field = new Field2d();
         addChild("Field", field);
 
@@ -88,25 +88,20 @@ public class Chassis extends SubsystemBase {
         double leftDistance = left.update();
         double rightDistance = right.update();
 
-        odometry.update(navX.getRotation2d(), leftDistance, rightDistance);
-        field.setRobotPose(odometry.getPoseMeters());
+        poseEstimator.update(navX.getRotation2d(), leftDistance, rightDistance);
+        field.setRobotPose(getPose());
     }
 
     public ChargeStationStatus getChargeStationStatus() {
         return ChargeStationStatus.NONE;
     }
 
-    public void resetPose(Pose2d pose) {
-        left.resetDistance();
-        right.resetDistance();
-        odometry.resetPosition(
-                navX.getRotation2d(),
-                0.0, 0.0,
-                pose);
+    public void visionPose(Pose2d pose, double timestampSeconds) {
+        poseEstimator.addVisionMeasurement(pose, timestampSeconds);
     }
 
     public Pose2d getPose() {
-        return odometry.getPoseMeters();
+        return poseEstimator.getEstimatedPosition();
     }
 
     public void drive(ChassisSpeeds chassisSpeeds) {

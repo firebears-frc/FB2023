@@ -49,7 +49,7 @@ public class RobotContainer {
         chassis = new Chassis();
         arm = new Arm();
         schlucker = new Schlucker();
-        vision = new Vision(chassis::resetPose);
+        vision = new Vision(chassis::visionPose);
         lights = new Lights(chassis::getChargeStationStatus, schlucker::getHeldItem, schlucker::getWantedItem);
         joystick = new Joystick(RobotConstants.JOYSTICK_PORT);
         controller = new XboxController(RobotConstants.CONTROLLER_PORT);

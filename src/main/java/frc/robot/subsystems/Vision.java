@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -24,12 +24,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
     PhotonCamera camera;
     PhotonPoseEstimator poseEstimator;
-    Pose3d lastPose;
-    Consumer<Pose2d> consumer;
+    EstimatedRobotPose lastResult;
+    BiConsumer<Pose2d, Double> consumer;
 
-    public Vision(Consumer<Pose2d> consumer) {
+    public Vision(BiConsumer<Pose2d, Double> consumer) {
         this.consumer = consumer;
-        lastPose = null;
+        lastResult = null;
 
         camera = new PhotonCamera("MainC");
 
@@ -51,6 +51,7 @@ public class Vision extends SubsystemBase {
                         Units.inchesToMeters(0),
                         Units.inchesToMeters(0)),
                         new Rotation3d()));
+        poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     }
 
     @Override
@@ -68,14 +69,14 @@ public class Vision extends SubsystemBase {
         if (!poseResult.isPresent())
             return;
 
-        lastPose = poseResult.get().estimatedPose;
+        lastResult = poseResult.get();
         if (consumer == null)
             return;
 
-        consumer.accept(lastPose.toPose2d());
+        consumer.accept(lastResult.estimatedPose.toPose2d(), lastResult.timestampSeconds);
     }
 
-    public Pose3d getLastPose() {
-        return lastPose;
+    public Pose3d getLastResult() {
+        return lastResult.estimatedPose;
     }
 }
