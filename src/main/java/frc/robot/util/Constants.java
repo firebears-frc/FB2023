@@ -37,42 +37,6 @@ public class Constants {
         public static final double A = 0.22029;
     }
 
-    public static class ArmConstants {
-        public static final int ELBOW_PORT = 7;
-        public static final int ELBOW_STALL_CURRENT_LIMIT = 35;
-        public static final int ELBOW_FREE_CURRENT_LIMIT = 20;
-        public static final double ELBOW_SECONDARY_CURRENT_LIMIT = 40.0;
-        public static final double ELBOW_MANUAL_SPEED = 1.0; // degrees per loop
-        public static final double ELBOW_P = 0.03;
-        public static final double ELBOW_I = 0;
-        public static final double ELBOW_D = 0.0005;
-        public static final double ELBOW_OFFSET = 240; // degrees
-
-        public static final int SHOULDER_RIGHT_PORT = 12;
-        public static final int SHOULDER_LEFT_PORT = 13;
-        public static final int SHOULDER_STALL_CURRENT_LIMIT = 35;
-        public static final int SHOULDER_FREE_CURRENT_LIMIT = 20;
-        public static final double SHOULDER_SECONDARY_CURRENT_LIMIT = 40.0;
-        public static final double SHOULDER_MANUAL_SPEED = 1.0; // degrees per loop
-        public static final double SHOULDER_P = 0.02;
-        public static final double SHOULDER_I = 0;
-        public static final double SHOULDER_D = 0.001;
-        public static final double SHOULDER_OFFSET = 196; // degrees
-
-        public static final double SHOULDER_SUBSTATION = 89; // degrees
-        public static final double ELBOW_SUBSTATION = 295; // degrees
-        public static final double SHOULDER_STOW = 20; // degrees
-        public static final double ELBOW_STOW = 220; // degrees
-        public static final double SHOULDER_GROUND = 130; // degrees
-        public static final double ELBOW_GROUND = 288; // degrees
-        public static final double SHOULDER_HIGH = 106; // degrees
-        public static final double ELBOW_HIGH = 319; // degrees
-        public static final double SHOULDER_MID = 76; // degrees
-        public static final double ELBOW_MID = 267; // degrees
-
-        public static final double ANGLE_TOLERANCE = 5; // degrees
-    }
-
     public static class SchluckerConstants {
         public static final int MOTOR_PORT = 6;
 

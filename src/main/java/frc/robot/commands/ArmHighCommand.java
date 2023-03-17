@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Arm;
-import frc.robot.util.Constants.ArmConstants;
+import frc.robot.subsystems.Arm.ArmConstants;
 
 public class ArmHighCommand extends ArmPositionCommand {
     public ArmHighCommand(Arm arm) {

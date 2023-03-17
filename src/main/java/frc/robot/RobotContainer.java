@@ -1,9 +1,17 @@
 package frc.robot;
 
-import frc.robot.commands.*;
-import frc.robot.subsystems.*;
 import frc.robot.util.Constants;
-import frc.robot.util.Constants.ArmConstants;
+import frc.robot.commands.ArmGroundCommand;
+import frc.robot.commands.ArmHighCommand;
+import frc.robot.commands.ArmMidCommand;
+import frc.robot.commands.ArmStowCommand;
+import frc.robot.commands.ArmSubstationCommand;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Schlucker;
+import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.util.Constants.ChassisConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,8 +63,7 @@ public class RobotContainer {
             if (joystick.getRawButton(1)) {
                 forward *= ChassisConstants.SLOW_VELOCITY;
                 rotation *= ChassisConstants.SLOW_ANGULAR_VELOCITY;
-            }
-            else {
+            } else {
                 forward *= ChassisConstants.MAX_VELOCITY;
                 rotation *= ChassisConstants.MAX_ANGULAR_VELOCITY;
             }
