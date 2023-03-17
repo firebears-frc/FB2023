@@ -151,6 +151,16 @@ gradle-app.setting
 .settings/
 bin/
 
+# WPILib files
+.DataLogTool/
+.roboRIOTeamNumberSetter/
+.Glass/
+networktables.ini*
+networktables.json*
+outlineviewer-window.json
+outlineviewer.json
+.OutlineViewer/
+simgui*
 
 # IntelliJ
 .idea/
@@ -158,3 +168,4 @@ bin/
 # Git info
 src/main/deploy/branch.txt
 src/main/deploy/commit.txt
+src/main/java/frc/robot/BuildConstants.java
