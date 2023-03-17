@@ -34,7 +34,7 @@ public final class Config {
     /**
      * Print out all key/value pairs in {@link Preferences}, with the keys in
      * alphabetical order.
-     * 
+     *
      * @param outStream Outputstream, such as {@code System.out}.
      */
     public static void printPreferences(PrintStream outStream) {
@@ -89,7 +89,7 @@ public final class Config {
      * Read a sequence of property files into {@link Preferences}. If the files or
      * resources don't exist, print an error message and gracefully move to the next
      * file.
-     * 
+     *
      * @param fileNames File names or resource names.
      */
     public static void loadConfiguration(String... fileNames) {

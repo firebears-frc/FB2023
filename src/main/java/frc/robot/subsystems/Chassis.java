@@ -52,6 +52,8 @@ public class Chassis extends SubsystemBase {
     private double pitchVelocity;
     private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
     private boolean Currentbrakemode = false;
+    private boolean slowMode = false;
+
     private final DifferentialDriveOdometry m_odometry;
 
     private final PIDController leftPID, rightPID;
@@ -238,6 +240,13 @@ public class Chassis extends SubsystemBase {
 
     public Pose2d getPose() {
         return m_odometry.getPoseMeters();
+    }
+
+    public boolean getSlowMode() {
+        return slowMode;
+    }
+    public void toggleSlowMode() {
+        slowMode = !slowMode;
     }
 
     public void togglebrakemode() {

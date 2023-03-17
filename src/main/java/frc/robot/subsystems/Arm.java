@@ -48,20 +48,19 @@ public class Arm extends SubsystemBase {
         elbowMotor.setSmartCurrentLimit(STALL_CURRENT_LIMIT_ELBOW, FREE_CURRENT_LIMIT_ELBOW);
         elbowMotor.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_ELBOW);
 
-
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        elbowPID.setP(0.03);
+        elbowPID.setP(0.01);
         elbowPID.setI(0.0);
-        elbowPID.setD(0.0005);
+        elbowPID.setD(0.005);
         elbowPID.setFeedbackDevice(elbowEncoder);
         elbowPID.setPositionPIDWrappingEnabled(true);
         elbowPID.setPositionPIDWrappingMinInput(0.0);
         elbowPID.setPositionPIDWrappingMaxInput(360);
         elbowEncoder.setPositionConversionFactor(360);
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
+        elbowEncoder.setInverted(!PRACTICE_ROBOT);  // TODO! set this to true after encoders are replaced
         elbowMotor.burnFlash();
-
 
         shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
 
@@ -83,9 +82,10 @@ public class Arm extends SubsystemBase {
 
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderPID.setP(0.02);
+        shoulderEncoder.setInverted(!PRACTICE_ROBOT);  // TODO! set this to true after encoders are replaced
+        shoulderPID.setP(0.0175);
         shoulderPID.setI(0);
-        shoulderPID.setD(0.001);
+        shoulderPID.setD(0.005);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
@@ -118,14 +118,14 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-         if(setpoint < 0 || setpoint > 280){
+        if (setpoint < 0 || setpoint > 280) {
 
             setpoint = 0;
         } else if (setpoint > 200 && setpoint < 280) {
-        
+
             setpoint = 199;
         } else {
-    
+
         }
         shoulderSetpoint = setpoint;
     }
@@ -138,13 +138,13 @@ public class Arm extends SubsystemBase {
             setpoint += 360;
         }
 
-        if(setpoint > 15 && setpoint < 180){
-       
+        if (setpoint > 15 && setpoint < 180) {
+
             setpoint = 14;
         } else if (setpoint < 200 && setpoint > 180) {
-    
+
             setpoint = 201;
-   
+
         }
         elbowSetpoint = setpoint;
     }
@@ -152,45 +152,45 @@ public class Arm extends SubsystemBase {
     public double getElbowSetpoint() {
         return elbowSetpoint;
     }
+
     public double getShoulderSetpoint() {
         return shoulderSetpoint;
     }
-    public Translation2d getArmPosition(){
-        double elbowX=Math.cos(Math.toRadians(getShoulderAngle()));
-        double elbowY=Math.sin(Math.toRadians(getShoulderAngle()));
-        elbowX*=shoulderArmLength;
-        elbowY*=shoulderArmLength;
 
-        double shluckerX=Math.cos(Math.toRadians(getElbowAngle()+getShoulderAngle()));
-        double ShluckerY=Math.sin(Math.toRadians(getElbowAngle()+getShoulderAngle()));
-        shluckerX*=elbowArmLength;
-        ShluckerY*=elbowArmLength;
+    public Translation2d getArmPosition() {
+        double elbowX = Math.cos(Math.toRadians(getShoulderAngle()));
+        double elbowY = Math.sin(Math.toRadians(getShoulderAngle()));
+        elbowX *= shoulderArmLength;
+        elbowY *= shoulderArmLength;
 
-        Translation2d output=new Translation2d(elbowX+shluckerX,elbowY+ShluckerY);
+        double shluckerX = Math.cos(Math.toRadians(getElbowAngle() + getShoulderAngle()));
+        double ShluckerY = Math.sin(Math.toRadians(getElbowAngle() + getShoulderAngle()));
+        shluckerX *= elbowArmLength;
+        ShluckerY *= elbowArmLength;
+
+        Translation2d output = new Translation2d(elbowX + shluckerX, elbowY + ShluckerY);
         return output;
     }
 
     @Override
     public void periodic() {
-        if (DEBUG)
-        {SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
-            SmartDashboard.putNumber("elbow angle", getElbowAngle());
-            SmartDashboard.putNumber("setpoint", elbowSetpoint);
+        if (DEBUG) {
+            SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
             SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
-            elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
-            shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);}
+            SmartDashboard.putNumber("shoulder left output", shoulderMotorRight.getAppliedOutput());
+            SmartDashboard.putNumber("shoulder right output", shoulderMotorLeft.getAppliedOutput());
 
-        //SmartDashboard.putString("shlucker position",getArmPosition().getX()+"+"+getArmPosition().getY());
+            SmartDashboard.putNumber("elbow angle", getElbowAngle());
+            SmartDashboard.putNumber("elbow setpoint", elbowSetpoint);
+            SmartDashboard.putNumber("elbow output", elbowMotor.getAppliedOutput());
+        }
 
-        //SmartDashboard.putNumber("Shoulder Left Output", shoulderMotorRight.getAppliedOutput());
-        //SmartDashboard.putNumber("Shoulder Right Output", shoulderMotorLeft.getAppliedOutput());
-        //SmartDashboard.putNumber("Elbow Output", elbowMotor.getAppliedOutput());
+        elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
+        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
 
-        double shoulderAngle = getShoulderAngle();
-        double elbowAngle = getElbowAngle();
         if (LOGGING) {
-            shoulderLog.append(shoulderAngle);
-            elbowLog.append(elbowAngle);
+            shoulderLog.append(getShoulderAngle());
+            elbowLog.append(getElbowAngle());
         }
     }
 }
