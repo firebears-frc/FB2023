@@ -50,7 +50,8 @@ public class RobotContainer {
         arm = new Arm();
         schlucker = new Schlucker();
         vision = new Vision(chassis::visionPose);
-        lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem);
+        lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
+                chassis::isOnChargeStation, chassis::isNotPitching);
         joystick = new Joystick(RobotConstants.JOYSTICK_PORT);
         controller = new XboxController(RobotConstants.CONTROLLER_PORT);
 
@@ -89,7 +90,6 @@ public class RobotContainer {
         POVButton upButton = new POVButton(controller, 0);
         upButton.onTrue(new ArmSubstationCommand(arm));
         POVButton rightButton = new POVButton(controller, 90);
-        // TODO: Add a delay and switch to a group
         rightButton.onTrue(new ArmMidCommand(arm).andThen(new InstantCommand(schlucker::eject, schlucker)));
         rightButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
         POVButton downButton = new POVButton(controller, 180);

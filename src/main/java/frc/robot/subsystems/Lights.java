@@ -11,18 +11,22 @@ import frc.robot.util.GamePiece;
 public class Lights extends SubsystemBase {
     private final Supplier<GamePiece> itemHeldSupplier;
     private final Supplier<GamePiece> itemWantedSupplier;
+    private final Supplier<Boolean> levelSupplier;
+    private final Supplier<Boolean> onChargeStationSupplier;
+    private final Supplier<Boolean> isNotPitchingSupplier;
     private final ParallelBus communication;
     private ChargeStationStatus chargeStationStatus;
 
-    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier) {
+    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier,
+            Supplier<Boolean> levelSupplier, Supplier<Boolean> onChargeStationSupplier,
+            Supplier<Boolean> isPitchingSupplier) {
         this.itemHeldSupplier = itemHeldSupplier;
         this.itemWantedSupplier = itemWantedSupplier;
+        this.levelSupplier = levelSupplier;
+        this.onChargeStationSupplier = onChargeStationSupplier;
+        this.isNotPitchingSupplier = isPitchingSupplier;
         communication = new ParallelBus();
         chargeStationStatus = ChargeStationStatus.NONE;
-    }
-
-    public void setChargeStationStatus(ChargeStationStatus status) {
-        chargeStationStatus = status;
     }
 
     private enum Status {
@@ -66,14 +70,42 @@ public class Lights extends SubsystemBase {
             default:
                 return none;
         }
+    }
 
+    private void updateChargeStationStatus() {
+        if (levelSupplier == null || onChargeStationSupplier == null || isNotPitchingSupplier == null) {
+            chargeStationStatus = ChargeStationStatus.NONE;
+            return;
+        }
+
+        switch (chargeStationStatus) {
+            case ENGAGED:
+                if (!levelSupplier.get()) {
+                    chargeStationStatus = ChargeStationStatus.DOCKED;
+                }
+                break;
+            case DOCKED:
+                if (levelSupplier.get() && isNotPitchingSupplier.get()) {
+                    chargeStationStatus = ChargeStationStatus.ENGAGED;
+                }
+                break;
+            case NONE:
+            default:
+                if (onChargeStationSupplier.get()) {
+                    chargeStationStatus = ChargeStationStatus.DOCKED;
+                }
+                break;
+        }
     }
 
     private Status getStatus() {
         // Disabled
         if (!DriverStation.isEnabled()) {
+            chargeStationStatus = ChargeStationStatus.NONE;
             return getAlliance(Status.DISABLED_RED, Status.DISABLED_BLUE, Status.DISABLED);
         }
+
+        updateChargeStationStatus();
 
         // Auto
         if (DriverStation.isAutonomousEnabled()) {

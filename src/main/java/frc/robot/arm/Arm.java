@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase {
         public static final double SHOULDER_MID = 76.0; // degrees
         public static final double ELBOW_MID = 267.0; // degrees
 
-        public static final double ANGLE_TOLERANCE = 5.0; // degrees
+        public static final double ANGLE_TOLERANCE = 2.5; // degrees
     }
 
     private CANSparkMax elbowMotor;

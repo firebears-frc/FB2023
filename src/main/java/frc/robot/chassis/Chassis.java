@@ -2,7 +2,6 @@ package frc.robot.chassis;
 
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.ChargeStationStatus;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
@@ -44,6 +43,11 @@ public class Chassis extends SubsystemBase {
         // Trajectories
         public static final double MAX_ACCELERATION = 5.0; // Meters per second squared: TODO!
         public static final double MAX_VOLTAGE = 10.0;
+
+        // Charge Station
+        public static final double LEVEL_TOLERANCE = 2.0; // degrees
+        public static final double ON_TOLERANCE = 10.0; // degrees
+        public static final double PITCH_VELOCITY_MAX = 0.2; // degrees per cycle
     }
 
     // Driving
@@ -156,7 +160,19 @@ public class Chassis extends SubsystemBase {
         return navX.getPitch();
     }
 
-    public double getPitchVelocity() {
+    public boolean isLevel() {
+        return Math.abs(getPitch()) < ChassisConstants.LEVEL_TOLERANCE;
+    }
+
+    public boolean isOnChargeStation() {
+        return Math.abs(getPitch()) > ChassisConstants.ON_TOLERANCE;
+    }
+
+    private double getPitchVelocity() {
         return pitchVelocity;
+    }
+
+    public boolean isNotPitching() {
+        return Math.abs(getPitchVelocity()) < ChassisConstants.PITCH_VELOCITY_MAX;
     }
 }
