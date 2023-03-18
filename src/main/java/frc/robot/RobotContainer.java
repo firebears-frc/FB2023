@@ -7,11 +7,13 @@ import frc.robot.arm.ArmMidCommand;
 import frc.robot.arm.ArmStowCommand;
 import frc.robot.arm.ArmSubstationCommand;
 import frc.robot.arm.Arm.ArmConstants;
+import frc.robot.auto.AutoDriveCommand;
 import frc.robot.chassis.Chassis;
 import frc.robot.chassis.Chassis.ChassisConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -44,6 +46,7 @@ public class RobotContainer {
     private final Lights lights;
     private final Joystick joystick;
     private final XboxController controller;
+    private final SendableChooser<Command> autoSelector;
 
     public RobotContainer() {
         chassis = new Chassis();
@@ -54,6 +57,14 @@ public class RobotContainer {
                 chassis::isOnChargeStation, chassis::isNotPitching);
         joystick = new Joystick(RobotConstants.JOYSTICK_PORT);
         controller = new XboxController(RobotConstants.CONTROLLER_PORT);
+        autoSelector = new SendableChooser<>();
+
+        autoSelector.setDefaultOption("Drive Backwards", new AutoDriveCommand(chassis, -2.0));
+        autoSelector.addOption("Drive Forwards", new AutoDriveCommand(chassis, 2.0));
+        autoSelector.addOption("1 Cone w/ Mobility", null);
+        autoSelector.addOption("1 Cube w/ Mobility", null);
+        autoSelector.addOption("1 Cone w/ Mobility & Engage", null);
+        autoSelector.addOption("1 Cube w/ Mobility & Engage", null);
 
         configureButtonBindings();
 
@@ -118,10 +129,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        Trajectory trajectory = chassis.generateTrajectory(
-                new Pose2d(0, 0, new Rotation2d()),
-                new Pose2d(1.0, 0, new Rotation2d()));
-        return chassis.generateRamseteCommand(trajectory);
+        return autoSelector.getSelected();
     }
 
     private String getFileContents(String filename) {

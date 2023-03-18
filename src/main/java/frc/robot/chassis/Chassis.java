@@ -138,10 +138,15 @@ public class Chassis extends SubsystemBase {
 
     /****************** TRAJECTORIES ******************/
     public Trajectory generateTrajectory(Pose2d start, Pose2d end) {
-        return generateTrajectory(start, new ArrayList<>(), end);
+        return generateTrajectory(start, end, false);
     }
 
-    public Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end) {
+    public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
+        return generateTrajectory(start, new ArrayList<>(), end, reversed);
+    }
+
+    public Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
+        config.setReversed(reversed);
         return TrajectoryGenerator.generateTrajectory(start, interior, end, config);
     }
 
