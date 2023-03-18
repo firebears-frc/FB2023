@@ -32,7 +32,6 @@ public class Arm extends SubsystemBase {
     private SparkMaxPIDController shoulderPID;
     private double elbowSetpoint;
     private double shoulderSetpoint;
-    Arm arm;
 
     public Arm() {
 

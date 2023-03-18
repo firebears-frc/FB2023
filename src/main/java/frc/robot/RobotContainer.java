@@ -63,6 +63,7 @@ public class RobotContainer {
     m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
 
     // m_chooser.addOption("Auto Balance", ());
     /*
