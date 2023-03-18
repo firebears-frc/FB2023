@@ -51,7 +51,7 @@ public class RobotContainer {
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
-    m_vision = new Vision("MainC",m_chassis);
+    m_vision = new Vision("MainC", m_chassis);
     usbcamera = CameraServer.startAutomaticCapture();
     usbcamera.setResolution(320, 240);
     configureButtonBindings();
@@ -63,37 +63,39 @@ public class RobotContainer {
     m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
     // m_chooser.addOption("Auto Balance", ());
-    /*m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(338, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
-        .andThen(new ArmElbowSetpointCommand(350, m_arm))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
-
-    m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
-        .andThen(new WaitCommand(1))
-        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(338, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ShluckerSetSpeedCommand(-0.5, m_schlucker))
-        .andThen(new ArmElbowSetpointCommand(350, m_arm))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));*/
+    /*
+     * m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
+     * .andThen(new WaitCommand(0.5))
+     * .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+     * .andThen(new ArmElbowSetpointCommand(338, m_arm))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
+     * .andThen(new ArmElbowSetpointCommand(350, m_arm))
+     * .andThen(new WaitCommand(0.5))
+     * .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+     * .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
+     * .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+     * .andThen(new ArmElbowSetpointCommand(220, m_arm))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+     * .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+     * 
+     * m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+     * .andThen(new ArmElbowSetpointCommand(338, m_arm))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ShluckerSetSpeedCommand(-0.5, m_schlucker))
+     * .andThen(new ArmElbowSetpointCommand(350, m_arm))
+     * .andThen(new WaitCommand(0.5))
+     * .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+     * .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
+     * .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+     * .andThen(new ArmElbowSetpointCommand(220, m_arm))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+     * .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+     */
     // m_chooser.addOption("Cone + Balance", ());
     // m_chooser.addOption("Cube + Balance", ());y
 
@@ -135,7 +137,8 @@ public class RobotContainer {
       DataLogManager.log("branchName=" + branchName);
       DataLogManager.log("commitHash=" + commitHash);
     } else {
-      System.out.println("branchName=" + branchName + " #  " + commitHash);
+      System.out.println("branchName=" + branchName);
+      System.out.println("commitHash=" + commitHash);
     }
   }
 
@@ -159,8 +162,8 @@ public class RobotContainer {
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-   JoystickButton twobutton = new JoystickButton(joystick, 2);
-  
+    JoystickButton twobutton = new JoystickButton(joystick, 2);
+
     JoystickButton triggerButton = new JoystickButton(joystick, 1);
     triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
 
@@ -228,9 +231,10 @@ public class RobotContainer {
     Command autoCommand = m_chooser.getSelected();
     if (LOGGING) {
       DataLogManager.log("autoCommand=" + autoCommand);
+    } else {
+      System.out.println("autoCommand=" + autoCommand);
     }
     return autoCommand;
   }
 
-  
 }

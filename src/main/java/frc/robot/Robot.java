@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
         m_robotContainer.armReset();
         if (LOGGING) {
             DataLogManager.start(LOG_DIR);
+            DataLogManager.logNetworkTables(LOGGING_NT);
             DriverStation.startDataLog(DataLogManager.getLog());
             Config.forEach((key, value) -> DataLogManager.log(key + "=" + value));
         }
