@@ -59,7 +59,7 @@ public class Arm extends SubsystemBase {
         elbowPID.setPositionPIDWrappingMaxInput(360);
         elbowEncoder.setPositionConversionFactor(360);
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
-        elbowEncoder.setInverted(!PRACTICE_ROBOT);  // TODO! set this to true after encoders are replaced
+        elbowEncoder.setInverted(true); 
         elbowMotor.burnFlash();
 
         shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
@@ -82,8 +82,7 @@ public class Arm extends SubsystemBase {
 
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
-        shoulderEncoder.setInverted(!PRACTICE_ROBOT);  // TODO! set this to true after encoders are replaced
-        shoulderPID.setP(0.0175);
+        shoulderEncoder.setInverted(true); 
         shoulderPID.setI(0);
         shoulderPID.setD(0.005);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
