@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -14,11 +15,10 @@ public class Schlucker extends SubsystemBase {
         public static final int MOTOR_PORT = 6;
 
         public static final int STALL_CURRENT_LIMIT = 20;
-        public static final int FREE_CURRENT_LIMIT = 5;
-        public static final double SECONDARY_CURRENT_LIMIT = 30.0;
+        public static final int FREE_CURRENT_LIMIT = 20;
+        public static final double SECONDARY_CURRENT_LIMIT = 25.0;
 
-        public static final double INTAKE_SPEED = 0.7;
-        public static final double HOLD_CURRENT = 1.0;
+        public static final double INTAKE_SPEED = 0.01; // rotations per cycle
 
         public static final double P = 1.0;
         public static final double I = 0.0;
@@ -26,7 +26,9 @@ public class Schlucker extends SubsystemBase {
     }
 
     private final CANSparkMax motor;
+    private final RelativeEncoder encoder;
     private final SparkMaxPIDController pid;
+    private double speed = 0;
     private GamePiece itemHeld = GamePiece.NONE;
     private GamePiece lastItemHeld = GamePiece.NONE;
     private GamePiece itemWanted = GamePiece.NONE;
@@ -35,9 +37,10 @@ public class Schlucker extends SubsystemBase {
         motor = new CANSparkMax(SchluckerConstants.MOTOR_PORT, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
-        motor.setIdleMode(IdleMode.kCoast);
+        motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(SchluckerConstants.STALL_CURRENT_LIMIT, SchluckerConstants.FREE_CURRENT_LIMIT);
         motor.setSecondaryCurrentLimit(SchluckerConstants.SECONDARY_CURRENT_LIMIT);
+        encoder = motor.getEncoder();
         pid = motor.getPIDController();
         pid.setP(SchluckerConstants.P);
         pid.setI(SchluckerConstants.I);
@@ -46,49 +49,39 @@ public class Schlucker extends SubsystemBase {
     }
 
     public void intakeCone() {
-        pid.setReference(SchluckerConstants.INTAKE_SPEED, ControlType.kDutyCycle);
+        speed = SchluckerConstants.INTAKE_SPEED;
         itemHeld = GamePiece.CONE;
         lastItemHeld = GamePiece.CONE;
         itemWanted = GamePiece.NONE;
     }
 
     public void intakeCube() {
-        pid.setReference(-1.0 * SchluckerConstants.INTAKE_SPEED, ControlType.kDutyCycle);
+        speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
         itemHeld = GamePiece.CUBE;
         lastItemHeld = GamePiece.CUBE;
         itemWanted = GamePiece.NONE;
     }
 
     public void hold() {
-        switch (itemHeld) {
-            case CONE:
-                pid.setReference(-1.0 * SchluckerConstants.HOLD_CURRENT, ControlType.kCurrent);
-                break;
-            case CUBE:
-                pid.setReference(SchluckerConstants.HOLD_CURRENT, ControlType.kCurrent);
-                break;
-            case NONE:
-            default:
-                break;
-        }
+        speed = 0;
     }
 
     public void eject() {
         switch (itemHeld) {
             case CONE:
-                motor.set(SchluckerConstants.INTAKE_SPEED);
+                speed = SchluckerConstants.INTAKE_SPEED;
                 break;
             case CUBE:
-                motor.set(-1.0 * SchluckerConstants.INTAKE_SPEED);
+                speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
                 break;
             case NONE:
             default:
                 switch (lastItemHeld) {
                     case CONE:
-                        motor.set(SchluckerConstants.INTAKE_SPEED);
+                        speed = SchluckerConstants.INTAKE_SPEED;
                         break;
                     case CUBE:
-                        motor.set(-1.0 * SchluckerConstants.INTAKE_SPEED);
+                        speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
                         break;
                     case NONE:
                     default:
@@ -99,7 +92,7 @@ public class Schlucker extends SubsystemBase {
     }
 
     public void stop() {
-        pid.setReference(0, ControlType.kDutyCycle);
+        speed = 0;
     }
 
     public GamePiece getHeldItem() {
@@ -116,5 +109,12 @@ public class Schlucker extends SubsystemBase {
 
     public GamePiece getWantedItem() {
         return itemWanted;
+    }
+
+    @Override
+    public void periodic() {
+        double position = encoder.getPosition();
+        position += speed;
+        pid.setReference(position, ControlType.kPosition);
     }
 }
