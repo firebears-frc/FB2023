@@ -39,6 +39,8 @@ public class Arm extends SubsystemBase {
         public static final double ELBOW_STOW = 220.0; // degrees
         public static final double SHOULDER_GROUND = 130.0; // degrees
         public static final double ELBOW_GROUND = 288.0; // degrees
+        public static final double SHOULDER_READY = 122.0; // degrees
+        public static final double ELBOW_READY = 355.0; // degrees
         public static final double SHOULDER_HIGH = 106.0; // degrees
         public static final double ELBOW_HIGH = 319.0; // degrees
         public static final double SHOULDER_MID = 76.0; // degrees
