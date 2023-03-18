@@ -12,17 +12,17 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Schlucker;
 
-public class AutoConeGetOutCommand extends SequentialCommandGroup {
+public class AutoCubeGetOutCommand extends SequentialCommandGroup {
   Chassis m_chassis;
   Schlucker m_schlucker;
   Arm m_arm;
 
-  public AutoConeGetOutCommand(Chassis chassis, Schlucker schlucker, Arm arm) {
+  public AutoCubeGetOutCommand(Chassis chassis, Schlucker schlucker, Arm arm) {
     m_chassis = chassis;
     m_schlucker = schlucker;
     m_arm = arm;
     addCommands(
-        (new InstantCommand(m_schlucker::intakeCone, m_schlucker)),
+        (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
         (new InstantCommand(m_schlucker::hold, m_schlucker)),
         (new WaitCommand(1)),
         (new ArmShoulderSetpointCommand(122, m_arm)),
