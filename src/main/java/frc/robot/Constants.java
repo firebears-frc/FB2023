@@ -11,6 +11,7 @@ public class Constants {
     public static boolean DEBUG = false;
     public static boolean LOGGING = false;
     public static boolean LOGGING_NT = false;
+    public static boolean LOGGING_DS = true;
     public static String LOG_DIR = "";
 
     public static boolean PRACTICE_ROBOT = true;
@@ -52,6 +53,7 @@ public class Constants {
         LOGGING = Preferences.getBoolean("LOGGING", false);
         LOG_DIR = Preferences.getString("LOG_DIR", "");
         LOGGING_NT = Preferences.getBoolean("LOGGING_NT", false);
+        LOGGING_DS = Preferences.getBoolean("LOGGING_DS", true);
         PRACTICE_ROBOT = Preferences.getBoolean("PRACTICE_ROBOT", true);
         ELBOW_ENCODER_OFFSET = Preferences.getDouble("ELBOW_ENCODER_OFFSET", 0.0);
         SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);

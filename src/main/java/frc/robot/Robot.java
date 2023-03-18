@@ -40,7 +40,9 @@ public class Robot extends TimedRobot {
         if (LOGGING) {
             DataLogManager.start(LOG_DIR);
             DataLogManager.logNetworkTables(LOGGING_NT);
-            DriverStation.startDataLog(DataLogManager.getLog());
+            if (LOGGING_DS) {
+                DriverStation.startDataLog(DataLogManager.getLog());
+            }
             Config.forEach((key, value) -> DataLogManager.log(key + "=" + value));
         }
     }
@@ -87,12 +89,12 @@ public class Robot extends TimedRobot {
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
-        //m_robotContainer.armReset();
+        // m_robotContainer.armReset();
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
         m_robotContainer.m_chassis.setBrakemode(false);
-        
+
     }
 
     /**
