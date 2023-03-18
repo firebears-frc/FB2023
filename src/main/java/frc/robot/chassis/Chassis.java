@@ -41,7 +41,7 @@ public class Chassis extends SubsystemBase {
         public static final double A = 0.22029;
 
         // Trajectories
-        public static final double MAX_ACCELERATION = 5.0; // Meters per second squared: TODO!
+        public static final double MAX_ACCELERATION = 2.5; // Meters per second squared
         public static final double MAX_VOLTAGE = 10.0;
 
         // Charge Station

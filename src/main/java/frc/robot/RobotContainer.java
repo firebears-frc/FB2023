@@ -8,11 +8,14 @@ import frc.robot.arm.ArmStowCommand;
 import frc.robot.arm.ArmSubstationCommand;
 import frc.robot.arm.Arm.ArmConstants;
 import frc.robot.auto.AutoDriveCommand;
+import frc.robot.auto.OneElementWithMobility;
+import frc.robot.auto.OneElementWithMobilityAndEngaged;
 import frc.robot.chassis.Chassis;
 import frc.robot.chassis.Chassis.ChassisConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
+import frc.robot.util.GamePiece;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,10 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -59,12 +59,16 @@ public class RobotContainer {
         controller = new XboxController(RobotConstants.CONTROLLER_PORT);
         autoSelector = new SendableChooser<>();
 
-        autoSelector.setDefaultOption("Drive Backwards", new AutoDriveCommand(chassis, -2.0));
+        autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
+                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
+        autoSelector.addOption("1 Cube w/ Mobility & Engage",
+                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CUBE));
+        autoSelector.addOption("1 Cone w/ Mobility",
+                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
+        autoSelector.addOption("1 Cube w/ Mobility",
+                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
+        autoSelector.addOption("Drive Backwards", new AutoDriveCommand(chassis, -2.0));
         autoSelector.addOption("Drive Forwards", new AutoDriveCommand(chassis, 2.0));
-        autoSelector.addOption("1 Cone w/ Mobility", null);
-        autoSelector.addOption("1 Cube w/ Mobility", null);
-        autoSelector.addOption("1 Cone w/ Mobility & Engage", null);
-        autoSelector.addOption("1 Cube w/ Mobility & Engage", null);
 
         configureButtonBindings();
 
