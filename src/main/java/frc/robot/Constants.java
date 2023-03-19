@@ -35,6 +35,26 @@ public class Constants {
         public static final double MaxAngularVelocity = 8; // radians per second
     }
 
+    public static final class PracticeArmConstants {
+        public static final double shoulderP = 0.0175;
+        public static final double shoulderI = 0.0;
+        public static final double shoulderD = 0.005;
+
+        public static final double elbowP = 0.01;
+        public static final double elbowI = 0.0;
+        public static final double elbowD = 0.0;
+    }
+
+    public static final class CompArmConstants {
+        public static final double shoulderP = 0.0175;
+        public static final double shoulderI = 0.0;
+        public static final double shoulderD = 0.005;
+
+        public static final double elbowP = 0.01;
+        public static final double elbowI = 0.0;
+        public static final double elbowD = 0.005;
+    }
+
     public static final double kFeetToMeterFactor = 0.638f / 11.79f;
     public static int shoulderArmLength=30;
     public static int elbowArmLength=33;
