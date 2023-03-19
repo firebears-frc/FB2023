@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Chassis;
@@ -19,10 +20,12 @@ public class AutoBalanceRoutine extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new ChassisSetBrakeMode(true, m_chassis),
-      new ChassisDriveToPitch(10, 0.2, m_chassis),
-      new ChassisDriveToPitch(10, 0.2, m_chassis),
-      new ChassisDriveToDistanceCommand(0.75, 0.2, m_chassis),
-      new BalanceTake2Command(0.06, m_chassis)
+      // new ChassisDriveToPitch(10, 0.2, m_chassis),
+      new ChassisDriveToPitch(10, 0.2, m_chassis), new PrintCommand("PITCH"),
+      new ChassisDriveToDistanceCommand(0.7, 0.2, m_chassis), new PrintCommand("DRIVEN"),
+      new BalanceTake2Command(0.05, m_chassis),  new PrintCommand("BALANCED"),
+     
+      new ChassisStopCommand(3, m_chassis)
       //new ChassisDriveToDistanceCommand(-0.05, 0.15, m_chassis),
       //new WaitCommand(5)
     );

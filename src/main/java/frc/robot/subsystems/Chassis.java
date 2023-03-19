@@ -210,7 +210,8 @@ public class Chassis extends SubsystemBase {
     }
 
     public double getPitch() {
-        return (navX.getPitch()) * -1;
+        int m = PRACTICE_ROBOT ? -1: 1;
+        return (navX.getPitch()) * m;
     }
 
     public double getRoll() {

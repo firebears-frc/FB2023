@@ -38,7 +38,7 @@ public class BalanceTake2Command extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(m_chassis.getpitchVelocity()) > 0.2) {
+    if (Math.abs(m_chassis.getpitchVelocity()) > 0.15) {
       m_chassis.arcadeDrive(0, 0);
     } else {
       if (m_chassis.getPitch() > 0) {
@@ -58,7 +58,7 @@ public class BalanceTake2Command extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(m_chassis.getPitch()) < 3 && Math.abs(m_chassis.getpitchVelocity()) < 0.3;
+    return Math.abs(m_chassis.getPitch()) < 3 && Math.abs(m_chassis.getpitchVelocity()) < 0.15;
     //m_chassis.getPitch() < 5 || m_chassis.getpitchVelocity() < -0.3;
     //m_chassis.getpitchVelocity() <= -0.5;
   }
