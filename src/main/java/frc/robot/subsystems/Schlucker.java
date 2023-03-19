@@ -9,16 +9,15 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+
+import static frc.robot.Constants.*;
+
 public class Schlucker extends SubsystemBase {
 
     private CANSparkMax shluckerMotor;
     private SparkMaxPIDController pid;
 
-    private final double HOLD_POSITIVE_PERCENT = 0.3; 
-    private final double HOLD_NEGATIVE_PERCENT = -HOLD_POSITIVE_PERCENT; 
-    // variable to hold if an item was Ejected by the robot. variable needs to be used by lights
-    // should it be initially set to true or false? do we need to set it?
-    // should it be private or public?
+    private double schluckerHoldPercent = COMP_SCHLUCKER_HOLD_PERCENT;
 
     public enum ItemHeld {
         CONE,
@@ -43,6 +42,10 @@ public class Schlucker extends SubsystemBase {
         pid.setI(0);
         pid.setD(0);
         shluckerMotor.burnFlash();
+
+        if (PRACTICE_ROBOT) {
+            schluckerHoldPercent = PRACTICE_SCHLUCKER_HOLD_PERCENT;
+        }
     }
 
 
@@ -75,10 +78,10 @@ public class Schlucker extends SubsystemBase {
     public void hold() {
         switch(item_held) {
         case CONE:
-            pid.setReference(HOLD_NEGATIVE_PERCENT, ControlType.kDutyCycle);
+            pid.setReference(-schluckerHoldPercent, ControlType.kDutyCycle);
             break;
         case CUBE:
-            pid.setReference(HOLD_POSITIVE_PERCENT, ControlType.kDutyCycle);
+            pid.setReference(schluckerHoldPercent, ControlType.kDutyCycle);
             break;
         default:
             break;
