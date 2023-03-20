@@ -35,8 +35,10 @@ public class Arm extends SubsystemBase {
     private double elbowSetpoint;
     private double shoulderSetpoint;
     Arm arm;
-    private LogEntryDouble elbowLog;
-    private LogEntryDouble shoulderLog;
+    private LogEntryDouble elbowAngleLog;
+    private LogEntryDouble shoulderAngleLog;
+    private LogEntryDouble elbowMotorLog;
+    private LogEntryDouble shoulderMotorLog;
 
     public Arm() {
 
@@ -94,8 +96,10 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.burnFlash();
 
         if (LOGGING) {
-            elbowLog = new LogEntryDouble(DataLogManager.getLog(), "/arm/elbowAngle");
-            shoulderLog = new LogEntryDouble(DataLogManager.getLog(), "/arm/shoulderAngle");
+            elbowAngleLog = new LogEntryDouble(DataLogManager.getLog(), "/arm/elbowAngle");
+            shoulderAngleLog = new LogEntryDouble(DataLogManager.getLog(), "/arm/shoulderAngle");
+            elbowMotorLog = new LogEntryDouble(DataLogManager.getLog(), "/arm/elbowMotor");
+            shoulderMotorLog = new LogEntryDouble(DataLogManager.getLog(), "/arm/shoulderMotor");
         }
     }
 
@@ -188,8 +192,10 @@ public class Arm extends SubsystemBase {
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
 
         if (LOGGING) {
-            shoulderLog.append(getShoulderAngle());
-            elbowLog.append(getElbowAngle());
+            shoulderAngleLog.append(getShoulderAngle());
+            elbowAngleLog.append(getElbowAngle());
+            shoulderMotorLog.append(shoulderMotorLeft.getAppliedOutput());
+            elbowMotorLog.append(elbowMotor.getAppliedOutput());
         }
     }
 }

@@ -165,8 +165,10 @@ public class Chassis extends SubsystemBase {
         SmartDashboard.putNumber("getAngle", getAngle());
 
         if (LOGGING) {
-            leftMotorLog.append(leftVel / DriveConstants.MaxVelocity);
-            rightMotorLog.append(rightVel / DriveConstants.MaxVelocity);
+            // leftMotorLog.append(leftVel / DriveConstants.MaxVelocity);
+            // rightMotorLog.append(rightVel / DriveConstants.MaxVelocity);
+            leftMotorLog.append(leftFrontMotor.getAppliedOutput());
+            rightMotorLog.append(rightFrontMotor.getAppliedOutput());
         }
         lastPitch = getPitch();
 
