@@ -51,50 +51,39 @@ public class RobotContainer {
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
-    m_vision = new Vision("MainC",m_chassis);
+    m_vision = new Vision("MainC", m_chassis);
     usbcamera = CameraServer.startAutomaticCapture();
     usbcamera.setResolution(320, 240);
     configureButtonBindings();
 
+    m_chassis.setBrakemode(false);
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
     m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
-    // m_chooser.addOption("Auto Balance", ());
-    m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(338, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
-        .andThen(new ArmElbowSetpointCommand(350, m_arm))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+    m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
 
-    m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
-        .andThen(new WaitCommand(1))
-        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(338, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ShluckerSetSpeedCommand(-0.5, m_schlucker))
-        .andThen(new ArmElbowSetpointCommand(350, m_arm))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
-    // m_chooser.addOption("Cone + Balance", ());
-    // m_chooser.addOption("Cube + Balance", ());y
+    // m_chooser.addOption("Auto Balance", ());
+    /*
+     * m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
+     * .andThen(new WaitCommand(0.5))
+     * .andThen(new ArmShoulderSetpointCommand(122, m_arm))
+     * .andThen(new ArmElbowSetpointCommand(338, m_arm))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
+     * .andThen(new ArmElbowSetpointCommand(350, m_arm))
+     * .andThen(new WaitCommand(0.5))
+     * .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
+     * .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
+     * .andThen(new ArmShoulderSetpointCommand(20, m_arm))
+     * .andThen(new ArmElbowSetpointCommand(220, m_arm))
+     * .andThen(new WaitCommand(1))
+     * .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
+     * .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+     * 
+     */
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -125,7 +114,7 @@ public class RobotContainer {
   }
 
   private void displayGitInfo() {
-    if(Constants.DEBUG){
+    if (Constants.DEBUG) {
       // Get the branch name and display on the dashboard
       String branchName = getFileContents("branch.txt");
       SmartDashboard.putString("Branch Name", branchName);
@@ -156,7 +145,10 @@ public class RobotContainer {
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-   
+    JoystickButton twobutton = new JoystickButton(joystick, 2);
+
+    JoystickButton triggerButton = new JoystickButton(joystick, 1);
+    triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
 
     // oneButton.onTrue(new ArmManualCommand(m_arm));
 
@@ -164,24 +156,32 @@ public class RobotContainer {
 
     // Buttons
 
+    // A button = picks up cone and drops cube
     JoystickButton xboxAButton = new JoystickButton(xboxController, XboxController.Button.kA.value);
-    xboxAButton.whileTrue(new ShluckerCommand(-0.7, m_schlucker));
+    xboxAButton.onTrue(new InstantCommand(m_schlucker::intakeCone, m_schlucker));
+    xboxAButton.onFalse(new InstantCommand(m_schlucker::hold, m_schlucker));
 
+    // B button = reset position (stow)
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
         .andThen(new ArmElbowSetpointCommand(220, m_arm)));
-    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
-    xboxXButton.whileTrue(new ShluckerCommand(0.7, m_schlucker));
 
+    // X button = picks up cube and drops cone
+    JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
+    xboxXButton.onTrue(new InstantCommand(m_schlucker::intakeCube, m_schlucker));
+    xboxXButton.onFalse(new InstantCommand(m_schlucker::hold, m_schlucker));
+
+    // Y button = eject button
     JoystickButton xboxYButton = new JoystickButton(xboxController, XboxController.Button.kY.value);
-    xboxYButton.onTrue(new ArmShoulderSetpointCommand(0, m_arm));
+    xboxYButton.onTrue(new InstantCommand(m_schlucker::eject, m_schlucker));
+    xboxYButton.onFalse(new InstantCommand(m_schlucker::stop, m_schlucker));
 
     // Dpad
 
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
-    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(84, m_arm))
-        .andThen(new ArmElbowSetpointCommand(283, m_arm)));
+    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(89, m_arm))
+        .andThen(new ArmElbowSetpointCommand(295, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
@@ -190,14 +190,13 @@ public class RobotContainer {
 
     // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
-    xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(264, m_arm)));
+    xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(130, m_arm))
+        .andThen(new ArmElbowSetpointCommand(288, m_arm)));
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(95, m_arm))
-        .andThen(new ArmElbowSetpointCommand(325, m_arm)));
-
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(106, m_arm))
+        .andThen(new ArmElbowSetpointCommand(319, m_arm)));
   }
 
   public XboxController getXboxController() {
