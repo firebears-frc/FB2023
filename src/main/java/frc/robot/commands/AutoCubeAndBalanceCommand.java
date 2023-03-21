@@ -26,7 +26,7 @@ public class AutoCubeAndBalanceCommand extends SequentialCommandGroup {
         (new InstantCommand(m_schlucker::hold, m_schlucker)),
         (new WaitCommand(1)),
         (new ArmShoulderSetpointCommand(122, m_arm)),
-        (new ArmElbowSetpointCommand(355, m_arm)),
+        (new ArmElbowSetpointCommand(360, m_arm)),
         (new WaitCommand(2)),
         (new ArmElbowSetpointCommand(338, m_arm)),
         (new WaitCommand(1)),
@@ -38,7 +38,7 @@ public class AutoCubeAndBalanceCommand extends SequentialCommandGroup {
         (new ArmShoulderSetpointCommand(20, m_arm)),
         (new ArmElbowSetpointCommand(220, m_arm)),
         (new WaitCommand(1)),
-        (new ChassisDriveToDistanceCommand(-3, 0.3, m_chassis)),
+        (new ChassisDriveToDistanceCommand(-3.5, 0.3, m_chassis)),
         (new AutoBalanceRoutine(m_chassis)))
       
         
