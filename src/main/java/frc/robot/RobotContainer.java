@@ -168,8 +168,8 @@ public class RobotContainer {
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
-    xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(76, m_arm))
-        .andThen(new ArmElbowSetpointCommand(267, m_arm)));
+    xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(79, m_arm))
+        .andThen(new ArmElbowSetpointCommand(271, m_arm)));
 
     // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
@@ -178,8 +178,8 @@ public class RobotContainer {
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(106, m_arm))
-        .andThen(new ArmElbowSetpointCommand(319, m_arm)));
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(107, m_arm))
+        .andThen(new ArmElbowSetpointCommand(327, m_arm)));
   }
 
   public XboxController getXboxController() {
