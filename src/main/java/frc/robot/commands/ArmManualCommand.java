@@ -18,7 +18,7 @@ public class ArmManualCommand extends CommandBase {
   private double shoulderAngle;
   private double elbowAngle;
   XboxController controller;
-  
+
   public ArmManualCommand(Arm subsystem, XboxController x) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_arm = subsystem;
@@ -29,33 +29,43 @@ public class ArmManualCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //XboxController xboxController=RobotContainer.getInstance().getxbox();
+    // XboxController xboxController=RobotContainer.getInstance().getxbox();
     shoulderSetPoint = m_arm.getShoulderAngle();
     elbowSetPoint = m_arm.getElbowAngle();
-    //SmartDashboard.putBoolean("Running Arm", true);
+    // SmartDashboard.putBoolean("Running Arm", true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shoulderSetPoint = m_arm.getShoulderSetpoint();
+    double newShoulderSetpoint = shoulderSetPoint;
+    newShoulderSetpoint = m_arm.getShoulderSetpoint();
     if (Math.abs(controller.getRightY()) > 0.1) {
-      shoulderSetPoint -= controller.getRightY();
+      newShoulderSetpoint -= controller.getRightY();
     }
-    m_arm.setShoulderSetpoint(shoulderSetPoint);
 
-    elbowSetPoint = m_arm.getElbowSetpoint();
+    double newElbowSetpoint = elbowSetPoint;
+    newElbowSetpoint = m_arm.getElbowSetpoint();
     if (Math.abs(controller.getLeftY()) > 0.1) {
-      elbowSetPoint -= controller.getLeftY();
+      newElbowSetpoint -= controller.getLeftY();
     }
-    m_arm.setElbowSetpoint(elbowSetPoint);
-    
+
+    double horizontalDistance = Arm.armHorizontalDistance(newElbowSetpoint, newShoulderSetpoint);
+    if (horizontalDistance > 48) {
+      // VETO
+    } else {
+      shoulderSetPoint = newShoulderSetpoint;
+      elbowSetPoint = newElbowSetpoint;
+      m_arm.setShoulderSetpoint(shoulderSetPoint);
+      m_arm.setElbowSetpoint(elbowSetPoint);
+    }
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //SmartDashboard.putBoolean("Running Arm", false);
+    // SmartDashboard.putBoolean("Running Arm", false);
   }
 
   // Returns true when the command should end.
@@ -63,7 +73,9 @@ public class ArmManualCommand extends CommandBase {
   public boolean isFinished() {
     return false;
 
-    //return Math.abs(elbowSetPoint - m_arm.getElbowAngle()) < 5;
-    //return m_arm.getShoulderAngle() <= shoulderSetPoint + 5 & m_arm.getShoulderAngle() >= shoulderSetPoint - 5 || m_arm.getElbowAngle() <= elbowSetPoint + 5 & m_arm.getElbowAngle() >= elbowSetPoint - 5;
+    // return Math.abs(elbowSetPoint - m_arm.getElbowAngle()) < 5;
+    // return m_arm.getShoulderAngle() <= shoulderSetPoint + 5 &
+    // m_arm.getShoulderAngle() >= shoulderSetPoint - 5 || m_arm.getElbowAngle() <=
+    // elbowSetPoint + 5 & m_arm.getElbowAngle() >= elbowSetPoint - 5;
   }
 }

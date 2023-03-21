@@ -162,6 +162,14 @@ public class Arm extends SubsystemBase {
         return output;
     }
 
+    public static double armHorizontalDistance(double armAngle, double shoulderAngle) {
+        return shoulderArmLength * cosd(180 - shoulderAngle) + elbowArmLength * cosd(armAngle + (180 - shoulderAngle));
+    }
+
+    private static double cosd(double degrees) {
+        return Math.cos(Math.toRadians(degrees));
+    }
+
     @Override
     public void periodic() {
         if (DEBUG) {
