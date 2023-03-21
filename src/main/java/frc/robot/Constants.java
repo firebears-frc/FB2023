@@ -36,8 +36,8 @@ public class Constants {
     }
 
     public static final double kFeetToMeterFactor = 0.638f / 11.79f;
-    public static int shoulderArmLength=30;
-    public static int elbowArmLength=33;
+    public static int shoulderArmLength=28;
+    public static int elbowArmLength=32;
 
     public static void init(String... fileNames) {
         cleanAllPreferences();

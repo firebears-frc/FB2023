@@ -78,6 +78,7 @@ public class Arm extends SubsystemBase {
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderEncoder.setInverted(true); 
+        shoulderPID.setP(0.0175);
         shoulderPID.setI(0);
         shoulderPID.setD(0.005);
         shoulderPID.setFeedbackDevice(shoulderEncoder);
@@ -114,10 +115,15 @@ public class Arm extends SubsystemBase {
         } else if (setpoint > 200 && setpoint < 280) {
 
             setpoint = 199;
-        } else {
+        }
+
+         else {
 
         }
+        if (!violatesFramePerimiter(setpoint, getElbowAngle())){
         shoulderSetpoint = setpoint;
+
+        }else {System.out.println("hit limit");}
     }
 
     public void setElbowSetpoint(double setpoint) {
@@ -136,7 +142,10 @@ public class Arm extends SubsystemBase {
             setpoint = 201;
 
         }
-        elbowSetpoint = setpoint;
+        if (!violatesFramePerimiter(getShoulderAngle(), setpoint)){
+            elbowSetpoint = setpoint;
+            
+        }else {System.out.println("hit limit");}
     }
 
     public double getElbowSetpoint() {
@@ -147,19 +156,28 @@ public class Arm extends SubsystemBase {
         return shoulderSetpoint;
     }
 
-    public Translation2d getArmPosition() {
-        double elbowX = Math.cos(Math.toRadians(getShoulderAngle()));
-        double elbowY = Math.sin(Math.toRadians(getShoulderAngle()));
+    public Translation2d getArmPosition(double shoulder_Angle, double elbow_Angle) {
+             //105 is when its 6 inches off
+             
+        double shoulder_Compliment = 180-shoulder_Angle;
+        double elbowX = Math.cos(Math.toRadians(shoulder_Compliment));
+        double elbowY = Math.sin(Math.toRadians(shoulder_Compliment));
         elbowX *= shoulderArmLength;
         elbowY *= shoulderArmLength;
 
-        double shluckerX = Math.cos(Math.toRadians(getElbowAngle() + getShoulderAngle()));
-        double ShluckerY = Math.sin(Math.toRadians(getElbowAngle() + getShoulderAngle()));
+        double shluckerX = Math.cos(Math.toRadians(elbow_Angle + shoulder_Compliment));
+        double ShluckerY = Math.sin(Math.toRadians(elbow_Angle + shoulder_Compliment));
         shluckerX *= elbowArmLength;
         ShluckerY *= elbowArmLength;
 
         Translation2d output = new Translation2d(elbowX + shluckerX, elbowY + ShluckerY);
         return output;
+    }
+    public boolean violatesFramePerimiter(double shoulder_Angle, double elbow_Angle) {
+        return shoulder_Angle > 105 && getArmPosition(shoulder_Angle, elbow_Angle).getX()+5>46;
+
+
+
     }
 
     @Override
@@ -169,6 +187,8 @@ public class Arm extends SubsystemBase {
             SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
             SmartDashboard.putNumber("shoulder left output", shoulderMotorRight.getAppliedOutput());
             SmartDashboard.putNumber("shoulder right output", shoulderMotorLeft.getAppliedOutput());
+         //   SmartDashboard.putNumber("shoulder X", getArmPosition().getX());
+           // SmartDashboard.putNumber("shoulder Y", getArmPosition().getY());
 
             SmartDashboard.putNumber("elbow angle", getElbowAngle());
             SmartDashboard.putNumber("elbow setpoint", elbowSetpoint);
