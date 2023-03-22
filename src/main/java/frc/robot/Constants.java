@@ -56,10 +56,8 @@ public class Constants {
     }
 
     public static final double kFeetToMeterFactor = 0.638f / 11.79f;
-    public static int ARM_SHOULDER_LENGTH=30;
-    public static int ARM_ELBOW_LENGTH=33;
-
-
+    public static int ARM_SHOULDER_LENGTH = 28;
+    public static int ARM_ELBOW_LENGTH = 32;
 
     public static final double PRACTICE_SCHLUCKER_HOLD_PERCENT = 0.15;
     public static final double COMP_SCHLUCKER_HOLD_PERCENT = 0.3;
