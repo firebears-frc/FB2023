@@ -147,13 +147,15 @@ public class Chassis extends SubsystemBase {
         double rightDistanceMeters = rightDistanceTraveled();
         m_odometry.update(gyroAngleRadians, leftDistanceMeters, rightDistanceMeters);
 
-        SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
-        SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
-        SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
-        SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
-        SmartDashboard.putNumber("getPitch", getPitch());
-        SmartDashboard.putNumber("getRoll", getRoll());
-        SmartDashboard.putNumber("getAngle", getAngle());
+        if (DEBUG) {
+            SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
+            SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
+            SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
+            SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
+            SmartDashboard.putNumber("getPitch", getPitch());
+            SmartDashboard.putNumber("getRoll", getRoll());
+            SmartDashboard.putNumber("getAngle", getAngle());
+        }
 
         lastPitch = getPitch();
 
@@ -210,7 +212,8 @@ public class Chassis extends SubsystemBase {
     }
 
     public double getPitch() {
-        return (navX.getPitch()) * -1;
+        int m = PRACTICE_ROBOT ? -1: 1;
+        return (navX.getPitch()) * m;
     }
 
     public double getRoll() {

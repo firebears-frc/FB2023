@@ -9,17 +9,15 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+
+import static frc.robot.Constants.*;
+
 public class Schlucker extends SubsystemBase {
 
     private CANSparkMax shluckerMotor;
     private SparkMaxPIDController pid;
 
-    private final double HOLD_POSITIVE_CURRENT = 0.3; 
-    private final double HOLD_NEGATIVE_CURRENT = -HOLD_POSITIVE_CURRENT; 
-    // variable to hold if an item was Ejected by the robot. variable needs to be used by lights
-    public boolean ejectPushed;
-    // should it be initially set to true or false? do we need to set it?
-    // should it be private or public?
+    private double schluckerHoldPercent = COMP_SCHLUCKER_HOLD_PERCENT;
 
     public enum ItemHeld {
         CONE,
@@ -27,7 +25,8 @@ public class Schlucker extends SubsystemBase {
         NONE  
     }
 
-    private ItemHeld item_held;
+    private ItemHeld item_held = ItemHeld.NONE;
+    private ItemHeld saved_item_held = ItemHeld.NONE;
     
     public Schlucker() {
         shluckerMotor = new CANSparkMax(6, MotorType.kBrushed);
@@ -43,21 +42,27 @@ public class Schlucker extends SubsystemBase {
         pid.setI(0);
         pid.setD(0);
         shluckerMotor.burnFlash();
+
+        if (PRACTICE_ROBOT) {
+            schluckerHoldPercent = PRACTICE_SCHLUCKER_HOLD_PERCENT;
+        }
     }
 
 
     public void intakeCone(){
         pid.setReference(-0.7, ControlType.kDutyCycle);
         item_held = ItemHeld.CONE;
+        saved_item_held = item_held;
     }
 
     public void intakeCube(){
         pid.setReference(0.7, ControlType.kDutyCycle);
         item_held = ItemHeld.CUBE;
+        saved_item_held = item_held;
     }
 
     public void eject(){
-        switch(item_held) {
+        switch(saved_item_held) {
         case CONE:
             pid.setReference(0.7, ControlType.kDutyCycle);
             break;
@@ -67,16 +72,16 @@ public class Schlucker extends SubsystemBase {
         default:
             break;
         }
-        ejectPushed = true;
+        item_held = ItemHeld.NONE;
     }
 
     public void hold() {
         switch(item_held) {
         case CONE:
-            pid.setReference(HOLD_NEGATIVE_CURRENT, ControlType.kDutyCycle);
+            pid.setReference(-schluckerHoldPercent, ControlType.kDutyCycle);
             break;
         case CUBE:
-            pid.setReference(HOLD_POSITIVE_CURRENT, ControlType.kDutyCycle);
+            pid.setReference(schluckerHoldPercent, ControlType.kDutyCycle);
             break;
         default:
             break;
@@ -87,9 +92,13 @@ public class Schlucker extends SubsystemBase {
         pid.setReference(0, ControlType.kDutyCycle);
     }
 
+    public ItemHeld getHeldPiece() {
+        return item_held;
+    }
+
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("shluckerOutput", shluckerMotor.getAppliedOutput());
+        SmartDashboard.putNumber("shlucker output", shluckerMotor.getAppliedOutput());
     }
 
     @Override

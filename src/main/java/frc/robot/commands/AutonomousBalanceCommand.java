@@ -31,7 +31,7 @@ public class AutonomousBalanceCommand extends CommandBase {
     lastPitch = m_chassis.getPitch();
     timer2.reset();
     timer2.start();
-    speed = 0.35;
+    speed = 0.07;
     moveForward = true;
   }
 
@@ -48,7 +48,7 @@ public class AutonomousBalanceCommand extends CommandBase {
       pitchVelocity * Math.signum(m_chassis.getPitch())
     );
     if(pitchSpeed >= 0.3 && timer2.hasElapsed(1)) {
-        speed = -0.28;
+        speed = -0.05;
       moveForward = false;
     }
 

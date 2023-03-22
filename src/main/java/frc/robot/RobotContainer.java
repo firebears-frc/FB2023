@@ -51,7 +51,7 @@ public class RobotContainer {
     m_schlucker = new Schlucker();
     m_arm = new Arm();
     m_chassis = new Chassis();
-    m_vision = new Vision("MainC",m_chassis);
+    m_vision = new Vision("MainC", m_chassis);
     usbcamera = CameraServer.startAutomaticCapture();
     usbcamera.setResolution(320, 240);
     configureButtonBindings();
@@ -62,40 +62,11 @@ public class RobotContainer {
 
     m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
         .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
-    // m_chooser.addOption("Auto Balance", ());
-    /*m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(338, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
-        .andThen(new ArmElbowSetpointCommand(350, m_arm))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
+    m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
 
-    m_chooser.addOption("Cube", (new ShluckerSetSpeedCommand(0.7, m_schlucker))
-        .andThen(new WaitCommand(1))
-        .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-        .andThen(new ArmElbowSetpointCommand(338, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ShluckerSetSpeedCommand(-0.5, m_schlucker))
-        .andThen(new ArmElbowSetpointCommand(350, m_arm))
-        .andThen(new WaitCommand(0.5))
-        .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-        .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-        .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm))
-        .andThen(new WaitCommand(1))
-        .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));*/
-    // m_chooser.addOption("Cone + Balance", ());
-    // m_chooser.addOption("Cube + Balance", ());y
+    m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_chassis));
+    m_chooser.addOption("Auto Cube and Balance", new AutoCubeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -126,7 +97,7 @@ public class RobotContainer {
   }
 
   private void displayGitInfo() {
-    if(Constants.DEBUG){
+    if (Constants.DEBUG) {
       // Get the branch name and display on the dashboard
       String branchName = getFileContents("branch.txt");
       SmartDashboard.putString("Branch Name", branchName);
@@ -157,8 +128,8 @@ public class RobotContainer {
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-   JoystickButton twobutton = new JoystickButton(joystick, 2);
-  
+    JoystickButton twobutton = new JoystickButton(joystick, 2);
+
     JoystickButton triggerButton = new JoystickButton(joystick, 1);
     triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
 
@@ -197,8 +168,8 @@ public class RobotContainer {
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
-    xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(76, m_arm))
-        .andThen(new ArmElbowSetpointCommand(267, m_arm)));
+    xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(79, m_arm))
+        .andThen(new ArmElbowSetpointCommand(271, m_arm)));
 
     // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
@@ -207,8 +178,8 @@ public class RobotContainer {
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(106, m_arm))
-        .andThen(new ArmElbowSetpointCommand(319, m_arm)));
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(107, m_arm))
+        .andThen(new ArmElbowSetpointCommand(327, m_arm)));
   }
 
   public XboxController getXboxController() {
@@ -226,5 +197,4 @@ public class RobotContainer {
     return m_chooser.getSelected();
   }
 
-  
 }
