@@ -194,7 +194,7 @@ public class Arm extends SubsystemBase {
     public boolean violatesFramePerimeter(double shoulder_Angle, double elbow_Angle) {
         double currentExtension = getArmPosition(getShoulderAngle(), getElbowAngle()).getX();
         double desiredExtension = getArmPosition(shoulder_Angle, elbow_Angle).getX();
-        return shoulder_Angle > 105 && !(desiredExtension < currentExtension || desiredExtension < 46);
+        return shoulder_Angle > 105 && !(desiredExtension < currentExtension || desiredExtension < 45);
 
     }
 
