@@ -60,13 +60,12 @@ public class RobotContainer {
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
+    m_chooser.setDefaultOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
-    m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Auto CUBE and Balance", new AutoCubeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Auto cone and Balance", new AutoConeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
 
     m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_chassis));
-    m_chooser.addOption("Auto Cube and Balance", new AutoCubeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -122,8 +121,6 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // JoystickButton twoButton = new JoystickButton(joystick, 2);
-    // twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
@@ -132,10 +129,6 @@ public class RobotContainer {
 
     JoystickButton triggerButton = new JoystickButton(joystick, 1);
     triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
-
-    // oneButton.onTrue(new ArmManualCommand(m_arm));
-
-    // xboxController leftJoystick = new XboxController(1);
 
     // Buttons
 
