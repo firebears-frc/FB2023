@@ -128,17 +128,14 @@ public class RobotContainer {
   
     /* Lights Controls */
 
-    JoystickButton sixButton = new JoystickButton(joystick, 6);
-    sixButton.onTrue(new InstantCommand(m_lights::showFire, m_lights));
+    JoystickButton sixButton = new JoystickButton(joystick, 5);
+    sixButton.onTrue(new InstantCommand(m_lights::showTeam, m_lights));
 
-    JoystickButton sevenButton = new JoystickButton(joystick, 7);
+    JoystickButton sevenButton = new JoystickButton(joystick, 6);
     sevenButton.onTrue(new InstantCommand(m_lights::showCone, m_lights));
 
-    JoystickButton eightButton = new JoystickButton(joystick, 8);
+    JoystickButton eightButton = new JoystickButton(joystick, 7);
     eightButton.onTrue(new InstantCommand(m_lights::showCube, m_lights));
-
-    JoystickButton nineButton = new JoystickButton(joystick, 9);
-    nineButton.onTrue(new InstantCommand(m_lights::showRainbow, m_lights));
 
 
    JoystickButton twobutton = new JoystickButton(joystick, 2);
