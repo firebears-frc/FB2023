@@ -26,18 +26,18 @@ public class AutoConeAndBalanceCommand extends SequentialCommandGroup {
       (new InstantCommand(m_schlucker::hold, m_schlucker)),
       (new ArmShoulderSetpointCommand(122, m_arm)),
       (new ArmElbowSetpointCommand(360, m_arm)),
-      (new WaitCommand(1)),
+      (new WaitCommand(0.9)),
       (new ArmElbowSetpointCommand(338, m_arm)),
-      (new WaitCommand(1)),
+      (new WaitCommand(0.9)),
       (new InstantCommand(m_schlucker::eject, m_schlucker)),
       (new ArmElbowSetpointCommand(350, m_arm)),
-      (new WaitCommand(0.5)),
+      (new WaitCommand(0.3)),
       (new InstantCommand(m_schlucker::stop, m_schlucker)),
       (new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis)),
       (new ArmShoulderSetpointCommand(20, m_arm)),
       (new ArmElbowSetpointCommand(220, m_arm)),
-      (new WaitCommand(1)),
-      (new ChassisDriveToDistanceCommand(-3.5, 0.3, m_chassis)),
+      (new WaitCommand(0.5)),
+      (new ChassisDriveToDistanceCommand(-3.5, 0.4, m_chassis)),
       (new AutoBalanceRoutine(m_chassis)))
     
       
