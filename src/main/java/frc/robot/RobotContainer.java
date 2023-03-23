@@ -184,8 +184,8 @@ public class RobotContainer {
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(107, m_arm))
-        .andThen(new ArmElbowSetpointCommand(327, m_arm)));
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(112, m_arm))
+        .andThen(new ArmElbowSetpointCommand(332, m_arm)));
   }
 
   public XboxController getXboxController() {
