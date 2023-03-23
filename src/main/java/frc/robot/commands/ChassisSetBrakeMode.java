@@ -3,26 +3,26 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands;
-  
+
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Chassis;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ArmElbowSetpointCommand extends InstantCommand {
-  Arm m_arm;
-  double setPoint;
-  public ArmElbowSetpointCommand(double s, Arm arm) {
+public class ChassisSetBrakeMode extends InstantCommand {
+  private Chassis m_chassis;
+  private boolean brake;
+  public ChassisSetBrakeMode(boolean b, Chassis c) {
+    m_chassis = c;
+    brake = b;
+    addRequirements(m_chassis);
     // Use addRequirements() here to declare subsystem dependencies.
-    m_arm = arm;
-    addRequirements(arm);
-    setPoint = s;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_arm.setElbowSetpoint(setPoint);
+    m_chassis.setBrakemode(brake);
   }
 }

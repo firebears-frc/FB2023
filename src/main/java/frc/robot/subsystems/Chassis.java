@@ -50,10 +50,13 @@ public class Chassis extends SubsystemBase {
     private double pitchVelocity;
     private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
     private boolean Currentbrakemode = false;
+    private boolean slowMode = false;
+
     private final DifferentialDriveOdometry m_odometry;
 
     private final PIDController leftPID, rightPID;
     private final SimpleMotorFeedforward feedForward;
+
 
     public Chassis() {
         SmartDashboard.putData("Odometry", Field);
@@ -144,13 +147,15 @@ public class Chassis extends SubsystemBase {
         double rightDistanceMeters = rightDistanceTraveled();
         m_odometry.update(gyroAngleRadians, leftDistanceMeters, rightDistanceMeters);
 
-        SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
-        SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
-        SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
-        SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
-        SmartDashboard.putNumber("getPitch", getPitch());
-        SmartDashboard.putNumber("getRoll", getRoll());
-        SmartDashboard.putNumber("getAngle", getAngle());
+        if (DEBUG) {
+            SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
+            SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
+            SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
+            SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
+            SmartDashboard.putNumber("getPitch", getPitch());
+            SmartDashboard.putNumber("getRoll", getRoll());
+            SmartDashboard.putNumber("getAngle", getAngle());
+        }
 
         lastPitch = getPitch();
 
@@ -207,7 +212,8 @@ public class Chassis extends SubsystemBase {
     }
 
     public double getPitch() {
-        return (navX.getPitch()) * -1;
+        int m = PRACTICE_ROBOT ? -1: 1;
+        return (navX.getPitch()) * m;
     }
 
     public double getRoll() {
@@ -224,6 +230,13 @@ public class Chassis extends SubsystemBase {
 
     public Pose2d getPose() {
         return m_odometry.getPoseMeters();
+    }
+
+    public boolean getSlowMode() {
+        return slowMode;
+    }
+    public void toggleSlowMode() {
+        slowMode = !slowMode;
     }
 
     public void togglebrakemode() {

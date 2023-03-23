@@ -16,6 +16,13 @@ public class BalanceTake2Command extends CommandBase {
   /** Creates a new BalanceTake2Command. */
   public BalanceTake2Command(Chassis chassis) {
     m_chassis = chassis;
+    speed = 0.07;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_chassis);
+  }
+  public BalanceTake2Command(double s, Chassis chassis) {
+    m_chassis = chassis;
+    speed = s;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_chassis);
   }
@@ -23,20 +30,22 @@ public class BalanceTake2Command extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    speed = 0.35;
     lastPitch = m_chassis.getPitch();
+    m_chassis.setBrakemode(true);
+    m_chassis.arcadeDrive(speed, 0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double pitchVelocity = m_chassis.getpitchVelocity();
-    double pitchSpeed = Math.abs(pitchVelocity);
-
-    if (pitchVelocity > -0.5 ){
-      m_chassis.arcadeDrive(speed, 0);
-    }else{
+    if (Math.abs(m_chassis.getpitchVelocity()) > 0.15) {
       m_chassis.arcadeDrive(0, 0);
+    } else {
+      if (m_chassis.getPitch() > 0) {
+        m_chassis.arcadeDrive(speed, 0);
+      } else {
+        m_chassis.arcadeDrive(-speed, 0);
+      }
     }
   }
 
@@ -49,6 +58,8 @@ public class BalanceTake2Command extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_chassis.getpitchVelocity() <= -0.5;
+    return Math.abs(m_chassis.getPitch()) < 3 && Math.abs(m_chassis.getpitchVelocity()) < 0.15;
+    //m_chassis.getPitch() < 5 || m_chassis.getpitchVelocity() < -0.3;
+    //m_chassis.getpitchVelocity() <= -0.5;
   }
 }
