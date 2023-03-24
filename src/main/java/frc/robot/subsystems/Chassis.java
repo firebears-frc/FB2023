@@ -244,8 +244,11 @@ public class Chassis extends SubsystemBase {
         setBrakemode(Currentbrakemode);
     }
 
-    public void setBrakemode(boolean DaBrake) {
 
+
+
+    public void setBrakemode(boolean DaBrake) {
+        Currentbrakemode = DaBrake;
         if (DaBrake) {
             leftBackMotor.setIdleMode(IdleMode.kBrake);
             rightBackMotor.setIdleMode(IdleMode.kBrake);

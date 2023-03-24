@@ -125,6 +125,8 @@ public class RobotContainer {
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
+    //break mode
+  
   
     /* Lights Controls */
 
@@ -141,7 +143,7 @@ public class RobotContainer {
    JoystickButton twobutton = new JoystickButton(joystick, 2);
 
     JoystickButton triggerButton = new JoystickButton(joystick, 1);
-    triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
+    triggerButton.onTrue(new InstantCommand(m_chassis::togglebrakemode,m_chassis));
 
     // Buttons
 
