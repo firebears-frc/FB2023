@@ -22,7 +22,7 @@ public class AutoConeAndBalanceCommand extends SequentialCommandGroup {
     m_schlucker = schlucker;
     m_arm = arm;
     addCommands(
-      (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
+      (new InstantCommand(m_schlucker::intakeCone, m_schlucker)),
       (new InstantCommand(m_schlucker::hold, m_schlucker)),
       (new WaitCommand(0.5)),
       (new ArmShoulderSetpointCommand(122, m_arm)),
