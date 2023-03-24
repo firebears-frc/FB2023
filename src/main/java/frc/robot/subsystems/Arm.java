@@ -31,7 +31,8 @@ public class Arm extends SubsystemBase {
     private static SparkMaxPIDController elbowPID;
     private SparkMaxPIDController shoulderPID;
     private double elbowSetpoint;
-    private double shoulderSetpoint;
+    private double shoulderSetpoint; 
+    private boolean disableLimits = true;
 
     public Arm() {
 
@@ -127,13 +128,13 @@ public class Arm extends SubsystemBase {
         if (setpoint < 0 || setpoint > 280) {
 
             setpoint = 0;
-        } else if (setpoint > 130 && setpoint < 280) {
+        } else if (setpoint > 200 && setpoint < 280) {
 
-            setpoint = 130;
+            setpoint = 200;
         } else {
 
         }
-        if (!violatesFramePerimeter(setpoint, getElbowAngle())) {
+        if (!violatesFramePerimeter(setpoint, getElbowAngle()) || disableLimits) {
             shoulderSetpoint = setpoint;
 
         } else {
@@ -157,7 +158,7 @@ public class Arm extends SubsystemBase {
             setpoint = 201;
 
         }
-        if (!violatesFramePerimeter(getShoulderAngle(), setpoint)) {
+        if (!violatesFramePerimeter(getShoulderAngle(), setpoint) || disableLimits) {
             elbowSetpoint = setpoint;
 
         } else {

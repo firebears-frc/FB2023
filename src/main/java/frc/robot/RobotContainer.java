@@ -66,7 +66,7 @@ public class RobotContainer {
     m_chooser.addOption("Auto cone and Balance", new AutoConeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
 
     m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_chassis));
-
+  m_chooser.addOption("Pushups", new Pushups(m_chassis, m_schlucker, m_arm));
     SmartDashboard.putData("Auto Mode", m_chooser);
 
     displayGitInfo();
