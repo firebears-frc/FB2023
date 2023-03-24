@@ -49,7 +49,7 @@ public class Chassis extends SubsystemBase {
     private double lastPitch;
     private double pitchVelocity;
     private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
-    private boolean Currentbrakemode = false;
+    private boolean currentBrakeMode = false;
     private boolean slowMode = false;
 
     private final DifferentialDriveOdometry m_odometry;
@@ -237,18 +237,20 @@ public class Chassis extends SubsystemBase {
     }
     public void toggleSlowMode() {
         slowMode = !slowMode;
+        SmartDashboard.putBoolean("Slow Mode", slowMode);
     }
 
-    public void togglebrakemode() {
-        Currentbrakemode = !Currentbrakemode;
-        setBrakemode(Currentbrakemode);
+    public void toggleBrakeMode() {
+        currentBrakeMode = !currentBrakeMode;
+        setBrakemode(currentBrakeMode);
     }
 
 
 
 
     public void setBrakemode(boolean DaBrake) {
-        Currentbrakemode = DaBrake;
+        currentBrakeMode = DaBrake;
+        SmartDashboard.putBoolean("Brake Mode", DaBrake);
         if (DaBrake) {
             leftBackMotor.setIdleMode(IdleMode.kBrake);
             rightBackMotor.setIdleMode(IdleMode.kBrake);
