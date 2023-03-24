@@ -21,6 +21,7 @@ public class AutoCubeAndBalanceCommand extends SequentialCommandGroup {
     m_chassis = chassis;
     m_schlucker = schlucker;
     m_arm = arm;
+    
     addCommands(
         (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
         (new InstantCommand(m_schlucker::hold, m_schlucker)),
