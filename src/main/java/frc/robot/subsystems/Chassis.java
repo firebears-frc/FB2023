@@ -51,7 +51,7 @@ public class Chassis extends SubsystemBase {
     private double lastPitch;
     private double pitchVelocity;
     private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
-    private boolean Currentbrakemode = false;
+    private boolean currentBrakeMode = false;
     private boolean slowMode = false;
 
     private final DifferentialDriveOdometry m_odometry;
@@ -156,13 +156,15 @@ public class Chassis extends SubsystemBase {
         double rightDistanceMeters = rightDistanceTraveled();
         m_odometry.update(gyroAngleRadians, leftDistanceMeters, rightDistanceMeters);
 
-        SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
-        SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
-        SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
-        SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
-        SmartDashboard.putNumber("getPitch", getPitch());
-        SmartDashboard.putNumber("getRoll", getRoll());
-        SmartDashboard.putNumber("getAngle", getAngle());
+        if (DEBUG) {
+            SmartDashboard.putNumber("Pitch Velocity", getpitchVelocity());
+            SmartDashboard.putNumber("getEncoderDistance", getEncoderDistance());
+            SmartDashboard.putNumber("getLeftDistance", leftDistanceTraveled());
+            SmartDashboard.putNumber("getRightDistance", rightDistanceTraveled());
+            SmartDashboard.putNumber("getPitch", getPitch());
+            SmartDashboard.putNumber("getRoll", getRoll());
+            SmartDashboard.putNumber("getAngle", getAngle());
+        }
 
         if (LOGGING) {
             // leftMotorLog.append(leftVel / DriveConstants.MaxVelocity);
@@ -225,7 +227,8 @@ public class Chassis extends SubsystemBase {
     }
 
     public double getPitch() {
-        return (navX.getPitch()) * -1;
+        int m = PRACTICE_ROBOT ? -1: 1;
+        return (navX.getPitch()) * m;
     }
 
     public double getRoll() {
@@ -249,15 +252,20 @@ public class Chassis extends SubsystemBase {
     }
     public void toggleSlowMode() {
         slowMode = !slowMode;
+        SmartDashboard.putBoolean("Slow Mode", slowMode);
     }
 
-    public void togglebrakemode() {
-        Currentbrakemode = !Currentbrakemode;
-        setBrakemode(Currentbrakemode);
+    public void toggleBrakeMode() {
+        currentBrakeMode = !currentBrakeMode;
+        setBrakemode(currentBrakeMode);
     }
+
+
+
 
     public void setBrakemode(boolean DaBrake) {
-
+        currentBrakeMode = DaBrake;
+        SmartDashboard.putBoolean("Brake Mode", DaBrake);
         if (DaBrake) {
             leftBackMotor.setIdleMode(IdleMode.kBrake);
             rightBackMotor.setIdleMode(IdleMode.kBrake);

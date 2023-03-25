@@ -34,7 +34,7 @@ public class ChassisDriveCommand extends CommandBase {
             speed *= 0.2;
 
         double rotation = joystick.getTwist();
-        double rotMultiplier = ((-joystick.getThrottle() / 2 + 0.5f) * 0.55f) + 0.25f;
+        double rotMultiplier = ((-joystick.getThrottle() / 2 + 0.5f) * 0.70f) + 0.1f;
         m_chassis.arcadeDrive(-speed,(-rotation) * rotMultiplier);
     }
 

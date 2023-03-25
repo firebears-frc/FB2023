@@ -60,30 +60,12 @@ public class RobotContainer {
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Autonomous Drving Only", (new ChassisDriveToDistanceCommand(-5, m_chassis))
-        .andThen(new ChassisDriveToDistanceCommand(5, m_chassis)));
+    m_chooser.setDefaultOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
-    m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Auto CUBE and Balance", new AutoCubeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Auto cone and Balance", new AutoConeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
 
-    // m_chooser.addOption("Auto Balance", ());
-    /*
-     * m_chooser.addOption("Cone", (new ShluckerSetSpeedCommand(-0.7, m_schlucker))
-     * .andThen(new WaitCommand(0.5))
-     * .andThen(new ArmShoulderSetpointCommand(122, m_arm))
-     * .andThen(new ArmElbowSetpointCommand(338, m_arm))
-     * .andThen(new WaitCommand(1))
-     * .andThen(new ShluckerSetSpeedCommand(0.5, m_schlucker))
-     * .andThen(new ArmElbowSetpointCommand(350, m_arm))
-     * .andThen(new WaitCommand(0.5))
-     * .andThen(new ShluckerSetSpeedCommand(0, m_schlucker))
-     * .andThen(new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis))
-     * .andThen(new ArmShoulderSetpointCommand(20, m_arm))
-     * .andThen(new ArmElbowSetpointCommand(220, m_arm))
-     * .andThen(new WaitCommand(1))
-     * .andThen(new ChassisDriveToDistanceCommand(-5, m_chassis))
-     * .andThen(new ChassisDriveToDistanceCommand(5.5, m_chassis)));
-     * 
-     */
+    m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_chassis));
 
     SmartDashboard.putData("Auto Mode", m_chooser);
 
@@ -142,20 +124,30 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // JoystickButton twoButton = new JoystickButton(joystick, 2);
-    // twoButton.onTrue(new ChassisResetEncoderCommand(m_chassis));
 
     JoystickButton fiveButton = new JoystickButton(joystick, 5); // DO NOT DELETE
     fiveButton.onTrue(new AutonomousBalanceCommand(m_chassis)); // DO NOT DELETE
 
-    JoystickButton twobutton = new JoystickButton(joystick, 2);
+    //break mode
+  
+  
+    /* Lights Controls */
+
+    JoystickButton sixButton = new JoystickButton(joystick, 5);
+    sixButton.onTrue(new InstantCommand(m_lights::showTeam, m_lights));
+
+    JoystickButton sevenButton = new JoystickButton(joystick, 6);
+    sevenButton.onTrue(new InstantCommand(m_lights::showCone, m_lights));
+
+    JoystickButton eightButton = new JoystickButton(joystick, 7);
+    eightButton.onTrue(new InstantCommand(m_lights::showCube, m_lights));
+
+
+   JoystickButton twobutton = new JoystickButton(joystick, 2);
+   twobutton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
 
     JoystickButton triggerButton = new JoystickButton(joystick, 1);
-    triggerButton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
-
-    // oneButton.onTrue(new ArmManualCommand(m_arm));
-
-    // xboxController leftJoystick = new XboxController(1);
+    triggerButton.onTrue(new InstantCommand(m_chassis::toggleBrakeMode,m_chassis));
 
     // Buttons
 
@@ -188,8 +180,8 @@ public class RobotContainer {
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
-    xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(76, m_arm))
-        .andThen(new ArmElbowSetpointCommand(267, m_arm)));
+    xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(79, m_arm))
+        .andThen(new ArmElbowSetpointCommand(271, m_arm)));
 
     // Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
@@ -198,8 +190,8 @@ public class RobotContainer {
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
-    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(106, m_arm))
-        .andThen(new ArmElbowSetpointCommand(319, m_arm)));
+    xboxDpadLeftButton.onTrue((new ArmShoulderSetpointCommand(112, m_arm))
+        .andThen(new ArmElbowSetpointCommand(332, m_arm)));
   }
 
   public XboxController getXboxController() {
