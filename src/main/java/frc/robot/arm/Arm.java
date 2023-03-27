@@ -21,6 +21,9 @@ public class Arm extends SubsystemBase {
         public static final double ELBOW_I = 0.0;
         public static final double ELBOW_D = 0.005;
         public static final double ELBOW_OFFSET = 240.0; // degrees
+        public static final double ELBOW_MIN_VELOCITY = 1.0; // degrees per second
+        public static final double ELBOW_MAX_VELOCITY = 90.0; // degrees per second
+        public static final double ELBOW_MAX_ACCELERATION = 90.0; // degrees per second squared
 
         public static final int SHOULDER_RIGHT_PORT = 12;
         public static final int SHOULDER_LEFT_PORT = 13;
@@ -32,6 +35,9 @@ public class Arm extends SubsystemBase {
         public static final double SHOULDER_I = 0.0;
         public static final double SHOULDER_D = 0.005;
         public static final double SHOULDER_OFFSET = 196.0; // degrees
+        public static final double SHOULDER_MIN_VELOCITY = 1.0; // degrees per second
+        public static final double SHOULDER_MAX_VELOCITY = 90.0; // degrees per second
+        public static final double SHOULDER_MAX_ACCELERATION = 90.0; // degrees per second squared
 
         public static final double SHOULDER_SUBSTATION = 89.0; // degrees
         public static final double ELBOW_SUBSTATION = 295.0; // degrees
@@ -76,9 +82,13 @@ public class Arm extends SubsystemBase {
         elbowPID.setPositionPIDWrappingEnabled(true);
         elbowPID.setPositionPIDWrappingMinInput(0);
         elbowPID.setPositionPIDWrappingMaxInput(360);
-        elbowPID.setP(ArmConstants.ELBOW_P);
-        elbowPID.setI(ArmConstants.ELBOW_I);
-        elbowPID.setD(ArmConstants.ELBOW_D);
+        elbowPID.setP(ArmConstants.ELBOW_P, 0);
+        elbowPID.setI(ArmConstants.ELBOW_I, 0);
+        elbowPID.setD(ArmConstants.ELBOW_D, 0);
+        elbowPID.setSmartMotionAllowedClosedLoopError(ArmConstants.ANGLE_TOLERANCE, 0);
+        elbowPID.setSmartMotionMinOutputVelocity(ArmConstants.ELBOW_MIN_VELOCITY, 0);
+        elbowPID.setSmartMotionMaxVelocity(ArmConstants.ELBOW_MAX_VELOCITY, 0);
+        elbowPID.setSmartMotionMaxAccel(ArmConstants.ELBOW_MAX_ACCELERATION, 0);
         elbowMotor.burnFlash();
 
         shoulderMotorRight = new CANSparkMax(ArmConstants.SHOULDER_RIGHT_PORT, MotorType.kBrushless);
@@ -97,9 +107,13 @@ public class Arm extends SubsystemBase {
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0);
         shoulderPID.setPositionPIDWrappingMaxInput(360);
-        shoulderPID.setP(ArmConstants.SHOULDER_P);
-        shoulderPID.setI(ArmConstants.SHOULDER_I);
-        shoulderPID.setD(ArmConstants.SHOULDER_D);
+        shoulderPID.setP(ArmConstants.SHOULDER_P, 0);
+        shoulderPID.setI(ArmConstants.SHOULDER_I, 0);
+        shoulderPID.setD(ArmConstants.SHOULDER_D, 0);
+        shoulderPID.setSmartMotionAllowedClosedLoopError(ArmConstants.ANGLE_TOLERANCE, 0);
+        shoulderPID.setSmartMotionMinOutputVelocity(ArmConstants.SHOULDER_MIN_VELOCITY, 0);
+        shoulderPID.setSmartMotionMaxVelocity(ArmConstants.SHOULDER_MAX_VELOCITY, 0);
+        shoulderPID.setSmartMotionMaxAccel(ArmConstants.SHOULDER_MAX_ACCELERATION, 0);
         shoulderMotorRight.burnFlash();
 
         shoulderMotorLeft = new CANSparkMax(ArmConstants.SHOULDER_LEFT_PORT, MotorType.kBrushless);
@@ -169,7 +183,7 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
-        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
+        elbowPID.setReference(elbowSetpoint, ControlType.kSmartMotion);
+        shoulderPID.setReference(shoulderSetpoint, ControlType.kSmartMotion);
     }
 }
