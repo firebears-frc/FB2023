@@ -27,7 +27,7 @@ public class AutoBalanceCommand extends CommandBase {
         }
 
         // Depending on what way the charge station is tipped, go to middle
-        if (chassis.getPitch() > 0) {
+        if (chassis.getPitchDegrees() > 0) {
             chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
         } else {
             chassis.drive(new ChassisSpeeds(-1.0 * BALANCE_SPEED, 0, 0));

@@ -33,15 +33,16 @@ public class Chassis extends SubsystemBase {
 
         public static final double TRACK_WIDTH = 0.96679; // Meters
         public static final double MAX_VELOCITY = 5.0; // Meters per second
+        public static final double MAX_ACCELERATION = 5.0; // Meters per second squared
         public static final double SLOW_VELOCITY = 1.0; // Meters per second
         public static final double MAX_ANGULAR_VELOCITY = 8.0; // Radians per second
+        public static final double MAX_ANGULAR_ACCELERATION = 8.0; // Radians per second squared
         public static final double SLOW_ANGULAR_VELOCITY = 2.0; // Radians per second
         public static final double S = 0.15473;
         public static final double V = 2.3007;
         public static final double A = 0.22029;
 
         // Trajectories
-        public static final double MAX_ACCELERATION = 2.5; // Meters per second squared
         public static final double MAX_VOLTAGE = 10.0;
 
         // Charge Station
@@ -103,7 +104,7 @@ public class Chassis extends SubsystemBase {
         poseEstimator.update(navX.getRotation2d(), leftDistance, rightDistance);
         field.setRobotPose(getPose());
 
-        double currentPitch = getPitch();
+        double currentPitch = getPitchDegrees();
         pitchVelocity = currentPitch - lastPitch;
         lastPitch = currentPitch;
     }
@@ -161,23 +162,28 @@ public class Chassis extends SubsystemBase {
     }
 
     /****************** CHARGE STATION ******************/
-    public double getPitch() {
+    public double getPitchDegrees() {
         return navX.getPitch();
     }
 
     public boolean isLevel() {
-        return Math.abs(getPitch()) < ChassisConstants.LEVEL_TOLERANCE;
+        return Math.abs(getPitchDegrees()) < ChassisConstants.LEVEL_TOLERANCE;
     }
 
     public boolean isOnChargeStation() {
-        return Math.abs(getPitch()) > ChassisConstants.ON_TOLERANCE;
+        return Math.abs(getPitchDegrees()) > ChassisConstants.ON_TOLERANCE;
     }
 
-    private double getPitchVelocity() {
+    private double getPitchVelocityDegrees() {
         return pitchVelocity;
     }
 
     public boolean isNotPitching() {
-        return Math.abs(getPitchVelocity()) < ChassisConstants.PITCH_VELOCITY_MAX;
+        return Math.abs(getPitchVelocityDegrees()) < ChassisConstants.PITCH_VELOCITY_MAX;
+    }
+
+    /****************** CHARGE STATION ******************/
+    public double getYawDegrees() {
+        return navX.getYaw();
     }
 }
