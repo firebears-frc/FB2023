@@ -224,6 +224,10 @@ public class Chassis extends SubsystemBase {
         return navX.getAngle();
     }
 
+    public double getYaw() {
+        return navX.getYaw();
+    }
+
     public double getpitchVelocity() {
         return pitchVelocity;
     }

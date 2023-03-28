@@ -144,7 +144,7 @@ public class RobotContainer {
    twobutton.onTrue(new InstantCommand(m_chassis::toggleSlowMode, m_chassis));
 
     JoystickButton triggerButton = new JoystickButton(joystick, 1);
-    triggerButton.onTrue(new InstantCommand(m_chassis::toggleBrakeMode,m_chassis));
+    triggerButton.onTrue(new ChassisRotateToAngleCommand(180, m_chassis));
 
     // Buttons
 
