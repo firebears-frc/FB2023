@@ -169,8 +169,8 @@ public class RobotContainer {
 
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
-    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(58, m_arm))
-        .andThen(new ArmElbowSetpointCommand(263, m_arm)));
+    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
+        .andThen(new ArmElbowSetpointCommand(275, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
