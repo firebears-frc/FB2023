@@ -2,7 +2,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
 import frc.robot.util.SparkMotor;
 
 import com.revrobotics.CANSparkMax.ControlType;
@@ -11,8 +14,11 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkMaxPIDController.AccelStrategy;
 
 import static frc.robot.Constants.*;
+
+import java.util.function.Function;
 
 public class Arm extends SubsystemBase {
     private static int STALL_CURRENT_LIMIT_SHOULDER = 30;
@@ -32,10 +38,17 @@ public class Arm extends SubsystemBase {
     private SparkMaxPIDController shoulderPID;
     private double elbowSetpoint;
     private double shoulderSetpoint;
+    private ProfiledPIDController profilePID;
+    private Constraints trapezoidalConstraint;
+
+    private double previousVelocity;
 
     public Arm() {
 
         elbowMotor = new SparkMotor(7, MotorType.kBrushless);
+        trapezoidalConstraint = new Constraints(200, 60);
+        profilePID = new ProfiledPIDController(PracticeArmConstants.elbowP, PracticeArmConstants.elbowI, PracticeArmConstants.elbowD, trapezoidalConstraint);
+
 
         elbowMotor.restoreFactoryDefaults();
         elbowMotor.setInverted(true);
@@ -50,6 +63,7 @@ public class Arm extends SubsystemBase {
             elbowPID.setP(PracticeArmConstants.elbowP);
             elbowPID.setI(PracticeArmConstants.elbowI);
             elbowPID.setD(PracticeArmConstants.elbowD);
+            elbowPID.setFF(PracticeArmConstants.elbowFF);
         } else {
             elbowPID.setP(CompArmConstants.elbowP);
             elbowPID.setI(CompArmConstants.elbowI);
@@ -60,9 +74,16 @@ public class Arm extends SubsystemBase {
         elbowPID.setPositionPIDWrappingEnabled(true);
         elbowPID.setPositionPIDWrappingMinInput(0.0);
         elbowPID.setPositionPIDWrappingMaxInput(360);
+        elbowPID.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
+        //elbowPID.setSmartMotionAllowedClosedLoopError(0.02, 0);
+        elbowPID.setSmartMotionMaxAccel(150, 0);
+        elbowPID.setSmartMotionMaxVelocity(360, 0);
+        elbowPID.setSmartMotionMinOutputVelocity(0.00, 0);
         elbowEncoder.setPositionConversionFactor(360);
+        elbowEncoder.setVelocityConversionFactor(360);
         elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowEncoder.setInverted(true);
+        previousVelocity = elbowEncoder.getVelocity();
         elbowMotor.burnFlash();
 
         shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
@@ -201,6 +222,10 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         if (DEBUG) {
+
+            double acceleration = (elbowEncoder.getVelocity() - previousVelocity );
+
+
             SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
             SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
             SmartDashboard.putNumber("shoulder left output", shoulderMotorRight.getAppliedOutput());
@@ -210,10 +235,21 @@ public class Arm extends SubsystemBase {
 
             SmartDashboard.putNumber("elbow angle", getElbowAngle());
             SmartDashboard.putNumber("elbow setpoint", elbowSetpoint);
-            SmartDashboard.putNumber("elbow output", elbowMotor.getAppliedOutput());
+            SmartDashboard.putNumber("elbow outut", elbowMotor.getAppliedOutput());
+
+            SmartDashboard.putNumber("Elbow velocity", elbowEncoder.getVelocity());
+            SmartDashboard.putNumber("Shoulder velocity", shoulderEncoder.getVelocity());
+            SmartDashboard.putNumber("Elbow Acceleration", acceleration);
+
+            
+            previousVelocity = elbowEncoder.getVelocity();
+
         }
 
-        elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
+        elbowMotor.setVoltage(
+            profilePID.calculate(getElbowAngle(), elbowSetpoint));
     }
+
+
 }

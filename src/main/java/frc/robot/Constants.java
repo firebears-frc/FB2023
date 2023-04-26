@@ -40,9 +40,13 @@ public class Constants {
         public static final double shoulderI = 0.0;
         public static final double shoulderD = 0.005;
 
-        public static final double elbowP = 0.02;
-        public static final double elbowI = 0.0;
-        public static final double elbowD = 0.001;
+        public static final double elbowP = 0.12;
+        //P is .003
+        public static final double elbowI = 0.00;
+        //I is 0
+        public static final double elbowD = 0.002;
+        //D is 0
+        public static final double elbowFF = 0.1;
     }
 
     public static final class CompArmConstants {
