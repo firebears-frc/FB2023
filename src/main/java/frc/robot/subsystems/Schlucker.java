@@ -7,6 +7,8 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.GamePiece;
 
@@ -48,63 +50,77 @@ public class Schlucker extends SubsystemBase {
         motor.burnFlash();
     }
 
-    public void intakeCone() {
-        speed = SchluckerConstants.INTAKE_SPEED;
-        itemHeld = GamePiece.CONE;
-        lastItemHeld = GamePiece.CONE;
-        itemWanted = GamePiece.NONE;
+    public Command intakeCone() {
+        return new InstantCommand(() -> {
+            speed = SchluckerConstants.INTAKE_SPEED;
+            itemHeld = GamePiece.CONE;
+            lastItemHeld = GamePiece.CONE;
+            itemWanted = GamePiece.NONE;
+        }, this);
     }
 
-    public void intakeCube() {
-        speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
-        itemHeld = GamePiece.CUBE;
-        lastItemHeld = GamePiece.CUBE;
-        itemWanted = GamePiece.NONE;
+    public Command intakeCube() {
+        return new InstantCommand(() -> {
+            speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
+            itemHeld = GamePiece.CUBE;
+            lastItemHeld = GamePiece.CUBE;
+            itemWanted = GamePiece.NONE;
+        }, this);
     }
 
-    public void hold() {
-        speed = 0;
+    public Command hold() {
+        return new InstantCommand(() -> {
+            speed = 0;
+        }, this);
     }
 
-    public void eject() {
-        switch (itemHeld) {
-            case CONE:
-                speed = SchluckerConstants.INTAKE_SPEED;
-                break;
-            case CUBE:
-                speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
-                break;
-            case NONE:
-            default:
-                switch (lastItemHeld) {
-                    case CONE:
-                        speed = SchluckerConstants.INTAKE_SPEED;
-                        break;
-                    case CUBE:
-                        speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
-                        break;
-                    case NONE:
-                    default:
-                        break;
-                }
-        }
-        itemHeld = GamePiece.NONE;
+    public Command eject() {
+        return new InstantCommand(() -> {
+            switch (itemHeld) {
+                case CONE:
+                    speed = SchluckerConstants.INTAKE_SPEED;
+                    break;
+                case CUBE:
+                    speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
+                    break;
+                case NONE:
+                default:
+                    switch (lastItemHeld) {
+                        case CONE:
+                            speed = SchluckerConstants.INTAKE_SPEED;
+                            break;
+                        case CUBE:
+                            speed = -1.0 * SchluckerConstants.INTAKE_SPEED;
+                            break;
+                        case NONE:
+                        default:
+                            break;
+                    }
+            }
+            itemHeld = GamePiece.NONE;
+        }, this);
     }
 
-    public void stop() {
-        speed = 0;
+    public Command stop() {
+        return new InstantCommand(() -> {
+            speed = 0;
+        }, this);
+    }
+
+    public Command wantCone() {
+        return new InstantCommand(() -> {
+            itemWanted = GamePiece.CONE;
+        }, this);
+    }
+
+    public Command wantCube() {
+        return new InstantCommand(() -> {
+            itemWanted = GamePiece.CUBE;
+        }, this);
     }
 
     public GamePiece getHeldItem() {
         return itemHeld;
-    }
-
-    public void wantCone() {
-        itemWanted = GamePiece.CONE;
-    }
-
-    public void wantCube() {
-        itemWanted = GamePiece.CUBE;
     }
 
     public GamePiece getWantedItem() {

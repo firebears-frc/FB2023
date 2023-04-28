@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +30,6 @@ import java.io.IOException;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 
 public class RobotContainer {
     public class RobotConstants {
@@ -44,8 +42,8 @@ public class RobotContainer {
     private final Schlucker schlucker;
     private final Vision vision;
     private final Lights lights;
-    private final Joystick joystick;
-    private final XboxController controller;
+    private final CommandJoystick joystick;
+    private final CommandXboxController controller;
     private final SendableChooser<Command> autoSelector;
 
     public RobotContainer() {
@@ -55,8 +53,8 @@ public class RobotContainer {
         vision = new Vision(chassis::visionPose);
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
-        joystick = new Joystick(RobotConstants.JOYSTICK_PORT);
-        controller = new XboxController(RobotConstants.CONTROLLER_PORT);
+        joystick = new CommandJoystick(RobotConstants.JOYSTICK_PORT);
+        controller = new CommandXboxController(RobotConstants.CONTROLLER_PORT);
         autoSelector = new SendableChooser<>();
 
         autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
@@ -80,7 +78,7 @@ public class RobotContainer {
             double forward = joystick.getY() * -1.0;
             double rotation = joystick.getX() * -1.0;
 
-            if (joystick.getRawButton(1)) {
+            if (joystick.getHID().getRawButton(1)) {
                 forward *= ChassisConstants.SLOW_VELOCITY;
                 rotation *= ChassisConstants.SLOW_ANGULAR_VELOCITY;
             } else {
@@ -102,34 +100,29 @@ public class RobotContainer {
         }, arm));
 
         // Arm target point commands
-        POVButton upButton = new POVButton(controller, 0);
-        upButton.onTrue(new ArmSubstationCommand(arm));
-        POVButton rightButton = new POVButton(controller, 90);
-        rightButton.onTrue(new ArmMidCommand(arm).andThen(new InstantCommand(schlucker::eject, schlucker)));
-        rightButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
-        POVButton downButton = new POVButton(controller, 180);
-        downButton.onTrue(new ArmGroundCommand(arm));
-        POVButton leftButton = new POVButton(controller, 270);
-        leftButton.onTrue(new ArmHighCommand(arm).andThen(new InstantCommand(schlucker::eject, schlucker)));
-        leftButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
-        JoystickButton bButton = new JoystickButton(controller, XboxController.Button.kB.value);
-        bButton.onTrue(new ArmStowCommand(arm));
+        controller.povUp().onTrue(new ArmSubstationCommand(arm));
+        controller.povRight()
+                .onTrue(new ArmMidCommand(arm).andThen(schlucker.eject()))
+                .onFalse(schlucker.stop());
+        controller.povDown().onTrue(new ArmGroundCommand(arm));
+        controller.povLeft()
+                .onTrue(new ArmHighCommand(arm).andThen(schlucker.eject()))
+                .onFalse(schlucker.stop());
+        controller.b().onTrue(new ArmStowCommand(arm));
 
         // Schlucker commands
-        JoystickButton aButton = new JoystickButton(controller, XboxController.Button.kA.value);
-        aButton.onTrue(new InstantCommand(schlucker::intakeCone, schlucker));
-        aButton.onFalse(new InstantCommand(schlucker::hold, schlucker));
-        JoystickButton xButton = new JoystickButton(controller, XboxController.Button.kX.value);
-        xButton.onTrue(new InstantCommand(schlucker::intakeCube, schlucker));
-        xButton.onFalse(new InstantCommand(schlucker::hold, schlucker));
-        JoystickButton yButton = new JoystickButton(controller, XboxController.Button.kY.value);
-        yButton.onTrue(new InstantCommand(schlucker::eject, schlucker));
-        yButton.onFalse(new InstantCommand(schlucker::stop, schlucker));
+        controller.a()
+                .onTrue(schlucker.intakeCone())
+                .onFalse(schlucker.hold());
+        controller.x()
+                .onTrue(schlucker.intakeCube())
+                .onFalse(schlucker.hold());
+        controller.y()
+                .onTrue(schlucker.eject())
+                .onFalse(schlucker.stop());
 
-        JoystickButton button3 = new JoystickButton(joystick, 3);
-        button3.onTrue(new InstantCommand(schlucker::wantCone, schlucker));
-        JoystickButton button4 = new JoystickButton(joystick, 4);
-        button4.onTrue(new InstantCommand(schlucker::wantCube, schlucker));
+        joystick.button(3).onTrue(schlucker.wantCone());
+        joystick.button(4).onTrue(schlucker.wantCube());
     }
 
     public Command getAutonomousCommand() {

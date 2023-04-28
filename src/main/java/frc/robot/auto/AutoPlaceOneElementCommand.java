@@ -1,6 +1,5 @@
 package frc.robot.auto;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.arm.Arm;
@@ -26,15 +25,15 @@ public class AutoPlaceOneElementCommand extends SequentialCommandGroup {
         }
 
         addCommands(
-                new InstantCommand(cone ? schlucker::intakeCone : schlucker::intakeCube, schlucker),
-                new InstantCommand(schlucker::hold, schlucker),
+                (cone ? schlucker.intakeCone() : schlucker.intakeCube()),
+                schlucker.hold(),
                 new ArmReadyCommand(arm),
                 new WaitCommand(0.5),
                 new ArmHighCommand(arm),
-                new InstantCommand(schlucker::eject, schlucker),
+                schlucker.eject(),
                 new WaitCommand(0.5),
                 new AutoDriveCommand(chassis, -0.5),
-                new InstantCommand(schlucker::stop, schlucker),
+                schlucker.stop(),
                 new ArmStowCommand(arm));
     }
 }
