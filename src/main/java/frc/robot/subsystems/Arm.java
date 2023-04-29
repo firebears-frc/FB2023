@@ -39,9 +39,12 @@ public class Arm extends SubsystemBase {
     private ProfiledPIDController elbowProfiledPID;
     private ProfiledPIDController shoulderProfiledPID;
     private Constraints elbowTrapezoidalConstraint;
-    private LinearFilter elbowAccelFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
+    private Constraints shoulderTrapezoidalConstraint;
 
-    private double elobwPreviousVelocity;
+    private LinearFilter accelFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
+
+    private double elbowPreviousVelocity;
+    private double shoulderPreviousVelocity;
 
     public Arm() {
         elbowMotor = new SparkMotor(7, MotorType.kBrushless);
@@ -59,15 +62,20 @@ public class Arm extends SubsystemBase {
         elbowEncoder.setInverted(true);
         elbowMotor.burnFlash();
 
-        elobwPreviousVelocity = elbowEncoder.getVelocity();
+        elbowPreviousVelocity = elbowEncoder.getVelocity();
         
-        elbowTrapezoidalConstraint = new Constraints(10, 50);
+        elbowTrapezoidalConstraint = new Constraints(
+            PracticeArmConstants.elbowMaxVelocity, 
+            PracticeArmConstants.elbowMaxAccel
+        );
+
         elbowProfiledPID = new ProfiledPIDController(
             PracticeArmConstants.elbowP, 
             PracticeArmConstants.elbowI, 
             PracticeArmConstants.elbowD, 
             elbowTrapezoidalConstraint
         );
+        
         elbowProfiledPID.enableContinuousInput(0, 360);
 
         shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
@@ -94,14 +102,28 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.follow(shoulderMotorRight, true);
         shoulderMotorLeft.burnFlash();
 
+
+        shoulderPreviousVelocity = shoulderEncoder.getVelocity();
+
+        shoulderTrapezoidalConstraint = new Constraints(
+            PracticeArmConstants.shoulderMaxVelocity, 
+            PracticeArmConstants.shoulderMaxAccel
+        );
+
         shoulderProfiledPID = new ProfiledPIDController(
             PracticeArmConstants.shoulderP, 
             PracticeArmConstants.shoulderI, 
             PracticeArmConstants.shoulderD, 
-            elbowTrapezoidalConstraint
+            shoulderTrapezoidalConstraint
         );
+        System.out.print("POS TOL : ");
+        System.out.println(shoulderProfiledPID.getPositionTolerance());
 
-        
+        System.out.print("VEL TOL : ");
+        System.out.println(shoulderProfiledPID.getVelocityTolerance());
+
+        shoulderProfiledPID.setTolerance(0.05, 15);
+        shoulderProfiledPID.enableContinuousInput(0, 360);
     }
 
     public double getShoulderAngle() {
@@ -193,15 +215,17 @@ public class Arm extends SubsystemBase {
         double currentExtension = getArmPosition(getShoulderAngle(), getElbowAngle()).getX();
         double desiredExtension = getArmPosition(shoulder_Angle, elbow_Angle).getX();
         return shoulder_Angle > 105 && !(desiredExtension < currentExtension || desiredExtension < 45);
-
     }
 
     @Override
     public void periodic() {
         if (DEBUG) {
 
-            double acceleration = elbowAccelFilter.calculate(elbowEncoder.getVelocity() - elobwPreviousVelocity);
-            elobwPreviousVelocity = elbowEncoder.getVelocity();
+            double elbowAcceleration = accelFilter.calculate(elbowEncoder.getVelocity() - elbowPreviousVelocity);
+            elbowPreviousVelocity = elbowEncoder.getVelocity();
+
+            double shoulderAcceleration = accelFilter.calculate(shoulderEncoder.getVelocity() - shoulderPreviousVelocity);
+            shoulderPreviousVelocity = shoulderEncoder.getVelocity();
 
             SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
             SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
@@ -215,8 +239,10 @@ public class Arm extends SubsystemBase {
             SmartDashboard.putNumber("elbow outut", elbowMotor.getAppliedOutput());
 
             SmartDashboard.putNumber("Elbow velocity", elbowEncoder.getVelocity());
+            SmartDashboard.putNumber("Elbow Acceleration", elbowAcceleration);
             SmartDashboard.putNumber("Shoulder velocity", shoulderEncoder.getVelocity());
-            SmartDashboard.putNumber("Elbow Acceleration", acceleration);
+            SmartDashboard.putNumber("Shoulder Acceleration", shoulderAcceleration);
+
         }
 
         elbowMotor.setVoltage(
