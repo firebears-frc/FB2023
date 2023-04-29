@@ -36,9 +36,11 @@ public class Constants {
     }
 
     public static final class PracticeArmConstants {
-        public static final double shoulderP = 0.0175;
+        public static final double shoulderP = 0.0;
         public static final double shoulderI = 0.0;
-        public static final double shoulderD = 0.005;
+        public static final double shoulderD = 0.00;
+        public static final double shoulderFF = 0.0;
+
 
         public static final double elbowP = 0.12;
         //P is .003

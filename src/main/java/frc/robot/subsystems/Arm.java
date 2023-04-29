@@ -39,6 +39,7 @@ public class Arm extends SubsystemBase {
     private double elbowSetpoint;
     private double shoulderSetpoint;
     private ProfiledPIDController profilePID;
+    private ProfiledPIDController shoulderProfilePID;
     private Constraints trapezoidalConstraint;
 
     private double previousVelocity;
@@ -48,6 +49,7 @@ public class Arm extends SubsystemBase {
         elbowMotor = new SparkMotor(7, MotorType.kBrushless);
         trapezoidalConstraint = new Constraints(200, 60);
         profilePID = new ProfiledPIDController(PracticeArmConstants.elbowP, PracticeArmConstants.elbowI, PracticeArmConstants.elbowD, trapezoidalConstraint);
+        shoulderProfilePID = new ProfiledPIDController(PracticeArmConstants.shoulderP, PracticeArmConstants.shoulderI, PracticeArmConstants.shoulderD, trapezoidalConstraint);
 
 
         elbowMotor.restoreFactoryDefaults();
@@ -249,7 +251,11 @@ public class Arm extends SubsystemBase {
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
         elbowMotor.setVoltage(
             profilePID.calculate(getElbowAngle(), elbowSetpoint));
+        shoulderMotorRight.setVoltage(
+            shoulderProfilePID.calculate(getShoulderAngle(), shoulderSetpoint));
     }
+
+
 
 
 }
