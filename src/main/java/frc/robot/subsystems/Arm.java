@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.constraint.MaxVelocityConstraint;
@@ -41,13 +42,14 @@ public class Arm extends SubsystemBase {
     private ProfiledPIDController profilePID;
     private ProfiledPIDController shoulderProfilePID;
     private Constraints trapezoidalConstraint;
+    private LinearFilter elbowAccelFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
 
     private double previousVelocity;
 
     public Arm() {
 
         elbowMotor = new SparkMotor(7, MotorType.kBrushless);
-        trapezoidalConstraint = new Constraints(200, 60);
+        trapezoidalConstraint = new Constraints(10, 400);
         profilePID = new ProfiledPIDController(PracticeArmConstants.elbowP, PracticeArmConstants.elbowI, PracticeArmConstants.elbowD, trapezoidalConstraint);
         shoulderProfilePID = new ProfiledPIDController(PracticeArmConstants.shoulderP, PracticeArmConstants.shoulderI, PracticeArmConstants.shoulderD, trapezoidalConstraint);
 
@@ -78,8 +80,8 @@ public class Arm extends SubsystemBase {
         elbowPID.setPositionPIDWrappingMaxInput(360);
         elbowPID.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
         //elbowPID.setSmartMotionAllowedClosedLoopError(0.02, 0);
-        elbowPID.setSmartMotionMaxAccel(150, 0);
-        elbowPID.setSmartMotionMaxVelocity(360, 0);
+        elbowPID.setSmartMotionMaxAccel(25, 0);
+        elbowPID.setSmartMotionMaxVelocity(50, 0);
         elbowPID.setSmartMotionMinOutputVelocity(0.00, 0);
         elbowEncoder.setPositionConversionFactor(360);
         elbowEncoder.setVelocityConversionFactor(360);
@@ -225,8 +227,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         if (DEBUG) {
 
-            double acceleration = (elbowEncoder.getVelocity() - previousVelocity );
-
+            double acceleration = elbowAccelFilter.calculate(elbowEncoder.getVelocity() - previousVelocity);
 
             SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
             SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
