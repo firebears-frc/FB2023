@@ -29,7 +29,7 @@ public class AutoPlaceOneElementCommand extends SequentialCommandGroup {
                 arm.high(),
                 schlucker.eject(),
                 new WaitCommand(0.5),
-                new AutoDriveCommand(chassis, -0.5),
+                chassis.driveDistance(-0.5),
                 schlucker.stop(),
                 arm.stow());
     }

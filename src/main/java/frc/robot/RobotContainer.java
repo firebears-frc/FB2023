@@ -1,10 +1,8 @@
 package frc.robot;
 
-import frc.robot.auto.AutoDriveCommand;
 import frc.robot.auto.OneElementWithMobility;
 import frc.robot.auto.OneElementWithMobilityAndEngaged;
 import frc.robot.chassis.Chassis;
-import frc.robot.chassis.Chassis.ChassisConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
@@ -13,7 +11,6 @@ import frc.robot.util.GamePiece;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -21,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public class RobotContainer {
@@ -58,8 +54,8 @@ public class RobotContainer {
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility",
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector.addOption("Drive Backwards", new AutoDriveCommand(chassis, -2.0));
-        autoSelector.addOption("Drive Forwards", new AutoDriveCommand(chassis, 2.0));
+        autoSelector.addOption("Drive Backwards", chassis.driveDistance(-2.0));
+        autoSelector.addOption("Drive Forwards", chassis.driveDistance(2.0));
 
         configureButtonBindings();
 
@@ -67,20 +63,8 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        chassis.setDefaultCommand(new RunCommand(() -> {
-            double forward = joystick.getY() * -1.0;
-            double rotation = joystick.getX() * -1.0;
-
-            if (joystick.getHID().getRawButton(1)) {
-                forward *= ChassisConstants.SLOW_VELOCITY;
-                rotation *= ChassisConstants.SLOW_ANGULAR_VELOCITY;
-            } else {
-                forward *= ChassisConstants.MAX_VELOCITY;
-                rotation *= ChassisConstants.MAX_ANGULAR_VELOCITY;
-            }
-
-            chassis.drive(new ChassisSpeeds(forward, 0, rotation));
-        }, chassis));
+        chassis.setDefaultCommand(
+                chassis.defaultCommand(joystick::getY, joystick::getX, () -> joystick.getHID().getRawButton(1)));
 
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 

@@ -10,8 +10,8 @@ public class OneElementWithMobilityAndEngaged extends SequentialCommandGroup {
     public OneElementWithMobilityAndEngaged(Chassis chassis, Arm arm, Schlucker schlucker, GamePiece gamePiece) {
         addCommands(
                 new AutoPlaceOneElementCommand(chassis, arm, schlucker, gamePiece),
-                new AutoDriveCommand(chassis, -2.0),
-                new AutoDriveCommand(chassis, 1.0),
+                chassis.driveDistance(-2.0),
+                chassis.driveDistance(1.0),
                 new AutoBalanceCommand(chassis));
     }
 }

@@ -1,11 +1,14 @@
 package frc.robot.chassis;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -18,13 +21,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class Chassis extends SubsystemBase {
-    public static class ChassisConstants {
+    private static class ChassisConstants {
         // Driving
         public static final int RIGHT_FRONT_PORT = 15;
         public static final int RIGHT_BACK_PORT = 17;
@@ -114,11 +118,11 @@ public class Chassis extends SubsystemBase {
         tankDrive(kinematics.toWheelSpeeds(chassisSpeeds));
     }
 
-    public void tankDrive(DifferentialDriveWheelSpeeds wheelSpeeds) {
+    private void tankDrive(DifferentialDriveWheelSpeeds wheelSpeeds) {
         tankDrive(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
     }
 
-    public void tankDrive(double leftSpeed, double rightSpeed) {
+    private void tankDrive(double leftSpeed, double rightSpeed) {
         left.setSetpoint(leftSpeed);
         right.setSetpoint(rightSpeed);
     }
@@ -138,20 +142,16 @@ public class Chassis extends SubsystemBase {
     }
 
     /****************** TRAJECTORIES ******************/
-    public Trajectory generateTrajectory(Pose2d start, Pose2d end) {
-        return generateTrajectory(start, end, false);
-    }
-
-    public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
+    private Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
         return generateTrajectory(start, new ArrayList<>(), end, reversed);
     }
 
-    public Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
+    private Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
         config.setReversed(reversed);
         return TrajectoryGenerator.generateTrajectory(start, interior, end, config);
     }
 
-    public RamseteCommand generateRamseteCommand(Trajectory trajectory) {
+    private RamseteCommand generateRamseteCommand(Trajectory trajectory) {
         return new RamseteCommand(
                 trajectory,
                 this::getPose,
@@ -159,6 +159,14 @@ public class Chassis extends SubsystemBase {
                 kinematics,
                 this::tankDrive,
                 this);
+    }
+
+    public Command driveDistance(double distance) {
+        Trajectory trajectory = generateTrajectory(
+                new Pose2d(0, 0, new Rotation2d()),
+                new Pose2d(1.0, 0, new Rotation2d()),
+                distance < 0);
+        return generateRamseteCommand(trajectory);
     }
 
     /****************** CHARGE STATION ******************/
@@ -182,8 +190,26 @@ public class Chassis extends SubsystemBase {
         return Math.abs(getPitchVelocityDegrees()) < ChassisConstants.PITCH_VELOCITY_MAX;
     }
 
-    /****************** CHARGE STATION ******************/
+    /****************** ROTATION ******************/
     public double getYawDegrees() {
         return navX.getYaw();
+    }
+
+    /****************** COMMANDS ******************/
+    public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier) {
+        return new RunCommand(() -> {
+            double forward = forwardSupplier.get() * -1.0;
+            double rotation = rotationSupplier.get() * -1.0;
+
+            if (slowModeSupplier.get()) {
+                forward *= ChassisConstants.SLOW_VELOCITY;
+                rotation *= ChassisConstants.SLOW_ANGULAR_VELOCITY;
+            } else {
+                forward *= ChassisConstants.MAX_VELOCITY;
+                rotation *= ChassisConstants.MAX_ANGULAR_VELOCITY;
+            }
+
+            drive(new ChassisSpeeds(forward, 0, rotation));
+        }, this);
     }
 }
