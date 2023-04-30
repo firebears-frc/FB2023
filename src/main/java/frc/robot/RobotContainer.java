@@ -6,6 +6,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
+import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -31,7 +32,7 @@ public class RobotContainer {
     public RobotContainer() {
         chassis = new Chassis();
         arm = new Arm();
-        schlucker = new Schlucker();
+        schlucker = new SchluckerNeo550();
         vision = new Vision(chassis::visionPose);
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
