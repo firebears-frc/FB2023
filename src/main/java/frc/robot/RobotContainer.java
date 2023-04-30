@@ -9,16 +9,9 @@ import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import edu.wpi.first.wpilibj.Filesystem;
 
 public class RobotContainer {
     public class RobotConstants {
@@ -44,8 +37,8 @@ public class RobotContainer {
                 chassis::isOnChargeStation, chassis::isNotPitching);
         joystick = new CommandJoystick(RobotConstants.JOYSTICK_PORT);
         controller = new CommandXboxController(RobotConstants.CONTROLLER_PORT);
-        autoSelector = new SendableChooser<>();
 
+        autoSelector = new SendableChooser<>();
         autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
                 new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility & Engage",
@@ -58,8 +51,6 @@ public class RobotContainer {
         autoSelector.addOption("Drive Forwards", chassis.driveDistance(2.0));
 
         configureButtonBindings();
-
-        displayGitInfo();
     }
 
     private void configureButtonBindings() {
@@ -97,33 +88,5 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return autoSelector.getSelected();
-    }
-
-    private String getFileContents(String filename) {
-        // Create the file object
-        File file = new File(Filesystem.getDeployDirectory(), filename);
-        // Open the file stream
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            // Prepare the buffer
-            byte[] data = new byte[(int) file.length()];
-            // Read the data
-            data = inputStream.readAllBytes();
-            // Format into string and return
-            return new String(data, "UTF-8");
-        } catch (IOException e) {
-            // Print exception and return
-            e.printStackTrace();
-            return "Unknown";
-        }
-    }
-
-    private void displayGitInfo() {
-        // Get the branch name and display on the dashboard
-        String branchName = getFileContents("branch.txt");
-        SmartDashboard.putString("Branch Name", branchName);
-
-        // Get the commit hash and display on the dashboard
-        String commitHash = getFileContents("commit.txt");
-        SmartDashboard.putString("Commit Hash", commitHash.substring(0, 8));
     }
 }
