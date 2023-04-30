@@ -2,8 +2,8 @@ package frc.robot.auto;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.chassis.Chassis;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.util.GamePiece;
 

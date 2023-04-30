@@ -2,7 +2,7 @@ package frc.robot.auto;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.chassis.Chassis;
+import frc.robot.subsystems.Chassis;
 
 public class AutoBalanceCommand extends CommandBase {
     private static final double BALANCE_SPEED = 0.375; // meters per second

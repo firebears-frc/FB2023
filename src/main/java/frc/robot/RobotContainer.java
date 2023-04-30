@@ -2,8 +2,8 @@ package frc.robot;
 
 import frc.robot.auto.OneElementWithMobility;
 import frc.robot.auto.OneElementWithMobilityAndEngaged;
-import frc.robot.chassis.Chassis;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
