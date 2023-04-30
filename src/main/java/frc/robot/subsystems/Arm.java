@@ -1,4 +1,4 @@
-package frc.robot.arm;
+package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
@@ -8,6 +8,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -185,5 +187,70 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         elbowPID.setReference(elbowSetpoint, ControlType.kSmartMotion);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kSmartMotion);
+    }
+
+    private class PositionCommand extends CommandBase {
+        private final Arm arm;
+        private final double elbowSetpoint;
+        private final double shoulderSetpoint;
+
+        public PositionCommand(Arm arm, double elbowSetpoint, double shoulderSetpoint) {
+            this.arm = arm;
+            this.elbowSetpoint = elbowSetpoint;
+            this.shoulderSetpoint = shoulderSetpoint;
+            addRequirements(arm);
+        }
+
+        @Override
+        public void execute() {
+            arm.setAngles(elbowSetpoint, shoulderSetpoint);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return arm.onTarget();
+        }
+    }
+
+    public Command ground() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_GROUND,
+                ArmConstants.SHOULDER_GROUND);
+    }
+
+    public Command high() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_HIGH,
+                ArmConstants.SHOULDER_HIGH);
+    }
+
+    public Command mid() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_MID,
+                ArmConstants.SHOULDER_MID);
+    }
+
+    public Command ready() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_READY,
+                ArmConstants.SHOULDER_READY);
+    }
+
+    public Command stow() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_STOW,
+                ArmConstants.SHOULDER_STOW);
+    }
+
+    public Command substation() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_SUBSTATION,
+                ArmConstants.SHOULDER_SUBSTATION);
     }
 }

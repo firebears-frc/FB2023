@@ -1,25 +1,19 @@
 package frc.robot;
 
-import frc.robot.arm.Arm;
-import frc.robot.arm.ArmGroundCommand;
-import frc.robot.arm.ArmHighCommand;
-import frc.robot.arm.ArmMidCommand;
-import frc.robot.arm.ArmStowCommand;
-import frc.robot.arm.ArmSubstationCommand;
-import frc.robot.arm.Arm.ArmConstants;
 import frc.robot.auto.AutoDriveCommand;
 import frc.robot.auto.OneElementWithMobility;
 import frc.robot.auto.OneElementWithMobilityAndEngaged;
 import frc.robot.chassis.Chassis;
 import frc.robot.chassis.Chassis.ChassisConstants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.util.GamePiece;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -100,15 +94,15 @@ public class RobotContainer {
         }, arm));
 
         // Arm target point commands
-        controller.povUp().onTrue(new ArmSubstationCommand(arm));
+        controller.povUp().onTrue(arm.substation());
         controller.povRight()
-                .onTrue(new ArmMidCommand(arm).andThen(schlucker.eject()))
+                .onTrue(arm.mid().andThen(schlucker.eject()))
                 .onFalse(schlucker.stop());
-        controller.povDown().onTrue(new ArmGroundCommand(arm));
+        controller.povDown().onTrue(arm.ground());
         controller.povLeft()
-                .onTrue(new ArmHighCommand(arm).andThen(schlucker.eject()))
+                .onTrue(arm.high().andThen(schlucker.eject()))
                 .onFalse(schlucker.stop());
-        controller.b().onTrue(new ArmStowCommand(arm));
+        controller.b().onTrue(arm.stow());
 
         // Schlucker commands
         controller.a()
