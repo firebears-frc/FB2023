@@ -5,7 +5,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class SchluckerBag extends Schlucker {
-    public static class SchluckerBagConstants {
+    public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 10;
         public static final int FREE_CURRENT_LIMIT = 10;
         public static final double SECONDARY_CURRENT_LIMIT = 20.0;
@@ -17,12 +17,12 @@ public class SchluckerBag extends Schlucker {
     private final CANSparkMax motor;
 
     public SchluckerBag() {
-        motor = new CANSparkMax(SchluckerConstants.MOTOR_PORT, MotorType.kBrushed);
+        motor = new CANSparkMax(Schlucker.Constants.MOTOR_PORT, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(SchluckerBagConstants.STALL_CURRENT_LIMIT, SchluckerBagConstants.FREE_CURRENT_LIMIT);
-        motor.setSecondaryCurrentLimit(SchluckerBagConstants.SECONDARY_CURRENT_LIMIT);
+        motor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
+        motor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         motor.burnFlash();
     }
 
@@ -34,12 +34,12 @@ public class SchluckerBag extends Schlucker {
             case INTAKE:
                 switch (itemHeld) {
                     case CUBE:
-                        speed = SchluckerBagConstants.INTAKE_SPEED;
+                        speed = Constants.INTAKE_SPEED;
                         break;
                     case CONE:
                     case NONE:
                     default:
-                        speed = -1.0 * SchluckerBagConstants.INTAKE_SPEED;
+                        speed = -1.0 * Constants.INTAKE_SPEED;
                         break;
                 }
                 break;
@@ -47,21 +47,21 @@ public class SchluckerBag extends Schlucker {
             case EJECT:
                 switch (itemHeld) {
                     case CUBE:
-                        speed = -1.0 * SchluckerBagConstants.INTAKE_SPEED;
+                        speed = -1.0 * Constants.INTAKE_SPEED;
                         break;
                     case CONE:
-                        speed = SchluckerBagConstants.INTAKE_SPEED;
+                        speed = Constants.INTAKE_SPEED;
                         break;
                     case NONE:
                     default:
                         switch (lastItemHeld) {
                             case CUBE:
-                                speed = -1.0 * SchluckerBagConstants.INTAKE_SPEED;
+                                speed = -1.0 * Constants.INTAKE_SPEED;
                                 break;
                             case CONE:
                             case NONE:
                             default:
-                                speed = SchluckerBagConstants.INTAKE_SPEED;
+                                speed = Constants.INTAKE_SPEED;
                                 break;
                         }
                 }
@@ -70,12 +70,12 @@ public class SchluckerBag extends Schlucker {
             case HOLD:
                 switch (itemHeld) {
                     case CUBE:
-                        speed = SchluckerBagConstants.HOLD_SPEED;
+                        speed = Constants.HOLD_SPEED;
                         break;
                     case CONE:
                     case NONE:
                     default:
-                        speed = -1.0 * SchluckerBagConstants.HOLD_SPEED;
+                        speed = -1.0 * Constants.HOLD_SPEED;
                         break;
                 }
                 break;

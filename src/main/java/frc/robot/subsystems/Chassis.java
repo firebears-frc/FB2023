@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class Chassis extends SubsystemBase {
-    private static class ChassisConstants {
+    private static class Constants {
         // Driving
         public static final int RIGHT_FRONT_PORT = 15;
         public static final int RIGHT_BACK_PORT = 17;
@@ -75,12 +75,12 @@ public class Chassis extends SubsystemBase {
     private double pitchVelocity = 0;
 
     public Chassis() {
-        feedforward = new SimpleMotorFeedforward(ChassisConstants.S, ChassisConstants.V, ChassisConstants.A);
-        kinematics = new DifferentialDriveKinematics(ChassisConstants.TRACK_WIDTH);
+        feedforward = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
+        kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
 
-        left = new ChassisSide(ChassisConstants.LEFT_FRONT_PORT, ChassisConstants.LEFT_BACK_PORT, feedforward);
+        left = new ChassisSide(Constants.LEFT_FRONT_PORT, Constants.LEFT_BACK_PORT, feedforward);
         addChild("Left", left);
-        right = new ChassisSide(ChassisConstants.RIGHT_FRONT_PORT, ChassisConstants.RIGHT_BACK_PORT, feedforward);
+        right = new ChassisSide(Constants.RIGHT_FRONT_PORT, Constants.RIGHT_BACK_PORT, feedforward);
         addChild("Right", right);
         try {
             navX = new AHRS(SPI.Port.kMXP);
@@ -93,8 +93,8 @@ public class Chassis extends SubsystemBase {
         field = new Field2d();
         addChild("Field", field);
 
-        constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, ChassisConstants.MAX_VOLTAGE);
-        config = new TrajectoryConfig(ChassisConstants.MAX_VELOCITY, ChassisConstants.MAX_ACCELERATION);
+        constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, Constants.MAX_VOLTAGE);
+        config = new TrajectoryConfig(Constants.MAX_VELOCITY, Constants.MAX_ACCELERATION);
         config.setKinematics(kinematics);
         config.addConstraint(constraint);
         controller = new RamseteController(); // Uses default constants
@@ -175,11 +175,11 @@ public class Chassis extends SubsystemBase {
     }
 
     public boolean isLevel() {
-        return Math.abs(getPitchDegrees()) < ChassisConstants.LEVEL_TOLERANCE;
+        return Math.abs(getPitchDegrees()) < Constants.LEVEL_TOLERANCE;
     }
 
     public boolean isOnChargeStation() {
-        return Math.abs(getPitchDegrees()) > ChassisConstants.ON_TOLERANCE;
+        return Math.abs(getPitchDegrees()) > Constants.ON_TOLERANCE;
     }
 
     private double getPitchVelocityDegrees() {
@@ -187,7 +187,7 @@ public class Chassis extends SubsystemBase {
     }
 
     public boolean isNotPitching() {
-        return Math.abs(getPitchVelocityDegrees()) < ChassisConstants.PITCH_VELOCITY_MAX;
+        return Math.abs(getPitchVelocityDegrees()) < Constants.PITCH_VELOCITY_MAX;
     }
 
     /****************** ROTATION ******************/
@@ -202,11 +202,11 @@ public class Chassis extends SubsystemBase {
             double rotation = rotationSupplier.get() * -1.0;
 
             if (slowModeSupplier.get()) {
-                forward *= ChassisConstants.SLOW_VELOCITY;
-                rotation *= ChassisConstants.SLOW_ANGULAR_VELOCITY;
+                forward *= Constants.SLOW_VELOCITY;
+                rotation *= Constants.SLOW_ANGULAR_VELOCITY;
             } else {
-                forward *= ChassisConstants.MAX_VELOCITY;
-                rotation *= ChassisConstants.MAX_ANGULAR_VELOCITY;
+                forward *= Constants.MAX_VELOCITY;
+                rotation *= Constants.MAX_ANGULAR_VELOCITY;
             }
 
             drive(new ChassisSpeeds(forward, 0, rotation));

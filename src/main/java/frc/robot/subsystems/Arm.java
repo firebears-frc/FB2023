@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-    private static class ArmConstants {
+    private static class Constants {
         public static final double ELBOW_MANUAL_SPEED = 1.0; // degrees per loop
         public static final double SHOULDER_MANUAL_SPEED = 1.0; // degrees per loop
 
@@ -39,8 +39,8 @@ public class Arm extends SubsystemBase {
     }
 
     private boolean onTarget() {
-        return Math.abs(shoulder.getError()) < ArmConstants.ANGLE_TOLERANCE
-                && Math.abs(elbow.getError()) < ArmConstants.ANGLE_TOLERANCE;
+        return Math.abs(shoulder.getError()) < Constants.ANGLE_TOLERANCE
+                && Math.abs(elbow.getError()) < Constants.ANGLE_TOLERANCE;
     }
 
     private void setAngles(double elbowAngle, double shoulderAngle) {
@@ -80,59 +80,59 @@ public class Arm extends SubsystemBase {
     public Command groundCone() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_GROUND_CONE,
-                ArmConstants.SHOULDER_GROUND_CONE);
+                Constants.ELBOW_GROUND_CONE,
+                Constants.SHOULDER_GROUND_CONE);
     }
 
     public Command groundCube() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_GROUND_CUBE,
-                ArmConstants.SHOULDER_GROUND_CUBE);
+                Constants.ELBOW_GROUND_CUBE,
+                Constants.SHOULDER_GROUND_CUBE);
     }
 
     public Command high() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_HIGH,
-                ArmConstants.SHOULDER_HIGH);
+                Constants.ELBOW_HIGH,
+                Constants.SHOULDER_HIGH);
     }
 
     public Command mid() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_MID,
-                ArmConstants.SHOULDER_MID);
+                Constants.ELBOW_MID,
+                Constants.SHOULDER_MID);
     }
 
     public Command ready() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_READY,
-                ArmConstants.SHOULDER_READY);
+                Constants.ELBOW_READY,
+                Constants.SHOULDER_READY);
     }
 
     public Command stow() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_STOW,
-                ArmConstants.SHOULDER_STOW);
+                Constants.ELBOW_STOW,
+                Constants.SHOULDER_STOW);
     }
 
     public Command substation() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_SUBSTATION,
-                ArmConstants.SHOULDER_SUBSTATION);
+                Constants.ELBOW_SUBSTATION,
+                Constants.SHOULDER_SUBSTATION);
     }
 
     public Command defaultCommand(Supplier<Double> elbowChange, Supplier<Double> shoulderChange) {
         return new RunCommand(() -> {
             double elbowAngle = elbow.getTargetAngle();
-            elbowAngle += elbowChange.get() * ArmConstants.ELBOW_MANUAL_SPEED;
+            elbowAngle += elbowChange.get() * Constants.ELBOW_MANUAL_SPEED;
 
             double shoulderAngle = shoulder.getTargetAngle();
-            shoulderAngle += shoulderChange.get() * ArmConstants.SHOULDER_MANUAL_SPEED;
+            shoulderAngle += shoulderChange.get() * Constants.SHOULDER_MANUAL_SPEED;
 
             setAngles(elbowAngle, shoulderAngle);
         }, this);

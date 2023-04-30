@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.GamePiece;
 
 public class Schlucker extends SubsystemBase {
-    public static class SchluckerConstants {
+    public static class Constants {
         public static final int MOTOR_PORT = 6;
     }
 

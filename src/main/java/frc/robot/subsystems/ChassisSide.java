@@ -11,7 +11,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class ChassisSide implements Sendable {
-    public static class ChassisSideConstants {
+    public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 30;
         public static final int FREE_CURRENT_LIMIT = 20;
         public static final double SECONDARY_CURRENT_LIMIT = 60.0;
@@ -40,25 +40,25 @@ public class ChassisSide implements Sendable {
         frontMotor.restoreFactoryDefaults();
         frontMotor.setInverted(true);
         frontMotor.setIdleMode(IdleMode.kCoast);
-        frontMotor.setSmartCurrentLimit(ChassisSideConstants.STALL_CURRENT_LIMIT,
-                ChassisSideConstants.FREE_CURRENT_LIMIT);
-        frontMotor.setSecondaryCurrentLimit(ChassisSideConstants.SECONDARY_CURRENT_LIMIT);
+        frontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT,
+                Constants.FREE_CURRENT_LIMIT);
+        frontMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         encoder = frontMotor.getEncoder();
-        encoder.setPositionConversionFactor(ChassisSideConstants.METERS_PER_MOTOR_ROTATION);
-        encoder.setVelocityConversionFactor(ChassisSideConstants.VELOCITY_CONVERSION_FACTOR);
+        encoder.setPositionConversionFactor(Constants.METERS_PER_MOTOR_ROTATION);
+        encoder.setVelocityConversionFactor(Constants.VELOCITY_CONVERSION_FACTOR);
         frontMotor.burnFlash();
 
         backMotor = new CANSparkMax(backID, MotorType.kBrushless);
         backMotor.restoreFactoryDefaults();
         backMotor.setInverted(true);
         backMotor.setIdleMode(IdleMode.kCoast);
-        backMotor.setSmartCurrentLimit(ChassisSideConstants.STALL_CURRENT_LIMIT,
-                ChassisSideConstants.FREE_CURRENT_LIMIT);
-        backMotor.setSecondaryCurrentLimit(ChassisSideConstants.SECONDARY_CURRENT_LIMIT);
+        backMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT,
+                Constants.FREE_CURRENT_LIMIT);
+        backMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         backMotor.follow(frontMotor);
         backMotor.burnFlash();
 
-        pid = new PIDController(ChassisSideConstants.P, ChassisSideConstants.I, ChassisSideConstants.D);
+        pid = new PIDController(Constants.P, Constants.I, Constants.D);
 
         setSetpoint(0.0);
         resetDistance();
