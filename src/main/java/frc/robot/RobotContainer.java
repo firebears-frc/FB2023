@@ -73,10 +73,11 @@ public class RobotContainer {
         controller.povRight()
                 .onTrue(arm.mid().andThen(schlucker.eject()))
                 .onFalse(schlucker.stop());
-        controller.povDown().onTrue(arm.ground());
+        controller.povDown().onTrue(arm.groundCone());
         controller.povLeft()
                 .onTrue(arm.high().andThen(schlucker.eject()))
                 .onFalse(schlucker.stop());
+        controller.leftBumper().onTrue(arm.groundCube());
         controller.b().onTrue(arm.stow());
 
         // Schlucker commands

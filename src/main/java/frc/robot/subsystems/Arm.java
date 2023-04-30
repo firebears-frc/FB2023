@@ -42,12 +42,14 @@ public class Arm extends SubsystemBase {
         public static final double SHOULDER_MAX_VELOCITY = 90.0; // degrees per second
         public static final double SHOULDER_MAX_ACCELERATION = 90.0; // degrees per second squared
 
-        public static final double SHOULDER_SUBSTATION = 89.0; // degrees
-        public static final double ELBOW_SUBSTATION = 295.0; // degrees
+        public static final double SHOULDER_SUBSTATION = 65.0; // degrees
+        public static final double ELBOW_SUBSTATION = 275.0; // degrees
         public static final double SHOULDER_STOW = 20.0; // degrees
         public static final double ELBOW_STOW = 220.0; // degrees
-        public static final double SHOULDER_GROUND = 130.0; // degrees
-        public static final double ELBOW_GROUND = 288.0; // degrees
+        public static final double SHOULDER_GROUND_CONE = 110.0; // degrees
+        public static final double ELBOW_GROUND_CONE = 230.0; // degrees
+        public static final double SHOULDER_GROUND_CUBE = 127.0; // degrees
+        public static final double ELBOW_GROUND_CUBE = 224.0; // degrees
         public static final double SHOULDER_READY = 122.0; // degrees
         public static final double ELBOW_READY = 355.0; // degrees
         public static final double SHOULDER_HIGH = 106.0; // degrees
@@ -205,11 +207,18 @@ public class Arm extends SubsystemBase {
         }
     }
 
-    public Command ground() {
+    public Command groundCone() {
         return new PositionCommand(
                 this,
-                ArmConstants.ELBOW_GROUND,
-                ArmConstants.SHOULDER_GROUND);
+                ArmConstants.ELBOW_GROUND_CONE,
+                ArmConstants.SHOULDER_GROUND_CONE);
+    }
+
+    public Command groundCube() {
+        return new PositionCommand(
+                this,
+                ArmConstants.ELBOW_GROUND_CUBE,
+                ArmConstants.SHOULDER_GROUND_CUBE);
     }
 
     public Command high() {
