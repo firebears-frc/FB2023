@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -10,10 +12,11 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-    public static class ArmConstants {
+    private static class ArmConstants {
         public static final int ELBOW_PORT = 7;
         public static final int ELBOW_STALL_CURRENT_LIMIT = 40;
         public static final int ELBOW_FREE_CURRENT_LIMIT = 20;
@@ -23,7 +26,6 @@ public class Arm extends SubsystemBase {
         public static final double ELBOW_I = 0.0;
         public static final double ELBOW_D = 0.005;
         public static final double ELBOW_OFFSET = 240.0; // degrees
-        public static final double ELBOW_MIN_VELOCITY = 1.0; // degrees per second
         public static final double ELBOW_MAX_VELOCITY = 90.0; // degrees per second
         public static final double ELBOW_MAX_ACCELERATION = 90.0; // degrees per second squared
 
@@ -37,7 +39,6 @@ public class Arm extends SubsystemBase {
         public static final double SHOULDER_I = 0.0;
         public static final double SHOULDER_D = 0.005;
         public static final double SHOULDER_OFFSET = 196.0; // degrees
-        public static final double SHOULDER_MIN_VELOCITY = 1.0; // degrees per second
         public static final double SHOULDER_MAX_VELOCITY = 90.0; // degrees per second
         public static final double SHOULDER_MAX_ACCELERATION = 90.0; // degrees per second squared
 
@@ -87,10 +88,6 @@ public class Arm extends SubsystemBase {
         elbowPID.setP(ArmConstants.ELBOW_P, 0);
         elbowPID.setI(ArmConstants.ELBOW_I, 0);
         elbowPID.setD(ArmConstants.ELBOW_D, 0);
-        elbowPID.setSmartMotionAllowedClosedLoopError(ArmConstants.ANGLE_TOLERANCE, 0);
-        elbowPID.setSmartMotionMinOutputVelocity(ArmConstants.ELBOW_MIN_VELOCITY, 0);
-        elbowPID.setSmartMotionMaxVelocity(ArmConstants.ELBOW_MAX_VELOCITY, 0);
-        elbowPID.setSmartMotionMaxAccel(ArmConstants.ELBOW_MAX_ACCELERATION, 0);
         elbowMotor.burnFlash();
 
         shoulderMotorRight = new CANSparkMax(ArmConstants.SHOULDER_RIGHT_PORT, MotorType.kBrushless);
@@ -112,10 +109,6 @@ public class Arm extends SubsystemBase {
         shoulderPID.setP(ArmConstants.SHOULDER_P, 0);
         shoulderPID.setI(ArmConstants.SHOULDER_I, 0);
         shoulderPID.setD(ArmConstants.SHOULDER_D, 0);
-        shoulderPID.setSmartMotionAllowedClosedLoopError(ArmConstants.ANGLE_TOLERANCE, 0);
-        shoulderPID.setSmartMotionMinOutputVelocity(ArmConstants.SHOULDER_MIN_VELOCITY, 0);
-        shoulderPID.setSmartMotionMaxVelocity(ArmConstants.SHOULDER_MAX_VELOCITY, 0);
-        shoulderPID.setSmartMotionMaxAccel(ArmConstants.SHOULDER_MAX_ACCELERATION, 0);
         shoulderMotorRight.burnFlash();
 
         shoulderMotorLeft = new CANSparkMax(ArmConstants.SHOULDER_LEFT_PORT, MotorType.kBrushless);
@@ -129,7 +122,7 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.burnFlash();
     }
 
-    public void setElbowAngle(double angle) {
+    private void setElbowAngle(double angle) {
         while (angle > 360) {
             angle -= 360;
         }
@@ -139,19 +132,19 @@ public class Arm extends SubsystemBase {
         elbowSetpoint = angle;
     }
 
-    public double getElbowTargetAngle() {
+    private double getElbowTargetAngle() {
         return elbowSetpoint;
     }
 
-    public double getElbowAngle() {
+    private double getElbowAngle() {
         return elbowEncoder.getPosition();
     }
 
-    public double getElbowError() {
+    private double getElbowError() {
         return getElbowAngle() - getElbowTargetAngle();
     }
 
-    public void setShoulderAngle(double angle) {
+    private void setShoulderAngle(double angle) {
         while (angle > 360) {
             angle -= 360;
         }
@@ -161,32 +154,32 @@ public class Arm extends SubsystemBase {
         shoulderSetpoint = angle;
     }
 
-    public double getShoulderTargetAngle() {
+    private double getShoulderTargetAngle() {
         return shoulderSetpoint;
     }
 
-    public double getShoulderAngle() {
+    private double getShoulderAngle() {
         return shoulderEncoder.getPosition();
     }
 
-    public double getShoulderError() {
+    private double getShoulderError() {
         return getShoulderAngle() - getShoulderTargetAngle();
     }
 
-    public boolean onTarget() {
+    private boolean onTarget() {
         return Math.abs(getShoulderError()) < ArmConstants.ANGLE_TOLERANCE
                 && Math.abs(getElbowError()) < ArmConstants.ANGLE_TOLERANCE;
     }
 
-    public void setAngles(double elbowAngle, double shoulderAngle) {
+    private void setAngles(double elbowAngle, double shoulderAngle) {
         setElbowAngle(elbowAngle);
         setShoulderAngle(shoulderAngle);
     }
 
     @Override
     public void periodic() {
-        elbowPID.setReference(elbowSetpoint, ControlType.kSmartMotion);
-        shoulderPID.setReference(shoulderSetpoint, ControlType.kSmartMotion);
+        elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
+        shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
     }
 
     private class PositionCommand extends CommandBase {
@@ -252,5 +245,17 @@ public class Arm extends SubsystemBase {
                 this,
                 ArmConstants.ELBOW_SUBSTATION,
                 ArmConstants.SHOULDER_SUBSTATION);
+    }
+
+    public Command defaultCommand(Supplier<Double> elbowChange, Supplier<Double> shoulderChange) {
+        return new RunCommand(() -> {
+            double elbow = getElbowTargetAngle();
+            elbow += elbowChange.get() * ArmConstants.ELBOW_MANUAL_SPEED;
+
+            double shoulder = getShoulderTargetAngle();
+            shoulder += shoulderChange.get() * ArmConstants.SHOULDER_MANUAL_SPEED;
+
+            setAngles(elbow, shoulder);
+        }, this);
     }
 }

@@ -9,7 +9,6 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Arm.ArmConstants;
 import frc.robot.util.GamePiece;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -83,15 +82,7 @@ public class RobotContainer {
             chassis.drive(new ChassisSpeeds(forward, 0, rotation));
         }, chassis));
 
-        arm.setDefaultCommand(new RunCommand(() -> {
-            double elbow = arm.getElbowTargetAngle();
-            elbow += controller.getLeftY() * ArmConstants.ELBOW_MANUAL_SPEED;
-
-            double shoulder = arm.getShoulderTargetAngle();
-            shoulder += controller.getRightY() * ArmConstants.SHOULDER_MANUAL_SPEED;
-
-            arm.setAngles(elbow, shoulder);
-        }, arm));
+        arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
         // Arm target point commands
         controller.povUp().onTrue(arm.substation());
