@@ -15,7 +15,7 @@ public class SchluckerNeo550 extends Schlucker {
 
         public static final double INTAKE_SPEED = 0.01; // rotations per cycle
 
-        public static final double P = 1.0;
+        public static final double P = 3.0;
         public static final double I = 0.0;
         public static final double D = 0.0;
     }

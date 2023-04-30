@@ -6,6 +6,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
+import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
@@ -32,7 +33,7 @@ public class RobotContainer {
     public RobotContainer() {
         chassis = new Chassis();
         arm = new Arm();
-        schlucker = new SchluckerNeo550();
+        schlucker = new SchluckerBag(); // new SchluckerNeo550();
         vision = new Vision(chassis::visionPose);
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
@@ -56,7 +57,8 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         chassis.setDefaultCommand(
-                chassis.defaultCommand(joystick::getY, joystick::getX, () -> joystick.getHID().getRawButton(1)));
+                chassis.defaultCommand(joystick::getY, joystick::getX,
+                        () -> joystick.getHID().getRawButton(1)));
 
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
