@@ -170,7 +170,7 @@ public class RobotContainer {
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
-        .andThen(new ArmElbowSetpointCommand(275, m_arm)));
+        .andThen(new ArmElbowSetpointCommand(267, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
@@ -184,7 +184,7 @@ public class RobotContainer {
 
     // Cone Ground pickup
     JoystickButton xboxLeftBumperButton = new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value);
-    xboxLeftBumperButton.onTrue((new ArmShoulderSetpointCommand(127, m_arm))
+    xboxLeftBumperButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
           .andThen(new ArmElbowSetpointCommand(224, m_arm)));
 
     // High level mode
