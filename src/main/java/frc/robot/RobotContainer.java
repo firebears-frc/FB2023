@@ -152,8 +152,13 @@ public class RobotContainer {
 
     // B button = reset position (stow)
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
-    xboxBButton.onTrue((new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm)));
+    xboxBButton.onTrue(
+        (new ArmShoulderSetpointCommand(10, m_arm))
+        .andThen(new ArmElbowSetpointCommand(220, m_arm)
+        .andThen(new WaitCommand(2))
+        .andThen(new ArmShoulderSetpointCommand(0, m_arm))
+        .andThen(new ArmElbowSetpointCommand(209, m_arm)
+        )));
 
     // X button = picks up cube and drops cone
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
