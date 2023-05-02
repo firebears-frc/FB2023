@@ -36,11 +36,11 @@ public class Constants {
     }
 
     public static final class PracticeArmConstants {
-        public static final double shoulderP = 0.3;
+        public static final double shoulderP = 0.4;
         public static final double shoulderI = 0.0;
         public static final double shoulderD = 0.005;
-        public static final int shoulderMaxAccel = 50;
-        public static final int shoulderMaxVelocity = 50;
+        public static final int shoulderMaxAccel = 79;
+        public static final int shoulderMaxVelocity = 200;
 
         public static final double elbowP = 0.12;
         //P is .003

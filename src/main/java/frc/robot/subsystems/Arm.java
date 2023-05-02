@@ -122,7 +122,7 @@ public class Arm extends SubsystemBase {
         System.out.print("VEL TOL : ");
         System.out.println(shoulderProfiledPID.getVelocityTolerance());
 
-        shoulderProfiledPID.setTolerance(0.05, 15);
+        shoulderProfiledPID.setTolerance(0.05, 30);
         shoulderProfiledPID.enableContinuousInput(0, 360);
     }
 
