@@ -6,10 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -177,18 +174,23 @@ public class RobotContainer {
 
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
-    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(89, m_arm))
-        .andThen(new ArmElbowSetpointCommand(295, m_arm)));
+    xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
+        .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
     xboxDpadRightButton.onTrue((new ArmShoulderSetpointCommand(79, m_arm))
         .andThen(new ArmElbowSetpointCommand(271, m_arm)));
 
-    // Ground pickup
+    // Cone Ground pickup
     POVButton xboxDpadDownButton = new POVButton(xboxController, 180);
-    xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(130, m_arm))
-        .andThen(new ArmElbowSetpointCommand(288, m_arm)));
+    xboxDpadDownButton.onTrue((new ArmShoulderSetpointCommand(110, m_arm))
+        .andThen(new ArmElbowSetpointCommand(230, m_arm)));
+
+    // Cone Ground pickup
+    JoystickButton xboxLeftBumperButton = new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value);
+    xboxLeftBumperButton.onTrue((new ArmShoulderSetpointCommand(127, m_arm))
+          .andThen(new ArmElbowSetpointCommand(224, m_arm)));
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
