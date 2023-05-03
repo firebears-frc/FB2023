@@ -154,7 +154,7 @@ public class RobotContainer {
     // B button = reset position (stow)
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue(
-        (new ArmShoulderSetpointCommand(10, m_arm))
+        (new ArmShoulderSetpointCommand(20, m_arm))
         .andThen(new ArmElbowSetpointCommand(220, m_arm)
         .andThen(new WaitCommand(1))
         .andThen(new ArmShoulderSetpointCommand(0, m_arm))
