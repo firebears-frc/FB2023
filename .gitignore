@@ -156,8 +156,7 @@ bin/
 .idea/
 
 # Git info
-src/main/deploy/branch.txt
-src/main/deploy/commit.txt
+src/main/java/frc/robot/BuildConstants.java
 
 # Sysid
 sysid/sysid_data*.json
