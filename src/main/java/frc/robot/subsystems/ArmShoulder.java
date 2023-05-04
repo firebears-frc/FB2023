@@ -8,6 +8,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+
 public class ArmShoulder {
     private static class Constants {
         public static final int RIGHT_PORT = 12;
@@ -27,13 +30,16 @@ public class ArmShoulder {
         public static final double MAX_ACCELERATION = 90.0; // degrees per second squared
     }
 
-    private CANSparkMax motorRight;
-    private CANSparkMax motorLeft;
-    private SparkMaxAbsoluteEncoder encoder;
-    private SparkMaxPIDController pid;
+    private final CANSparkMax motorRight;
+    private final CANSparkMax motorLeft;
+    private final SparkMaxAbsoluteEncoder encoder;
+    private final SparkMaxPIDController pid;
     private double setpoint;
+    private double position;
+    private final DoubleLogEntry setpointLog;
+    private final DoubleLogEntry positionLog;
     
-    public ArmShoulder() {
+    public ArmShoulder(DataLog log) {
         motorRight = new CANSparkMax(Constants.RIGHT_PORT, MotorType.kBrushless);
         motorRight.restoreFactoryDefaults();
         motorRight.setInverted(true);
@@ -52,7 +58,6 @@ public class ArmShoulder {
         pid.setP(Constants.P, 0);
         pid.setI(Constants.I, 0);
         pid.setD(Constants.D, 0);
-        motorRight.burnFlash();
 
         motorLeft = new CANSparkMax(Constants.LEFT_PORT, MotorType.kBrushless);
         motorLeft.restoreFactoryDefaults();
@@ -61,6 +66,11 @@ public class ArmShoulder {
         motorLeft.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         motorLeft.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         motorLeft.follow(motorRight, true);
+
+        setpointLog = new DoubleLogEntry(log, "Arm/Shoulder/Setpoint");
+        positionLog = new DoubleLogEntry(log, "Arm/Shoulder/Position");
+
+        motorRight.burnFlash();
         motorLeft.burnFlash();
     }
 
@@ -79,7 +89,7 @@ public class ArmShoulder {
     }
 
     public double getAngle() {
-        return encoder.getPosition();
+        return position;
     }
 
     public double getError() {
@@ -87,6 +97,10 @@ public class ArmShoulder {
     }
 
     public void periodic() {
+        position = encoder.getPosition();
         pid.setReference(setpoint, ControlType.kPosition);
+
+        setpointLog.append(setpoint);
+        positionLog.append(position);
     }
 }

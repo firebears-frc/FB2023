@@ -10,6 +10,10 @@ import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -26,19 +30,27 @@ public class RobotContainer {
     private final Schlucker schlucker;
     private final Vision vision;
     private final Lights lights;
+
     private final CommandJoystick joystick;
     private final CommandXboxController controller;
     private final SendableChooser<Command> autoSelector;
+    private final DataLog log;
+    private final StringLogEntry autoLog;
 
     public RobotContainer() {
+        DataLogManager.start();
+        log = DataLogManager.getLog();
+
         chassis = new Chassis();
-        arm = new Arm();
+        arm = new Arm(log);
         schlucker = new SchluckerBag(); // new SchluckerNeo550();
         vision = new Vision(chassis::visionPose);
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
+
         joystick = new CommandJoystick(RobotConstants.JOYSTICK_PORT);
         controller = new CommandXboxController(RobotConstants.CONTROLLER_PORT);
+        DriverStation.startDataLog(log);
 
         autoSelector = new SendableChooser<>();
         autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
@@ -49,8 +61,7 @@ public class RobotContainer {
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility",
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector.addOption("Drive Backwards", chassis.driveDistance(-2.0));
-        autoSelector.addOption("Drive Forwards", chassis.driveDistance(2.0));
+        autoLog = new StringLogEntry(log, "/Auto/Command");
 
         configureButtonBindings();
     }
@@ -90,6 +101,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoSelector.getSelected();
+        Command auto = autoSelector.getSelected();
+        autoLog.append(auto.getName());
+        return auto;
     }
 }

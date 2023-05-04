@@ -8,6 +8,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+
 public class ArmElbow {
     private static class Constants {
         public static final int PORT = 7;
@@ -26,12 +29,15 @@ public class ArmElbow {
         public static final double MAX_ACCELERATION = 90.0; // degrees per second squared
     }
 
-    private CANSparkMax motor;
-    private SparkMaxAbsoluteEncoder encoder;
-    private SparkMaxPIDController pid;
+    private final CANSparkMax motor;
+    private final SparkMaxAbsoluteEncoder encoder;
+    private final SparkMaxPIDController pid;
     private double setpoint;
+    private double position;
+    private final DoubleLogEntry setpointLog;
+    private final DoubleLogEntry positionLog;
 
-    public ArmElbow() {
+    public ArmElbow(DataLog log) {
         motor = new CANSparkMax(Constants.PORT, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(true);
@@ -50,6 +56,10 @@ public class ArmElbow {
         pid.setP(Constants.P, 0);
         pid.setI(Constants.I, 0);
         pid.setD(Constants.D, 0);
+
+        setpointLog = new DoubleLogEntry(log, "Arm/Elbow/Setpoint");
+        positionLog = new DoubleLogEntry(log, "Arm/Elbow/Position");
+
         motor.burnFlash();
     }
 
@@ -68,7 +78,7 @@ public class ArmElbow {
     }
 
     public double getAngle() {
-        return encoder.getPosition();
+        return position;
     }
 
     public double getError() {
@@ -76,6 +86,10 @@ public class ArmElbow {
     }
 
     public void periodic() {
+        position = encoder.getPosition();
         pid.setReference(setpoint, ControlType.kPosition);
+
+        setpointLog.append(setpoint);
+        positionLog.append(position);
     }
 }

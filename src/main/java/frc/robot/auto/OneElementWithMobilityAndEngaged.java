@@ -7,11 +7,19 @@ import frc.robot.subsystems.Schlucker;
 import frc.robot.util.GamePiece;
 
 public class OneElementWithMobilityAndEngaged extends SequentialCommandGroup {
+    private final GamePiece gamePiece;
+
     public OneElementWithMobilityAndEngaged(Chassis chassis, Arm arm, Schlucker schlucker, GamePiece gamePiece) {
+        this.gamePiece = gamePiece;
         addCommands(
                 new AutoPlaceOneElementCommand(chassis, arm, schlucker, gamePiece),
                 chassis.driveDistance(-2.0),
                 chassis.driveDistance(1.0),
                 new AutoBalanceCommand(chassis));
+    }
+
+    @Override
+    public String getName() {
+        return "OneElementWithMobilityAndEngaged<" + gamePiece.name() + ">";
     }
 }

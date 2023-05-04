@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -30,12 +31,12 @@ public class Arm extends SubsystemBase {
         public static final double ANGLE_TOLERANCE = 2.5; // degrees
     }
 
-    private ArmElbow elbow;
-    private ArmShoulder shoulder;
+    private final ArmElbow elbow;
+    private final ArmShoulder shoulder;
 
-    public Arm() {
-        elbow = new ArmElbow();
-        shoulder = new ArmShoulder();
+    public Arm(DataLog log) {
+        elbow = new ArmElbow(log);
+        shoulder = new ArmShoulder(log);
     }
 
     private boolean onTarget() {
