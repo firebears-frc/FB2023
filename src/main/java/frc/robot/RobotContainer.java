@@ -58,10 +58,11 @@ public class RobotContainer {
     m_chassis.setDefaultCommand(new ChassisDriveCommand(m_chassis));
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.setDefaultOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
-    m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
-    m_chooser.addOption("Auto CUBE and Balance", new AutoCubeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.setDefaultOption("Auto CUBE and Balance", new AutoCubeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
     m_chooser.addOption("Auto cone and Balance", new AutoConeAndBalanceCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_chassis, m_schlucker, m_arm));
+    
 
     m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_chassis));
 
