@@ -7,6 +7,9 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+
 public class SchluckerNeo550 extends Schlucker {
     public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 20;
@@ -23,8 +26,13 @@ public class SchluckerNeo550 extends Schlucker {
     private final CANSparkMax motor;
     private final RelativeEncoder encoder;
     private final SparkMaxPIDController pid;
+    private final DoubleLogEntry speedLog;
+    private final DoubleLogEntry positionLog;
 
-    public SchluckerNeo550() {
+    public SchluckerNeo550(DataLog log) {
+        super(log);
+        typeLog.append("Neo550");
+
         motor = new CANSparkMax(Schlucker.Constants.MOTOR_PORT, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
@@ -36,11 +44,17 @@ public class SchluckerNeo550 extends Schlucker {
         pid.setP(Constants.P);
         pid.setI(Constants.I);
         pid.setD(Constants.D);
+
+        speedLog = new DoubleLogEntry(log, "Schlucker/Speed");
+        positionLog = new DoubleLogEntry(log, "Schlucker/Position");
+
         motor.burnFlash();
     }
 
     @Override
     public void periodic() {
+        super.periodic();
+
         // Figure out what speed we should be running
         double speed;
         switch (state) {
@@ -91,5 +105,8 @@ public class SchluckerNeo550 extends Schlucker {
         double position = encoder.getPosition();
         position += speed;
         pid.setReference(position, ControlType.kPosition);
+
+        speedLog.append(speed);
+        positionLog.append(position);
     }
 }

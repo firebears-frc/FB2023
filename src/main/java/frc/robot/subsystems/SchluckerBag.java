@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+
 public class SchluckerBag extends Schlucker {
     public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 10;
@@ -15,19 +18,28 @@ public class SchluckerBag extends Schlucker {
     }
 
     private final CANSparkMax motor;
+    private final DoubleLogEntry speedLog;
 
-    public SchluckerBag() {
+    public SchluckerBag(DataLog log) {
+        super(log);
+        typeLog.append("Bag Motor");
+
         motor = new CANSparkMax(Schlucker.Constants.MOTOR_PORT, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         motor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
+
+        speedLog = new DoubleLogEntry(log, "Schlucker/Speed");
+
         motor.burnFlash();
     }
 
     @Override
     public void periodic() {
+        super.periodic();
+
         // Figure out what speed we should be running
         double speed;
         switch (state) {
@@ -85,6 +97,8 @@ public class SchluckerBag extends Schlucker {
                 speed = 0;
                 break;
         }
+
         motor.set(speed);
+        speedLog.append(speed);
     }
 }

@@ -10,6 +10,8 @@ import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -43,7 +45,7 @@ public class RobotContainer {
 
         chassis = new Chassis(log);
         arm = new Arm(log);
-        schlucker = new SchluckerBag(); // new SchluckerNeo550();
+        schlucker = new SchluckerBag(log); // new SchluckerNeo550();
         vision = new Vision(chassis::visionPose);
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
@@ -64,6 +66,8 @@ public class RobotContainer {
         autoLog = new StringLogEntry(log, "/Auto/Command");
 
         configureButtonBindings();
+
+        displayGitInfo(log);
     }
 
     private void configureButtonBindings() {
@@ -104,5 +108,19 @@ public class RobotContainer {
         Command auto = autoSelector.getSelected();
         autoLog.append(auto.getName());
         return auto;
+    }
+
+    private static void displayGitInfo(DataLog log) {
+        final NetworkTable table = NetworkTableInstance.getDefault().getTable("Build Info");
+        table.getEntry("Branch Name").setString(BuildConstants.GIT_BRANCH);
+        table.getEntry("Commit Hash (Short)").setString(BuildConstants.GIT_SHA.substring(0, 8));
+        table.getEntry("Commit Hash (Full)").setString(BuildConstants.GIT_SHA);
+        table.getEntry("Dirty").setBoolean(BuildConstants.DIRTY == 1);
+        table.getEntry("Build Date & Time").setString(BuildConstants.BUILD_DATE);
+
+        log.setMetadata(0, BuildConstants.GIT_BRANCH);
+        log.setMetadata(1, BuildConstants.GIT_SHA);
+        log.setMetadata(2, String.valueOf(BuildConstants.DIRTY == 1));
+        log.setMetadata(3, BuildConstants.BUILD_DATE);
     }
 }
