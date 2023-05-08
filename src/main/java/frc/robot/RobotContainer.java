@@ -41,7 +41,7 @@ public class RobotContainer {
         DataLogManager.start();
         log = DataLogManager.getLog();
 
-        chassis = new Chassis();
+        chassis = new Chassis(log);
         arm = new Arm(log);
         schlucker = new SchluckerBag(); // new SchluckerNeo550();
         vision = new Vision(chassis::visionPose);

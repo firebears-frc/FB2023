@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import java.util.ArrayList;
@@ -56,32 +57,30 @@ public class Chassis extends SubsystemBase {
     }
 
     // Driving
-    private ChassisSide left, right;
-    private SimpleMotorFeedforward feedforward;
-    private DifferentialDriveKinematics kinematics;
+    private final ChassisSide left, right;
+    private final SimpleMotorFeedforward feedforward;
+    private final DifferentialDriveKinematics kinematics;
 
     // Localization
     private AHRS navX;
-    private DifferentialDrivePoseEstimator poseEstimator;
-    private Field2d field;
+    private final DifferentialDrivePoseEstimator poseEstimator;
+    private final Field2d field;
 
     // Trajectories
-    private DifferentialDriveVoltageConstraint constraint;
-    private TrajectoryConfig config;
-    private RamseteController controller;
+    private final DifferentialDriveVoltageConstraint constraint;
+    private final TrajectoryConfig config;
+    private final RamseteController controller;
 
     // Charge Station
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
-    public Chassis() {
+    public Chassis(DataLog log) {
         feedforward = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
         kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
 
-        left = new ChassisSide(Constants.LEFT_FRONT_PORT, Constants.LEFT_BACK_PORT, feedforward);
-        addChild("Left", left);
-        right = new ChassisSide(Constants.RIGHT_FRONT_PORT, Constants.RIGHT_BACK_PORT, feedforward);
-        addChild("Right", right);
+        left = new ChassisSide(Constants.LEFT_FRONT_PORT, Constants.LEFT_BACK_PORT, feedforward, log, "Left");
+        right = new ChassisSide(Constants.RIGHT_FRONT_PORT, Constants.RIGHT_BACK_PORT, feedforward, log, "Right");
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {

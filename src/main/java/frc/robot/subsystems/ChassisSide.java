@@ -7,10 +7,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 
-public class ChassisSide implements Sendable {
+public class ChassisSide {
     public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 30;
         public static final int FREE_CURRENT_LIMIT = 20;
@@ -29,13 +29,18 @@ public class ChassisSide implements Sendable {
         public static final double D = 0.0;
     }
 
-    private CANSparkMax frontMotor;
-    private CANSparkMax backMotor;
-    private RelativeEncoder encoder;
-    private PIDController pid;
-    private SimpleMotorFeedforward feedforward;
+    private final CANSparkMax frontMotor;
+    private final CANSparkMax backMotor;
+    private final RelativeEncoder encoder;
+    private final PIDController pid;
+    private final SimpleMotorFeedforward feedforward;
+    private final DoubleLogEntry setpointLog;
+    private final DoubleLogEntry positionLog;
+    private final DoubleLogEntry velocityLog;
+    private final DoubleLogEntry feedforwardVoltageLog;
+    private final DoubleLogEntry feedbackVoltageLog;
 
-    public ChassisSide(int frontID, int backID, SimpleMotorFeedforward feedforward) {
+    public ChassisSide(int frontID, int backID, SimpleMotorFeedforward feedforward, DataLog log, String name) {
         frontMotor = new CANSparkMax(frontID, MotorType.kBrushless);
         frontMotor.restoreFactoryDefaults();
         frontMotor.setInverted(true);
@@ -46,7 +51,6 @@ public class ChassisSide implements Sendable {
         encoder = frontMotor.getEncoder();
         encoder.setPositionConversionFactor(Constants.METERS_PER_MOTOR_ROTATION);
         encoder.setVelocityConversionFactor(Constants.VELOCITY_CONVERSION_FACTOR);
-        frontMotor.burnFlash();
 
         backMotor = new CANSparkMax(backID, MotorType.kBrushless);
         backMotor.restoreFactoryDefaults();
@@ -56,11 +60,21 @@ public class ChassisSide implements Sendable {
                 Constants.FREE_CURRENT_LIMIT);
         backMotor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         backMotor.follow(frontMotor);
-        backMotor.burnFlash();
 
         pid = new PIDController(Constants.P, Constants.I, Constants.D);
 
+        this.feedforward = feedforward;
         setSetpoint(0.0);
+
+        setpointLog = new DoubleLogEntry(log, "Chassis/" + name + "/Setpoint");
+        positionLog = new DoubleLogEntry(log, "Chassis/" + name + "/Position");
+        velocityLog = new DoubleLogEntry(log, "Chassis/" + name + "/Velocity");
+        feedforwardVoltageLog = new DoubleLogEntry(log, "Chassis/" + name + "/FeedforwardVoltage");
+        feedbackVoltageLog = new DoubleLogEntry(log, "Chassis/" + name + "/FeedbackVoltage");
+
+        frontMotor.burnFlash();
+        backMotor.burnFlash();
+
         resetDistance();
     }
 
@@ -127,15 +141,8 @@ public class ChassisSide implements Sendable {
         double voltage = feedbackVoltage + feedforwardVoltage;
 
         frontMotor.setVoltage(voltage);
+        backMotor.setVoltage(voltage);
 
         return currentDistance;
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("ChassisSide");
-        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-        builder.addDoubleProperty("distance", this::getDistance, null);
-        builder.addDoubleProperty("velocity", this::getVelocity, null);
     }
 }
