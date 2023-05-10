@@ -40,10 +40,10 @@ public class ChassisSide {
     private final DoubleLogEntry feedforwardVoltageLog;
     private final DoubleLogEntry feedbackVoltageLog;
 
-    public ChassisSide(int frontID, int backID, SimpleMotorFeedforward feedforward, DataLog log, String name) {
+    public ChassisSide(int frontID, int backID, boolean inverted, SimpleMotorFeedforward feedforward, DataLog log, String name) {
         frontMotor = new CANSparkMax(frontID, MotorType.kBrushless);
         frontMotor.restoreFactoryDefaults();
-        frontMotor.setInverted(true);
+        frontMotor.setInverted(inverted);
         frontMotor.setIdleMode(IdleMode.kCoast);
         frontMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT,
                 Constants.FREE_CURRENT_LIMIT);
@@ -54,7 +54,7 @@ public class ChassisSide {
 
         backMotor = new CANSparkMax(backID, MotorType.kBrushless);
         backMotor.restoreFactoryDefaults();
-        backMotor.setInverted(true);
+        backMotor.setInverted(inverted);
         backMotor.setIdleMode(IdleMode.kCoast);
         backMotor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT,
                 Constants.FREE_CURRENT_LIMIT);

@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-    public class RobotConstants {
+    public class Constants {
         public static final int JOYSTICK_PORT = 0;
         public static final int CONTROLLER_PORT = 1;
     }
@@ -50,8 +50,8 @@ public class RobotContainer {
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
 
-        joystick = new CommandJoystick(RobotConstants.JOYSTICK_PORT);
-        controller = new CommandXboxController(RobotConstants.CONTROLLER_PORT);
+        joystick = new CommandJoystick(Constants.JOYSTICK_PORT);
+        controller = new CommandXboxController(Constants.CONTROLLER_PORT);
         DriverStation.startDataLog(log);
 
         autoSelector = new SendableChooser<>();

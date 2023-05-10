@@ -79,8 +79,8 @@ public class Chassis extends SubsystemBase {
         feedforward = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
         kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
 
-        left = new ChassisSide(Constants.LEFT_FRONT_PORT, Constants.LEFT_BACK_PORT, feedforward, log, "Left");
-        right = new ChassisSide(Constants.RIGHT_FRONT_PORT, Constants.RIGHT_BACK_PORT, feedforward, log, "Right");
+        left = new ChassisSide(Constants.LEFT_FRONT_PORT, Constants.LEFT_BACK_PORT, false, feedforward, log, "Left");
+        right = new ChassisSide(Constants.RIGHT_FRONT_PORT, Constants.RIGHT_BACK_PORT, true, feedforward, log, "Right");
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
@@ -195,7 +195,8 @@ public class Chassis extends SubsystemBase {
     }
 
     /****************** COMMANDS ******************/
-    public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier) {
+    public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> rotationSupplier,
+            Supplier<Boolean> slowModeSupplier) {
         return new RunCommand(() -> {
             double forward = forwardSupplier.get() * -1.0;
             double rotation = rotationSupplier.get() * -1.0;
