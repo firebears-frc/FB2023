@@ -13,8 +13,8 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class ArmShoulder {
     private static class Constants {
-        public static final int RIGHT_PORT = 12;
-        public static final int LEFT_PORT = 13;
+        public static final int RIGHT_CAN_ID = 12;
+        public static final int LEFT_CAN_ID = 13;
 
         public static final int STALL_CURRENT_LIMIT = 30;
         public static final int FREE_CURRENT_LIMIT = 20;
@@ -40,7 +40,7 @@ public class ArmShoulder {
     private final DoubleLogEntry positionLog;
     
     public ArmShoulder(DataLog log) {
-        motorRight = new CANSparkMax(Constants.RIGHT_PORT, MotorType.kBrushless);
+        motorRight = new CANSparkMax(Constants.RIGHT_CAN_ID, MotorType.kBrushless);
         motorRight.restoreFactoryDefaults();
         motorRight.setInverted(true);
         motorRight.setIdleMode(IdleMode.kBrake);
@@ -59,7 +59,7 @@ public class ArmShoulder {
         pid.setI(Constants.I, 0);
         pid.setD(Constants.D, 0);
 
-        motorLeft = new CANSparkMax(Constants.LEFT_PORT, MotorType.kBrushless);
+        motorLeft = new CANSparkMax(Constants.LEFT_CAN_ID, MotorType.kBrushless);
         motorLeft.restoreFactoryDefaults();
         motorLeft.setInverted(false);
         motorLeft.setIdleMode(IdleMode.kBrake);

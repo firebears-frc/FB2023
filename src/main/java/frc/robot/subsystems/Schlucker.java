@@ -9,7 +9,7 @@ import frc.robot.util.GamePiece;
 
 public class Schlucker extends SubsystemBase {
     public static class Constants {
-        public static final int MOTOR_PORT = 6;
+        public static final int MOTOR_CAN_ID = 6;
     }
 
     protected enum SchluckerState {

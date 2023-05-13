@@ -35,10 +35,11 @@ public class ChassisSide {
     private final PIDController pid;
     private final SimpleMotorFeedforward feedforward;
     private final DoubleLogEntry setpointLog;
-    private final DoubleLogEntry positionLog;
+    private final DoubleLogEntry distanceLog;
     private final DoubleLogEntry velocityLog;
     private final DoubleLogEntry feedforwardVoltageLog;
     private final DoubleLogEntry feedbackVoltageLog;
+    private final DoubleLogEntry voltageLog;
 
     public ChassisSide(int frontID, int backID, boolean inverted, SimpleMotorFeedforward feedforward, DataLog log, String name) {
         frontMotor = new CANSparkMax(frontID, MotorType.kBrushless);
@@ -67,10 +68,11 @@ public class ChassisSide {
         setSetpoint(0.0);
 
         setpointLog = new DoubleLogEntry(log, "Chassis/" + name + "/Setpoint");
-        positionLog = new DoubleLogEntry(log, "Chassis/" + name + "/Position");
+        distanceLog = new DoubleLogEntry(log, "Chassis/" + name + "/Position");
         velocityLog = new DoubleLogEntry(log, "Chassis/" + name + "/Velocity");
         feedforwardVoltageLog = new DoubleLogEntry(log, "Chassis/" + name + "/FeedforwardVoltage");
         feedbackVoltageLog = new DoubleLogEntry(log, "Chassis/" + name + "/FeedbackVoltage");
+        voltageLog = new DoubleLogEntry(log, "Chassis/" + name + "/Voltage");
 
         frontMotor.burnFlash();
         backMotor.burnFlash();
@@ -136,12 +138,20 @@ public class ChassisSide {
         double currentDistance = getDistance();
         double currentVelocity = getVelocity();
 
-        double feedforwardVoltage = feedforward.calculate(pid.getSetpoint());
+        double setpoint = pid.getSetpoint();
+        double feedforwardVoltage = feedforward.calculate(setpoint);
         double feedbackVoltage = pid.calculate(currentVelocity);
         double voltage = feedbackVoltage + feedforwardVoltage;
 
         frontMotor.setVoltage(voltage);
         backMotor.setVoltage(voltage);
+
+        setpointLog.append(setpoint);
+        distanceLog.append(currentDistance);
+        velocityLog.append(currentVelocity);
+        feedforwardVoltageLog.append(feedforwardVoltage);
+        feedbackVoltageLog.append(feedbackVoltage);
+        voltageLog.append(voltage);
 
         return currentDistance;
     }

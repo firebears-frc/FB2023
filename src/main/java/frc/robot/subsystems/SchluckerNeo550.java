@@ -33,7 +33,7 @@ public class SchluckerNeo550 extends Schlucker {
         super(log);
         typeLog.append("Neo550");
 
-        motor = new CANSparkMax(Schlucker.Constants.MOTOR_PORT, MotorType.kBrushless);
+        motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);

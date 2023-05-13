@@ -31,10 +31,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 public class Chassis extends SubsystemBase {
     private static class Constants {
         // Driving
-        public static final int RIGHT_FRONT_PORT = 15;
-        public static final int RIGHT_BACK_PORT = 17;
-        public static final int LEFT_FRONT_PORT = 16;
-        public static final int LEFT_BACK_PORT = 18;
+        public static final int RIGHT_FRONT_CAN_ID = 15;
+        public static final int RIGHT_BACK_CAN_ID = 17;
+        public static final int LEFT_FRONT_CAN_ID = 16;
+        public static final int LEFT_BACK_CAN_ID = 18;
 
         public static final double TRACK_WIDTH = 0.96679; // Meters
         public static final double MAX_VELOCITY = 5.0; // Meters per second
@@ -79,8 +79,8 @@ public class Chassis extends SubsystemBase {
         feedforward = new SimpleMotorFeedforward(Constants.S, Constants.V, Constants.A);
         kinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
 
-        left = new ChassisSide(Constants.LEFT_FRONT_PORT, Constants.LEFT_BACK_PORT, false, feedforward, log, "Left");
-        right = new ChassisSide(Constants.RIGHT_FRONT_PORT, Constants.RIGHT_BACK_PORT, true, feedforward, log, "Right");
+        left = new ChassisSide(Constants.LEFT_FRONT_CAN_ID, Constants.LEFT_BACK_CAN_ID, false, feedforward, log, "Left");
+        right = new ChassisSide(Constants.RIGHT_FRONT_CAN_ID, Constants.RIGHT_BACK_CAN_ID, true, feedforward, log, "Right");
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {

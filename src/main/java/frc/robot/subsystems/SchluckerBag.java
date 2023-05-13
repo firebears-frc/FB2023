@@ -24,7 +24,7 @@ public class SchluckerBag extends Schlucker {
         super(log);
         typeLog.append("Bag Motor");
 
-        motor = new CANSparkMax(Schlucker.Constants.MOTOR_PORT, MotorType.kBrushed);
+        motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
