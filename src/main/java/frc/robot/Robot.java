@@ -19,6 +19,8 @@ public class Robot extends TimedRobot {
             autoCommand.cancel();
 
         autoCommand = robotContainer.getAutonomousCommand();
+        if (autoCommand != null)
+            autoCommand.schedule();
     }
 
     @Override
