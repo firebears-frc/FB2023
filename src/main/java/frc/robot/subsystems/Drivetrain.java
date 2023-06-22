@@ -1,0 +1,195 @@
+package frc.robot.subsystems;
+
+import java.util.function.Supplier;
+
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.SwerveModule.SwerveModuleConfiguration;
+
+public class Drivetrain extends SubsystemBase {
+    private static final class Constants {
+        public static final double TRACK_WIDTH = Units.inchesToMeters(26.5);
+        public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
+
+        public static final SwerveModuleConfiguration MODULES[] = {
+                // Front Left
+                new SwerveModuleConfiguration(11, 10, -Math.PI / 2,
+                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2)),
+                // Front Right
+                new SwerveModuleConfiguration(15, 14, 0,
+                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2)),
+                // Rear Left
+                new SwerveModuleConfiguration(13, 12, Math.PI,
+                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)),
+                // Rear Right
+                new SwerveModuleConfiguration(17, 16, Math.PI / 2,
+                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2))
+        };
+
+        // Driving
+        public static final double MAX_VELOCITY = 4.8; // meters per second
+        public static final double SLOW_VELOCITY = 1.0; // meters per second
+        public static final double MAX_ANGULAR_VELOCITY = 2 * Math.PI; // radians per second
+        public static final double SLOW_ANGULAR_VELOCITY = Math.PI; // radians per second
+
+        // Charge Station
+        public static final double LEVEL_TOLERANCE = 2.0; // degrees
+        public static final double ON_TOLERANCE = 10.0; // degrees
+        public static final double PITCH_VELOCITY_MAX = 0.2; // degrees per cycle
+    }
+
+    // Driving
+    private final SwerveModule[] modules;
+    private final SwerveDriveKinematics kinematics;
+    // TODO: Add slew rate limitations
+
+    // Localization
+    private AHRS navX;
+    private final SwerveDrivePoseEstimator poseEstimator;
+    private final Field2d field;
+
+    // Charge Station
+    private double lastPitch = 0;
+    private double pitchVelocity = 0;
+
+    public Drivetrain() {
+        // Build up modules array
+        modules = new SwerveModule[Constants.MODULES.length];
+        for (int i = 0; i < Constants.MODULES.length; i++) {
+            modules[i] = new SwerveModule(Constants.MODULES[i]);
+        }
+        // Build up position offset array for kinematics
+        Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
+        for (int i = 0; i < Constants.MODULES.length; i++) {
+            positionOffsets[i] = Constants.MODULES[i].positionOffset;
+        }
+        kinematics = new SwerveDriveKinematics(positionOffsets);
+
+        try {
+            navX = new AHRS(SPI.Port.kMXP);
+        } catch (RuntimeException ex) {
+            DriverStation.reportError(ex.getMessage(), true);
+        }
+        poseEstimator = new SwerveDrivePoseEstimator(
+                kinematics,
+                navX.getRotation2d(),
+                getModulePositions(),
+                new Pose2d());
+        field = new Field2d();
+        addChild("Field", field);
+    }
+
+    private SwerveModulePosition[] getModulePositions() {
+        // Build up position array
+        SwerveModulePosition result[] = new SwerveModulePosition[Constants.MODULES.length];
+        for (int i = 0; i < Constants.MODULES.length; i++) {
+            result[i] = modules[i].getPosition();
+        }
+        return result;
+    }
+
+    @Override
+    public void periodic() {
+        // Update pose estimate
+        poseEstimator.update(
+                navX.getRotation2d(),
+                getModulePositions());
+        field.setRobotPose(getPose());
+
+        // Update pitch velocity
+        double currentPitch = getPitchDegrees();
+        pitchVelocity = currentPitch - lastPitch;
+        lastPitch = currentPitch;
+    }
+
+    /****************** DRIVING ******************/
+    public void drive(ChassisSpeeds chassisSpeeds) {
+        drive(chassisSpeeds, false);
+    }
+
+    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
+        if (fieldRelative)
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, navX.getRotation2d());
+
+        swerveDrive(kinematics.toSwerveModuleStates(chassisSpeeds));
+    }
+
+    public void swerveDrive(SwerveModuleState states[]) {
+        if (states.length != Constants.MODULES.length)
+            throw new IllegalStateException(
+                    "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_VELOCITY);
+
+        for (int i = 0; i < Constants.MODULES.length; i++) {
+            modules[i].setDesiredState(states[i]);
+        }
+    }
+
+    /****************** LOCALIZATION ******************/
+    public void visionPose(Pose2d pose, double timestampSeconds) {
+        poseEstimator.addVisionMeasurement(pose, timestampSeconds);
+    }
+
+    public Pose2d getPose() {
+        return poseEstimator.getEstimatedPosition();
+    }
+
+    /****************** CHARGE STATION ******************/
+    public double getPitchDegrees() {
+        return navX.getPitch();
+    }
+
+    public boolean isLevel() {
+        return Math.abs(getPitchDegrees()) < Constants.LEVEL_TOLERANCE;
+    }
+
+    public boolean isOnChargeStation() {
+        return Math.abs(getPitchDegrees()) > Constants.ON_TOLERANCE;
+    }
+
+    private double getPitchVelocityDegrees() {
+        return pitchVelocity;
+    }
+
+    public boolean isNotPitching() {
+        return Math.abs(getPitchVelocityDegrees()) < Constants.PITCH_VELOCITY_MAX;
+    }
+
+    /****************** COMMANDS ******************/
+    public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
+            Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier) {
+        // TODO: Improve this to handle field relative driving
+        return new RunCommand(() -> {
+            double forward = forwardSupplier.get() * -1.0;
+            double strafe = strafeSupplier.get() * -1.0;
+            double rotation = rotationSupplier.get() * -1.0;
+
+            if (slowModeSupplier.get()) {
+                forward *= Constants.SLOW_VELOCITY;
+                strafe *= Constants.SLOW_VELOCITY;
+                rotation *= Constants.SLOW_ANGULAR_VELOCITY;
+            } else {
+                forward *= Constants.MAX_VELOCITY;
+                strafe *= Constants.MAX_VELOCITY;
+                rotation *= Constants.MAX_ANGULAR_VELOCITY;
+            }
+
+            drive(new ChassisSpeeds(forward, strafe, rotation));
+        }, this);
+    }
+}
