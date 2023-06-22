@@ -1,7 +1,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -25,7 +24,7 @@ public class RobotContainer {
         public static final int CONTROLLER_PORT = 2;
     }
 
-    private final DriveSubsystem drive;
+    private final Drivetrain drive;
     private final Arm arm;
     private final Schlucker schlucker;
 
@@ -40,7 +39,7 @@ public class RobotContainer {
         DataLogManager.start();
         log = DataLogManager.getLog();
 
-        drive = new DriveSubsystem();
+        drive = new Drivetrain();
         arm = new Arm(log);
         schlucker = new SchluckerBag(log); // new SchluckerNeo550();
 
@@ -58,10 +57,8 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        // TODO: Improve this to be a command factory
-        drive.setDefaultCommand(new RunCommand(() -> {
-            drive.drive(joystick_1.getX(), joystick_1.getY(), joystick_2.getX(), false, true);
-        }, drive));
+        drive.setDefaultCommand(drive.defaultCommand(joystick_1::getY, joystick_1::getX, joystick_2::getX,
+                () -> joystick_1.getHID().getRawButton(1)));
 
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
