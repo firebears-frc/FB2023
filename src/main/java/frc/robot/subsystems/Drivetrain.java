@@ -6,6 +6,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SwerveModule.SwerveModuleConfiguration;
@@ -140,6 +142,13 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    public void setX() {
+        modules[0].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        modules[1].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        modules[2].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        modules[3].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    }
+
     /****************** LOCALIZATION ******************/
     public void visionPose(Pose2d pose, double timestampSeconds) {
         poseEstimator.addVisionMeasurement(pose, timestampSeconds);
@@ -170,6 +179,11 @@ public class Drivetrain extends SubsystemBase {
         return Math.abs(getPitchVelocityDegrees()) < Constants.PITCH_VELOCITY_MAX;
     }
 
+    /****************** ROTATION ******************/
+    public double getYawDegrees() {
+        return navX.getYaw();
+    }
+
     /****************** COMMANDS ******************/
     public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
             Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier) {
@@ -191,5 +205,9 @@ public class Drivetrain extends SubsystemBase {
 
             drive(new ChassisSpeeds(forward, strafe, rotation));
         }, this);
+    }
+
+    public Command driveDistance(double distance) {
+        return new InstantCommand(); // TODO!
     }
 }

@@ -2,23 +2,23 @@ package frc.robot.auto;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Drivetrain;
 
 public class AutoRotationCommand extends CommandBase {
-    private final Chassis chassis;
+    private final Drivetrain drivetrain;
     private final double deltaAngle;
     private double targetAngle;
 
-    public AutoRotationCommand(Chassis chassis, double deltaAngle) {
-        this.chassis = chassis;
+    public AutoRotationCommand(Drivetrain drivetrain, double deltaAngle) {
+        this.drivetrain = drivetrain;
         this.deltaAngle = deltaAngle;
 
-        addRequirements(chassis);
+        addRequirements(drivetrain);
     }
 
     @Override
     public void initialize() {
-        targetAngle = chassis.getYawDegrees() + deltaAngle;
+        targetAngle = drivetrain.getYawDegrees() + deltaAngle;
 
         while (targetAngle > 180.0) {
             targetAngle -= 360.0;
@@ -30,16 +30,16 @@ public class AutoRotationCommand extends CommandBase {
 
     @Override
     public void execute() {
-        chassis.drive(new ChassisSpeeds(0.0, 0.0, Math.copySign(Math.PI, deltaAngle)));
+        drivetrain.drive(new ChassisSpeeds(0.0, 0.0, Math.copySign(Math.PI, deltaAngle)));
     }
 
     @Override
     public void end(boolean interrupted) {
-        chassis.drive(new ChassisSpeeds());
+        drivetrain.drive(new ChassisSpeeds());
     }
 
     @Override
     public boolean isFinished() {
-        return Math.abs(chassis.getYawDegrees() - targetAngle) <= 5.0;
+        return Math.abs(drivetrain.getYawDegrees() - targetAngle) <= 5.0;
     }
 }
