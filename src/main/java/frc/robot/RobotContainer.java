@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -22,6 +24,7 @@ public class RobotContainer {
         public static final int CONTROLLER_PORT = 1;
     }
 
+    private final DriveSubsystem drive;
     private final Arm arm;
     private final Schlucker schlucker;
 
@@ -35,6 +38,7 @@ public class RobotContainer {
         DataLogManager.start();
         log = DataLogManager.getLog();
 
+        drive = new DriveSubsystem();
         arm = new Arm(log);
         schlucker = new SchluckerBag(log); // new SchluckerNeo550();
 
@@ -51,6 +55,11 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
+        // TODO: Improve this to be a command factory
+        drive.setDefaultCommand(new RunCommand(() -> {
+            drive.drive(joystick.getX(), joystick.getY(), joystick.getTwist(), false, true);
+        }, drive));
+
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
         // Arm target point commands
