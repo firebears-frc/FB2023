@@ -20,15 +20,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     public class Constants {
-        public static final int JOYSTICK_PORT = 0;
-        public static final int CONTROLLER_PORT = 1;
+        public static final int JOYSTICK_1_PORT = 0;
+        public static final int JOYSTICK_2_PORT = 1;
+        public static final int CONTROLLER_PORT = 2;
     }
 
     private final DriveSubsystem drive;
     private final Arm arm;
     private final Schlucker schlucker;
 
-    private final CommandJoystick joystick;
+    private final CommandJoystick joystick_1;
+    private final CommandJoystick joystick_2;
     private final CommandXboxController controller;
     private final SendableChooser<Command> autoSelector;
     private final DataLog log;
@@ -42,7 +44,8 @@ public class RobotContainer {
         arm = new Arm(log);
         schlucker = new SchluckerBag(log); // new SchluckerNeo550();
 
-        joystick = new CommandJoystick(Constants.JOYSTICK_PORT);
+        joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
+        joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
         DriverStation.startDataLog(log);
 
@@ -57,7 +60,7 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // TODO: Improve this to be a command factory
         drive.setDefaultCommand(new RunCommand(() -> {
-            drive.drive(joystick.getX(), joystick.getY(), joystick.getTwist(), false, true);
+            drive.drive(joystick_1.getX(), joystick_1.getY(), joystick_2.getX(), false, true);
         }, drive));
 
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
@@ -85,8 +88,8 @@ public class RobotContainer {
                 .onTrue(schlucker.eject())
                 .onFalse(schlucker.stop());
 
-        joystick.button(3).onTrue(schlucker.wantCone());
-        joystick.button(4).onTrue(schlucker.wantCube());
+        joystick_1.button(3).onTrue(schlucker.wantCone());
+        joystick_1.button(4).onTrue(schlucker.wantCube());
     }
 
     public Command getAutonomousCommand() {
