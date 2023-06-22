@@ -1,14 +1,9 @@
 package frc.robot;
 
-import frc.robot.auto.OneElementWithMobility;
-import frc.robot.auto.OneElementWithMobilityAndEngaged;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
-import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -27,11 +22,8 @@ public class RobotContainer {
         public static final int CONTROLLER_PORT = 1;
     }
 
-    private final Chassis chassis;
     private final Arm arm;
     private final Schlucker schlucker;
-    private final Vision vision;
-    private final Lights lights;
 
     private final CommandJoystick joystick;
     private final CommandXboxController controller;
@@ -43,26 +35,14 @@ public class RobotContainer {
         DataLogManager.start();
         log = DataLogManager.getLog();
 
-        chassis = new Chassis(log);
         arm = new Arm(log);
         schlucker = new SchluckerBag(log); // new SchluckerNeo550();
-        vision = new Vision(chassis::visionPose);
-        lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
-                chassis::isOnChargeStation, chassis::isNotPitching);
 
         joystick = new CommandJoystick(Constants.JOYSTICK_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
         DriverStation.startDataLog(log);
 
         autoSelector = new SendableChooser<>();
-        autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
-                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
-        autoSelector.addOption("1 Cube w/ Mobility & Engage",
-                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector.addOption("1 Cone w/ Mobility",
-                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
-        autoSelector.addOption("1 Cube w/ Mobility",
-                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
         autoLog = new StringLogEntry(log, "/Auto/Command");
 
         configureButtonBindings();
@@ -71,10 +51,6 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        chassis.setDefaultCommand(
-                chassis.defaultCommand(joystick::getY, joystick::getX,
-                        () -> joystick.getHID().getRawButton(1)));
-
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
         // Arm target point commands
