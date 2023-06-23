@@ -2,48 +2,48 @@ package frc.robot.auto;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Chassis;
 
 public class AutoBalanceCommand extends CommandBase {
     private static final double BALANCE_SPEED = 0.375; // meters per second
 
-    private final Drivetrain drivetrain;
+    private final Chassis chassis;
 
-    public AutoBalanceCommand(Drivetrain drivetrain) {
-        this.drivetrain = drivetrain;
+    public AutoBalanceCommand(Chassis chassis) {
+        this.chassis = chassis;
     }
 
     @Override
     public void initialize() {
-        drivetrain.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
+        chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
     }
 
     @Override
     public void execute() {
-        if (!drivetrain.isNotPitching()) {
+        if (!chassis.isNotPitching()) {
             // Charge station is moving, stop!
-            drivetrain.drive(new ChassisSpeeds());
+            chassis.drive(new ChassisSpeeds());
             return;
         }
 
         // Depending on what way the charge station is tipped, go to middle
-        if (drivetrain.getPitchDegrees() > 0) {
-            drivetrain.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
+        if (chassis.getPitchDegrees() > 0) {
+            chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
         } else {
-            drivetrain.drive(new ChassisSpeeds(-1.0 * BALANCE_SPEED, 0, 0));
+            chassis.drive(new ChassisSpeeds(-1.0 * BALANCE_SPEED, 0, 0));
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        chassis.drive(new ChassisSpeeds());
         if (!interrupted) {
-            drivetrain.setX();
+            chassis.setX();
         }
     }
 
     @Override
     public boolean isFinished() {
-        return drivetrain.isNotPitching() && drivetrain.isLevel();
+        return chassis.isNotPitching() && chassis.isLevel();
     }
 }

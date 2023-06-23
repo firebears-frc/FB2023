@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
-public class Drivetrain extends SubsystemBase {
+public class Chassis extends SubsystemBase {
     private static final class Constants {
         public static final double TRACK_WIDTH = Units.inchesToMeters(26.5);
         public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
@@ -89,7 +89,7 @@ public class Drivetrain extends SubsystemBase {
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
-    public Drivetrain(DataLog log) {
+    public Chassis(DataLog log) {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {

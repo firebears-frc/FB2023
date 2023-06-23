@@ -3,13 +3,13 @@ package frc.robot.auto;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Chassis;
 
 public class AutoBalanceRoutineCommand extends SequentialCommandGroup {
-    public AutoBalanceRoutineCommand(Drivetrain drivetrain) {
+    public AutoBalanceRoutineCommand(Chassis chassis) {
         addCommands(
-                new AutoDriveOntoChargeStationCommand(drivetrain),
-                new AutoBalanceCommand(drivetrain),
+                new AutoDriveOntoChargeStationCommand(chassis),
+                new AutoBalanceCommand(chassis),
                 new WaitUntilCommand(DriverStation::isDisabled));
     }
 }
