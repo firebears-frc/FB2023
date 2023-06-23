@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class SwerveModule {
     public static class SwerveModuleConfiguration {
@@ -89,10 +91,15 @@ public class SwerveModule {
     private final SparkMaxPIDController drivingController;
     private final SparkMaxPIDController turningController;
 
+    private final DoubleLogEntry drivingSetpointLog;
+    private final DoubleLogEntry drivingPositionLog;
+    private final DoubleLogEntry turningSetpointLog;
+    private final DoubleLogEntry turningPositionLog;
+
     private final double angleOffset;
     private SwerveModuleState desiredState;
 
-    public SwerveModule(SwerveModuleConfiguration configuration) {
+    public SwerveModule(SwerveModuleConfiguration configuration, DataLog log, int id) {
         drivingMotor = new CANSparkMax(configuration.drivingID, MotorType.kBrushless);
         turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
 
@@ -134,6 +141,11 @@ public class SwerveModule {
         angleOffset = configuration.angleOffset;
         desiredState = new SwerveModuleState(0.0, new Rotation2d(turningEncoder.getPosition()));
 
+        drivingSetpointLog = new DoubleLogEntry(log, "Drive/" + id + "/Driving/Setpoint");
+        drivingPositionLog = new DoubleLogEntry(log, "Drive/" + id + "/Driving/Position");
+        turningSetpointLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Setpoint");
+        turningPositionLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Position");
+
         drivingMotor.burnFlash();
         turningMotor.burnFlash();
     }
@@ -152,5 +164,12 @@ public class SwerveModule {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
+    }
+
+    public void periodic() {
+        drivingSetpointLog.append(desiredState.speedMetersPerSecond);
+        drivingPositionLog.append(drivingEncoder.getPosition());
+        turningSetpointLog.append(desiredState.angle.getRadians());
+        turningPositionLog.append(turningEncoder.getPosition());
     }
 }

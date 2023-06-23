@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -89,11 +90,11 @@ public class Drivetrain extends SubsystemBase {
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
-    public Drivetrain() {
+    public Drivetrain(DataLog log) {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
-            modules[i] = new SwerveModule(Constants.MODULES[i]);
+            modules[i] = new SwerveModule(Constants.MODULES[i], log, i);
         }
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
