@@ -1,9 +1,13 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,14 +16,18 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.subsystems.SwerveModule.SwerveModuleConfiguration;
 
 public class Drivetrain extends SubsystemBase {
@@ -43,10 +51,19 @@ public class Drivetrain extends SubsystemBase {
         };
 
         // Driving
-        public static final double MAX_VELOCITY = 4.8; // meters per second
-        public static final double SLOW_VELOCITY = 1.0; // meters per second
-        public static final double MAX_ANGULAR_VELOCITY = 2 * Math.PI; // radians per second
-        public static final double SLOW_ANGULAR_VELOCITY = Math.PI; // radians per second
+        public static final double MAX_TELE_VELOCITY = 4.8; // meters per second
+        public static final double SLOW_TELE_VELOCITY = 1.0; // meters per second
+        public static final double MAX_TELE_ANGULAR_VELOCITY = 2 * Math.PI; // radians per second
+        public static final double SLOW_TELE_ANGULAR_VELOCITY = Math.PI; // radians per second
+
+        // Trajectories
+        public static final double MAX_AUTO_VELOCITY = 3.0; // meters per second
+        public static final double MAX_AUTO_ACCELERATION = 3.0; // meters per second squared
+        public static final double MAX_AUTO_ANGULAR_VELOCITY = Math.PI; // radians per second
+        public static final double MAX_AUTO_ANGULAR_ACCELERATION = Math.PI; // radians per second squared
+        public static final double X_CONTROLLER_P = 1.0;
+        public static final double Y_CONTROLLER_P = 1.0;
+        public static final double R_CONTROLLER_P = 1.0;
 
         // Charge Station
         public static final double LEVEL_TOLERANCE = 2.0; // degrees
@@ -63,6 +80,10 @@ public class Drivetrain extends SubsystemBase {
     private AHRS navX;
     private final SwerveDrivePoseEstimator poseEstimator;
     private final Field2d field;
+
+    // Trajectories
+    private final TrapezoidProfile.Constraints rotationConstraints;
+    private final TrajectoryConfig config;
 
     // Charge Station
     private double lastPitch = 0;
@@ -93,6 +114,11 @@ public class Drivetrain extends SubsystemBase {
                 new Pose2d());
         field = new Field2d();
         addChild("Field", field);
+
+        rotationConstraints = new TrapezoidProfile.Constraints(Constants.MAX_AUTO_ANGULAR_VELOCITY,
+                Constants.MAX_AUTO_ANGULAR_ACCELERATION);
+        config = new TrajectoryConfig(Constants.MAX_AUTO_VELOCITY, Constants.MAX_AUTO_ACCELERATION);
+        config.setKinematics(kinematics);
     }
 
     private SwerveModulePosition[] getModulePositions() {
@@ -135,7 +161,7 @@ public class Drivetrain extends SubsystemBase {
             throw new IllegalStateException(
                     "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_VELOCITY);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
 
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i].setDesiredState(states[i]);
@@ -156,6 +182,38 @@ public class Drivetrain extends SubsystemBase {
 
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    /****************** TRAJECTORIES ******************/
+    private Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
+        return generateTrajectory(start, new ArrayList<>(), end, reversed);
+    }
+
+    private Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
+        config.setReversed(reversed);
+        return TrajectoryGenerator.generateTrajectory(start, interior, end, config);
+    }
+
+    private SwerveControllerCommand generateSwerveControllerCommand(Trajectory trajectory) {
+        ProfiledPIDController rotationController = new ProfiledPIDController(Constants.R_CONTROLLER_P, 0.0, 0.0,
+                rotationConstraints);
+        return new SwerveControllerCommand(
+                trajectory,
+                this::getPose,
+                kinematics,
+                new PIDController(Constants.X_CONTROLLER_P, 0.0, 0.0),
+                new PIDController(Constants.Y_CONTROLLER_P, 0.0, 0.0),
+                rotationController,
+                this::swerveDrive,
+                this);
+    }
+
+    public Command driveDistance(double distance) {
+        Trajectory trajectory = generateTrajectory(
+                new Pose2d(0.0, 0.0, new Rotation2d()),
+                new Pose2d(distance, 0.0, new Rotation2d()),
+                distance < 0);
+        return generateSwerveControllerCommand(trajectory);
     }
 
     /****************** CHARGE STATION ******************/
@@ -194,20 +252,16 @@ public class Drivetrain extends SubsystemBase {
             double rotation = rotationSupplier.get() * -1.0;
 
             if (slowModeSupplier.get()) {
-                forward *= Constants.SLOW_VELOCITY;
-                strafe *= Constants.SLOW_VELOCITY;
-                rotation *= Constants.SLOW_ANGULAR_VELOCITY;
+                forward *= Constants.SLOW_TELE_VELOCITY;
+                strafe *= Constants.SLOW_TELE_VELOCITY;
+                rotation *= Constants.SLOW_TELE_ANGULAR_VELOCITY;
             } else {
-                forward *= Constants.MAX_VELOCITY;
-                strafe *= Constants.MAX_VELOCITY;
-                rotation *= Constants.MAX_ANGULAR_VELOCITY;
+                forward *= Constants.MAX_TELE_VELOCITY;
+                strafe *= Constants.MAX_TELE_VELOCITY;
+                rotation *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
 
             drive(new ChassisSpeeds(forward, strafe, rotation));
         }, this);
-    }
-
-    public Command driveDistance(double distance) {
-        return new InstantCommand(); // TODO!
     }
 }
