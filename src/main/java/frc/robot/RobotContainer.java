@@ -10,6 +10,12 @@ import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
+
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -66,6 +72,11 @@ public class RobotContainer {
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility",
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
+        autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
+                new Pose2d(0, 0, new Rotation2d(0)),
+                List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+                new Pose2d(3, 0, new Rotation2d(0)),
+                false));
         autoLog = new StringLogEntry(log, "/Auto/Command");
 
         configureButtonBindings();

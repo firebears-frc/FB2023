@@ -210,6 +210,16 @@ public class Chassis extends SubsystemBase {
                 this);
     }
 
+    public Command driveTrajectory(Pose2d start, Pose2d end, boolean reversed) {
+        Trajectory trajectory = generateTrajectory(start, end, reversed);
+        return generateSwerveControllerCommand(trajectory);
+    }
+
+    public Command driveTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
+        Trajectory trajectory = generateTrajectory(start, interior, end, reversed);
+        return generateSwerveControllerCommand(trajectory);
+    }
+
     public Command driveDistance(double distance) {
         Trajectory trajectory = generateTrajectory(
                 new Pose2d(0.0, 0.0, new Rotation2d()),
