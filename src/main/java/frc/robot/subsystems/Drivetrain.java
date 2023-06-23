@@ -29,25 +29,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import frc.robot.subsystems.SwerveModule.SwerveModuleConfiguration;
 
 public class Drivetrain extends SubsystemBase {
     private static final class Constants {
         public static final double TRACK_WIDTH = Units.inchesToMeters(26.5);
         public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
 
-        public static final SwerveModuleConfiguration MODULES[] = {
+        public static final SwerveModule.SwerveModuleConfiguration MODULES[] = {
                 // Front Left
-                new SwerveModuleConfiguration(11, 10, -Math.PI / 2,
+                new SwerveModule.SwerveModuleConfiguration(11, 10, -Math.PI / 2,
                         new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2)),
                 // Front Right
-                new SwerveModuleConfiguration(15, 14, 0,
+                new SwerveModule.SwerveModuleConfiguration(15, 14, 0,
                         new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2)),
                 // Rear Left
-                new SwerveModuleConfiguration(13, 12, Math.PI,
+                new SwerveModule.SwerveModuleConfiguration(13, 12, Math.PI,
                         new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)),
                 // Rear Right
-                new SwerveModuleConfiguration(17, 16, Math.PI / 2,
+                new SwerveModule.SwerveModuleConfiguration(17, 16, Math.PI / 2,
                         new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2))
         };
 
