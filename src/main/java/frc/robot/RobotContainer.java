@@ -4,6 +4,7 @@ import frc.robot.auto.OneElementWithMobility;
 import frc.robot.auto.OneElementWithMobilityAndEngaged;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
@@ -47,9 +48,9 @@ public class RobotContainer {
         drive = new Drivetrain();
         arm = new Arm(log);
         schlucker = new SchluckerBag(log); // new SchluckerNeo550();
-        vision = new Vision(chassis::visionPose);
-        lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
-                chassis::isOnChargeStation, chassis::isNotPitching);
+        vision = new Vision(drive::visionPose);
+        lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, drive::isLevel,
+                drive::isOnChargeStation, drive::isNotPitching);
 
         joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
@@ -58,13 +59,13 @@ public class RobotContainer {
 
         autoSelector = new SendableChooser<>();
         autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
-                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
+                new OneElementWithMobilityAndEngaged(drive, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility & Engage",
-                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CUBE));
+                new OneElementWithMobilityAndEngaged(drive, arm, schlucker, GamePiece.CUBE));
         autoSelector.addOption("1 Cone w/ Mobility",
-                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
+                new OneElementWithMobility(drive, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility",
-                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
+                new OneElementWithMobility(drive, arm, schlucker, GamePiece.CUBE));
         autoLog = new StringLogEntry(log, "/Auto/Command");
 
         configureButtonBindings();
