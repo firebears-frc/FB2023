@@ -133,10 +133,12 @@ public class Chassis extends SubsystemBase {
     @Override
     public void periodic() {
         // Update pose estimate
-        poseEstimator.update(
-                navX.getRotation2d(),
-                getModulePositions());
-        field.setRobotPose(getPose());
+        if (navX != null) {
+            poseEstimator.update(
+                    navX.getRotation2d(),
+                    getModulePositions());
+            field.setRobotPose(getPose());
+        }
 
         // Update pitch velocity
         double currentPitch = getPitchDegrees();
@@ -150,7 +152,7 @@ public class Chassis extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
-        if (fieldRelative)
+        if (fieldRelative && navX != null)
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, navX.getRotation2d());
 
         swerveDrive(kinematics.toSwerveModuleStates(chassisSpeeds));
@@ -218,6 +220,9 @@ public class Chassis extends SubsystemBase {
 
     /****************** CHARGE STATION ******************/
     public double getPitchDegrees() {
+        if (navX == null)
+            return 0;
+
         return navX.getPitch();
     }
 
@@ -239,6 +244,9 @@ public class Chassis extends SubsystemBase {
 
     /****************** ROTATION ******************/
     public double getYawDegrees() {
+        if (navX == null)
+            return 0;
+
         return navX.getYaw();
     }
 
