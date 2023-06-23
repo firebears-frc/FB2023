@@ -10,6 +10,12 @@ import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.GamePiece;
+
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -23,8 +29,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     public class Constants {
-        public static final int JOYSTICK_PORT = 0;
-        public static final int CONTROLLER_PORT = 1;
+        public static final int JOYSTICK_1_PORT = 0;
+        public static final int JOYSTICK_2_PORT = 1;
+        public static final int CONTROLLER_PORT = 2;
     }
 
     private final Chassis chassis;
@@ -33,7 +40,8 @@ public class RobotContainer {
     private final Vision vision;
     private final Lights lights;
 
-    private final CommandJoystick joystick;
+    private final CommandJoystick joystick_1;
+    private final CommandJoystick joystick_2;
     private final CommandXboxController controller;
     private final SendableChooser<Command> autoSelector;
     private final DataLog log;
@@ -50,7 +58,8 @@ public class RobotContainer {
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
 
-        joystick = new CommandJoystick(Constants.JOYSTICK_PORT);
+        joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
+        joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
         DriverStation.startDataLog(log);
 
@@ -63,6 +72,11 @@ public class RobotContainer {
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility",
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
+        autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
+                new Pose2d(0, 0, new Rotation2d(0)),
+                List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+                new Pose2d(3, 0, new Rotation2d(0)),
+                false));
         autoLog = new StringLogEntry(log, "/Auto/Command");
 
         configureButtonBindings();
@@ -71,9 +85,8 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        chassis.setDefaultCommand(
-                chassis.defaultCommand(joystick::getY, joystick::getX,
-                        () -> joystick.getHID().getRawButton(1)));
+        chassis.setDefaultCommand(chassis.defaultCommand(joystick_1::getY, joystick_1::getX, joystick_2::getX,
+                () -> joystick_1.getHID().getRawButton(1)));
 
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
@@ -100,8 +113,8 @@ public class RobotContainer {
                 .onTrue(schlucker.eject())
                 .onFalse(schlucker.stop());
 
-        joystick.button(3).onTrue(schlucker.wantCone());
-        joystick.button(4).onTrue(schlucker.wantCube());
+        joystick_1.button(3).onTrue(schlucker.wantCone());
+        joystick_1.button(4).onTrue(schlucker.wantCube());
     }
 
     public Command getAutonomousCommand() {

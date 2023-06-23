@@ -38,7 +38,7 @@ public class AutoBalanceCommand extends CommandBase {
     public void end(boolean interrupted) {
         chassis.drive(new ChassisSpeeds());
         if (!interrupted) {
-            chassis.setBrakeMode(true);
+            chassis.setX();
         }
     }
 

@@ -1,0 +1,175 @@
+package frc.robot.subsystems;
+
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+
+public class SwerveModule {
+    public static class SwerveModuleConfiguration {
+        protected final int drivingID;
+        protected final int turningID;
+        protected final double angleOffset;
+        protected final Translation2d positionOffset;
+
+        public SwerveModuleConfiguration(int drivingID, int turningID, double angleOffset,
+                Translation2d positionOffset) {
+            this.drivingID = drivingID;
+            this.turningID = turningID;
+            this.angleOffset = angleOffset;
+            this.positionOffset = positionOffset;
+        }
+    }
+
+    private static class Constants {
+        public static final double NEO_FREE_SPEED = 5676.0 / 60; // rotations per second
+
+        private static class Driving {
+            private static final double WHEEL_DIAMETER = 0.0762; // meters
+            private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; // meters
+            // 12T, 13T, or 14T gearing
+            private static final int PINION_TEETH = 14;
+            private static final double GEAR_RATIO = 45 * 22 / (PINION_TEETH * 15);
+            private static final double FREE_SPEED = NEO_FREE_SPEED * WHEEL_CIRCUMFERENCE / GEAR_RATIO; // meters per
+                                                                                                        // second
+            public static final double POSITION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO; // meters
+            public static final double VELOCITY_FACTOR = POSITION_FACTOR / 60.0; // meters per second
+
+            public static final double P = 0.04;
+            public static final double I = 0.0;
+            public static final double D = 0.0;
+            public static final double FF = 1.0 / FREE_SPEED;
+            public static final double MIN = -1.0;
+            public static final double MAX = 1.0;
+
+            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+
+            public static final int STALL_CURRENT_LIMIT = 50;
+            public static final int FREE_CURRENT_LIMIT = 20;
+            public static final double SECONDARY_CURRENT_LIMIT = 60.0;
+        }
+
+        private static class Turning {
+            public static final boolean ENCODER_INVERTED = true;
+
+            public static final double POSITION_FACTOR = 2 * Math.PI; // radians
+            public static final double VELOCITY_FACTOR = POSITION_FACTOR / 60.0; // radians per second
+            public static final double WRAPPING_MIN = 0; // radians
+            public static final double WRAPPING_MAX = POSITION_FACTOR; // radians
+
+            public static final double P = 1.0;
+            public static final double I = 0.0;
+            public static final double D = 0.0;
+            public static final double FF = 0.0;
+            public static final double MIN = -1.0;
+            public static final double MAX = 1.0;
+
+            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+
+            public static final int STALL_CURRENT_LIMIT = 20;
+            public static final int FREE_CURRENT_LIMIT = 10;
+            public static final double SECONDARY_CURRENT_LIMIT = 30.0;
+        }
+    }
+
+    private final CANSparkMax drivingMotor;
+    private final CANSparkMax turningMotor;
+
+    private final RelativeEncoder drivingEncoder;
+    private final AbsoluteEncoder turningEncoder;
+
+    private final SparkMaxPIDController drivingController;
+    private final SparkMaxPIDController turningController;
+
+    private final DoubleLogEntry drivingSetpointLog;
+    private final DoubleLogEntry drivingPositionLog;
+    private final DoubleLogEntry turningSetpointLog;
+    private final DoubleLogEntry turningPositionLog;
+
+    private final double angleOffset;
+    private SwerveModuleState desiredState;
+
+    public SwerveModule(SwerveModuleConfiguration configuration, DataLog log, int id) {
+        drivingMotor = new CANSparkMax(configuration.drivingID, MotorType.kBrushless);
+        turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
+
+        drivingMotor.restoreFactoryDefaults();
+        drivingMotor.setIdleMode(Constants.Driving.IDLE_MODE);
+        drivingMotor.setSmartCurrentLimit(Constants.Driving.STALL_CURRENT_LIMIT, Constants.Driving.FREE_CURRENT_LIMIT);
+        drivingMotor.setSecondaryCurrentLimit(Constants.Driving.SECONDARY_CURRENT_LIMIT);
+        drivingEncoder = drivingMotor.getEncoder();
+        drivingEncoder.setPositionConversionFactor(Constants.Driving.POSITION_FACTOR);
+        drivingEncoder.setVelocityConversionFactor(Constants.Driving.VELOCITY_FACTOR);
+        drivingEncoder.setPosition(0);
+        drivingController = drivingMotor.getPIDController();
+        drivingController.setFeedbackDevice(drivingEncoder);
+        drivingController.setP(Constants.Driving.P);
+        drivingController.setI(Constants.Driving.I);
+        drivingController.setD(Constants.Driving.D);
+        drivingController.setFF(Constants.Driving.FF);
+        drivingController.setOutputRange(Constants.Driving.MIN, Constants.Driving.MAX);
+
+        turningMotor.restoreFactoryDefaults();
+        turningMotor.setIdleMode(Constants.Turning.IDLE_MODE);
+        turningMotor.setSmartCurrentLimit(Constants.Turning.STALL_CURRENT_LIMIT, Constants.Turning.FREE_CURRENT_LIMIT);
+        turningMotor.setSecondaryCurrentLimit(Constants.Turning.SECONDARY_CURRENT_LIMIT);
+        turningEncoder = turningMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        turningEncoder.setPositionConversionFactor(Constants.Turning.POSITION_FACTOR);
+        turningEncoder.setVelocityConversionFactor(Constants.Turning.VELOCITY_FACTOR);
+        turningEncoder.setInverted(Constants.Turning.ENCODER_INVERTED);
+        turningController = turningMotor.getPIDController();
+        turningController.setFeedbackDevice(turningEncoder);
+        turningController.setPositionPIDWrappingEnabled(true);
+        turningController.setPositionPIDWrappingMinInput(Constants.Turning.WRAPPING_MIN);
+        turningController.setPositionPIDWrappingMaxInput(Constants.Turning.WRAPPING_MAX);
+        turningController.setP(Constants.Turning.P);
+        turningController.setI(Constants.Turning.I);
+        turningController.setD(Constants.Turning.D);
+        turningController.setFF(Constants.Turning.FF);
+        turningController.setOutputRange(Constants.Turning.MIN, Constants.Turning.MAX);
+
+        angleOffset = configuration.angleOffset;
+        desiredState = new SwerveModuleState(0.0, new Rotation2d(turningEncoder.getPosition()));
+
+        drivingSetpointLog = new DoubleLogEntry(log, "Drive/" + id + "/Driving/Setpoint");
+        drivingPositionLog = new DoubleLogEntry(log, "Drive/" + id + "/Driving/Position");
+        turningSetpointLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Setpoint");
+        turningPositionLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Position");
+
+        drivingMotor.burnFlash();
+        turningMotor.burnFlash();
+    }
+
+    public void setDesiredState(SwerveModuleState state) {
+        state.angle = state.angle.plus(Rotation2d.fromRadians(angleOffset));
+        state = SwerveModuleState.optimize(state, new Rotation2d(turningEncoder.getPosition()));
+
+        drivingController.setReference(state.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
+        turningController.setReference(state.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+
+        desiredState = state;
+    }
+
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+                drivingEncoder.getPosition(),
+                new Rotation2d(turningEncoder.getPosition() - angleOffset));
+    }
+
+    public void periodic() {
+        drivingSetpointLog.append(desiredState.speedMetersPerSecond);
+        drivingPositionLog.append(drivingEncoder.getPosition());
+        turningSetpointLog.append(desiredState.angle.getRadians());
+        turningPositionLog.append(turningEncoder.getPosition());
+    }
+}
