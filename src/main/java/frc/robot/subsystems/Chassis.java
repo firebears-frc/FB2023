@@ -22,6 +22,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -92,6 +93,10 @@ public class Chassis extends SubsystemBase {
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
+    private final DoubleLogEntry commandedXLog;
+    private final DoubleLogEntry commandedYLog;
+    private final DoubleLogEntry commandedRLog;
+
     public Chassis(DataLog log) {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
@@ -122,6 +127,10 @@ public class Chassis extends SubsystemBase {
                 Constants.MAX_AUTO_ANGULAR_ACCELERATION);
         config = new TrajectoryConfig(Constants.MAX_AUTO_VELOCITY, Constants.MAX_AUTO_ACCELERATION);
         config.setKinematics(kinematics);
+
+        commandedXLog = new DoubleLogEntry(log, "Drive/Command/X");
+        commandedYLog = new DoubleLogEntry(log, "Drive/Command/Y");
+        commandedRLog = new DoubleLogEntry(log, "Drive/Command/R");
     }
 
     private SwerveModulePosition[] getModulePositions() {
@@ -289,6 +298,9 @@ public class Chassis extends SubsystemBase {
                 strafe *= Constants.MAX_TELE_VELOCITY;
                 rotation *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
+            commandedXLog.append(forward);
+            commandedYLog.append(strafe);
+            commandedRLog.append(rotation);
 
             drive(new ChassisSpeeds(forward, strafe, rotation), fieldRelative);
         }, this);
