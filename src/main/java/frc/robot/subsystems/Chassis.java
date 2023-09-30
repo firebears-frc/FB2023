@@ -189,6 +189,10 @@ public class Chassis extends SubsystemBase {
         return poseEstimator.getEstimatedPosition();
     }
 
+    public void setPose(Pose2d pose) {
+        poseEstimator.resetPosition(navX.getRotation2d(), getModulePositions(), pose);
+    }
+
     /****************** TRAJECTORIES ******************/
     private Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
         return generateTrajectory(start, new ArrayList<>(), end, reversed);
@@ -265,8 +269,8 @@ public class Chassis extends SubsystemBase {
 
     /****************** COMMANDS ******************/
     public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
-            Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier) {
-        // TODO: Improve this to handle field relative driving
+            Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier,
+            boolean fieldRelative) {
         return new RunCommand(() -> {
             double forward = forwardSupplier.get() * -1.0;
             double strafe = strafeSupplier.get() * -1.0;
@@ -282,7 +286,17 @@ public class Chassis extends SubsystemBase {
                 rotation *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
 
-            drive(new ChassisSpeeds(forward, strafe, rotation));
+            drive(new ChassisSpeeds(forward, strafe, rotation), fieldRelative);
+        }, this);
+    }
+
+    public Command turtle() {
+        return new RunCommand(this::setX, this);
+    }
+
+    public Command zeroHeading() {
+        return new RunCommand(() -> {
+            setPose(new Pose2d());
         }, this);
     }
 }

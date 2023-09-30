@@ -86,7 +86,10 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         chassis.setDefaultCommand(chassis.defaultCommand(joystick_1::getY, joystick_1::getX, joystick_2::getX,
-                () -> joystick_1.getHID().getRawButton(1)));
+                () -> joystick_1.getHID().getRawButton(1), true));
+
+        joystick_1.trigger().whileTrue(chassis.turtle());
+        joystick_2.trigger().whileTrue(chassis.zeroHeading());
 
         // arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
 
