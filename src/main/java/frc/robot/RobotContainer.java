@@ -51,8 +51,8 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(-one.getY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(-one.getX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(one.getY(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(one.getX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(two.getX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
@@ -81,7 +81,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
+        0.5, // AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
         // Add kinematics to ensure max speed is actually obeyed
         .setKinematics(DriveConstants.kDriveKinematics);
@@ -91,9 +91,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(new Translation2d(0.5, 0)), //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
+        new Pose2d(1, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(
