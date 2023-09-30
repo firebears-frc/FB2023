@@ -173,6 +173,6 @@ public class SwerveModule {
         drivingPositionLog.append(drivingEncoder.getPosition());
         turningSetpointLog.append(desiredState.angle.getRadians());
         turningPositionLog.append(turningEncoder.getPosition());
-        turningOutputLog.append(drivingMotor.get());
+        turningOutputLog.append(drivingMotor.getAppliedOutput());
     }
 }
