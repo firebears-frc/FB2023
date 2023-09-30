@@ -32,8 +32,11 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class Chassis extends SubsystemBase {
     private static final class Constants {
-        public static final double TRACK_WIDTH = Units.inchesToMeters(26.5);
-        public static final double WHEEL_BASE = Units.inchesToMeters(26.5);
+        public static final double ROBOT_WIDTH = Units.inchesToMeters(30); // TODO
+        public static final double ROBOT_LENGTH = Units.inchesToMeters(30); // TODO
+        // Wheels are offset 1.75" into the modules
+        public static final double TRACK_WIDTH = ROBOT_WIDTH - (Units.inchesToMeters(3.5) * 2);
+        public static final double WHEEL_BASE = ROBOT_LENGTH - (Units.inchesToMeters(3.5) * 2);
 
         public static final SwerveModule.SwerveModuleConfiguration MODULES[] = {
                 // Front Left
