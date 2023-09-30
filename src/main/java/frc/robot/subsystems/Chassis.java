@@ -147,6 +147,10 @@ public class Chassis extends SubsystemBase {
         double currentPitch = getPitchDegrees();
         pitchVelocity = currentPitch - lastPitch;
         lastPitch = currentPitch;
+
+        for (int i = 0; i < Constants.MODULES.length; i++) {
+            modules[i].periodic();
+        }
     }
 
     /****************** DRIVING ******************/
