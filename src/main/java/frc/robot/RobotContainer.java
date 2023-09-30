@@ -71,6 +71,9 @@ public class RobotContainer {
     one.trigger().whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+
+    two.trigger().whileTrue(new RunCommand(
+      () -> m_robotDrive.zeroHeading(), m_robotDrive));
   }
 
   /**
