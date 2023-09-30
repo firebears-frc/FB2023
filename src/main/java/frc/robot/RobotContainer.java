@@ -34,7 +34,7 @@ public class RobotContainer {
         public static final int JOYSTICK_2_PORT = 1;
         public static final int CONTROLLER_PORT = 2;
 
-        public static final double JOYSTICK_DEADBAND = 0.0375;
+        public static final double JOYSTICK_DEADBAND = 0.05;
     }
 
     private final Chassis chassis;
