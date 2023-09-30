@@ -13,6 +13,7 @@ import frc.robot.util.GamePiece;
 
 import java.util.List;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,6 +33,8 @@ public class RobotContainer {
         public static final int JOYSTICK_1_PORT = 0;
         public static final int JOYSTICK_2_PORT = 1;
         public static final int CONTROLLER_PORT = 2;
+
+        public static final double JOYSTICK_DEADBAND = 0.0375;
     }
 
     private final Chassis chassis;
@@ -55,8 +58,9 @@ public class RobotContainer {
         // arm = new Arm(log);
         // schlucker = new SchluckerBag(log); // new SchluckerNeo550();
         // vision = new Vision(chassis::visionPose);
-        // lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
-        //         chassis::isOnChargeStation, chassis::isNotPitching);
+        // lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem,
+        // chassis::isLevel,
+        // chassis::isOnChargeStation, chassis::isNotPitching);
 
         joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
@@ -65,13 +69,15 @@ public class RobotContainer {
 
         autoSelector = new SendableChooser<>();
         // autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
-        //         new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
+        // new OneElementWithMobilityAndEngaged(chassis, arm, schlucker,
+        // GamePiece.CONE));
         // autoSelector.addOption("1 Cube w/ Mobility & Engage",
-        //         new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CUBE));
+        // new OneElementWithMobilityAndEngaged(chassis, arm, schlucker,
+        // GamePiece.CUBE));
         // autoSelector.addOption("1 Cone w/ Mobility",
-        //         new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
+        // new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
         // autoSelector.addOption("1 Cube w/ Mobility",
-        //         new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
+        // new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
         autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
                 new Pose2d(0, 0, new Rotation2d(0)),
                 List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
@@ -85,36 +91,41 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        chassis.setDefaultCommand(chassis.defaultCommand(joystick_1::getY, joystick_1::getX, joystick_2::getX,
-                () -> joystick_1.getHID().getRawButton(1), true));
+        chassis.setDefaultCommand(chassis.defaultCommand(
+                () -> MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
+                () -> MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
+                () -> MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND),
+                () -> joystick_1.getHID().getRawButton(1),
+                true));
 
         joystick_1.trigger().whileTrue(chassis.turtle());
         joystick_2.trigger().whileTrue(chassis.zeroHeading());
 
-        // arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
+        // arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY,
+        // controller::getRightY));
 
         // // Arm target point commands
         // controller.povUp().onTrue(arm.substation());
         // controller.povRight()
-        //         .onTrue(arm.mid().andThen(schlucker.eject()))
-        //         .onFalse(schlucker.stop());
+        // .onTrue(arm.mid().andThen(schlucker.eject()))
+        // .onFalse(schlucker.stop());
         // controller.povDown().onTrue(arm.groundCone());
         // controller.povLeft()
-        //         .onTrue(arm.high().andThen(schlucker.eject()))
-        //         .onFalse(schlucker.stop());
+        // .onTrue(arm.high().andThen(schlucker.eject()))
+        // .onFalse(schlucker.stop());
         // controller.leftBumper().onTrue(arm.groundCube());
         // controller.b().onTrue(arm.stow());
 
         // // Schlucker commands
         // controller.a()
-        //         .onTrue(schlucker.intakeCone())
-        //         .onFalse(schlucker.hold());
+        // .onTrue(schlucker.intakeCone())
+        // .onFalse(schlucker.hold());
         // controller.x()
-        //         .onTrue(schlucker.intakeCube())
-        //         .onFalse(schlucker.hold());
+        // .onTrue(schlucker.intakeCube())
+        // .onFalse(schlucker.hold());
         // controller.y()
-        //         .onTrue(schlucker.eject())
-        //         .onFalse(schlucker.stop());
+        // .onTrue(schlucker.eject())
+        // .onFalse(schlucker.stop());
 
         // joystick_1.button(3).onTrue(schlucker.wantCone());
         // joystick_1.button(4).onTrue(schlucker.wantCube());
