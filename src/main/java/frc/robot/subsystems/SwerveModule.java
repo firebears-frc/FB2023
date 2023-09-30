@@ -121,8 +121,9 @@ public class SwerveModule {
 
         turningMotor.restoreFactoryDefaults();
         turningMotor.setIdleMode(Constants.Turning.IDLE_MODE);
-        turningMotor.setSmartCurrentLimit(Constants.Turning.STALL_CURRENT_LIMIT, Constants.Turning.FREE_CURRENT_LIMIT);
-        turningMotor.setSecondaryCurrentLimit(Constants.Turning.SECONDARY_CURRENT_LIMIT);
+        turningMotor.setSmartCurrentLimit(20);
+        //turningMotor.setSmartCurrentLimit(Constants.Turning.STALL_CURRENT_LIMIT, Constants.Turning.FREE_CURRENT_LIMIT);
+        //turningMotor.setSecondaryCurrentLimit(Constants.Turning.SECONDARY_CURRENT_LIMIT);
         turningEncoder = turningMotor.getAbsoluteEncoder(Type.kDutyCycle);
         turningEncoder.setPositionConversionFactor(Constants.Turning.POSITION_FACTOR);
         turningEncoder.setVelocityConversionFactor(Constants.Turning.VELOCITY_FACTOR);
