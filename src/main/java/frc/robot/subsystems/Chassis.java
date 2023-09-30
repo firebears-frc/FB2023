@@ -46,12 +46,12 @@ public class Chassis extends SubsystemBase {
                 // Front Right
                 new SwerveModule.SwerveModuleConfiguration(21, 20, 0,
                         new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2)),
-                // Rear Left
-                new SwerveModule.SwerveModuleConfiguration(24, 25, Math.PI,
-                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)),
                 // Rear Right
                 new SwerveModule.SwerveModuleConfiguration(23, 22, Math.PI / 2,
-                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2))
+                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)),
+                // Rear Left
+                new SwerveModule.SwerveModuleConfiguration(24, 25, Math.PI,
+                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2))
         };
 
         // Driving
