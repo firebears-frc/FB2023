@@ -95,6 +95,7 @@ public class SwerveModule {
     private final DoubleLogEntry drivingPositionLog;
     private final DoubleLogEntry turningSetpointLog;
     private final DoubleLogEntry turningPositionLog;
+    private final DoubleLogEntry turningOutputLog;
 
     private final double angleOffset;
     private SwerveModuleState desiredState;
@@ -145,6 +146,7 @@ public class SwerveModule {
         drivingPositionLog = new DoubleLogEntry(log, "Drive/" + id + "/Driving/Position");
         turningSetpointLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Setpoint");
         turningPositionLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Position");
+        turningOutputLog = new DoubleLogEntry(log, "Drive/" + id + "/Turning/Output");
 
         drivingMotor.burnFlash();
         turningMotor.burnFlash();
@@ -171,5 +173,6 @@ public class SwerveModule {
         drivingPositionLog.append(drivingEncoder.getPosition());
         turningSetpointLog.append(desiredState.angle.getRadians());
         turningPositionLog.append(turningEncoder.getPosition());
+        turningOutputLog.append(drivingMotor.get());
     }
 }
