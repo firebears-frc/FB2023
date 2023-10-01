@@ -100,14 +100,11 @@ public class Chassis extends SubsystemBase {
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
-    // Logging
-    private final DataLog log;
-
-    public Chassis(DataLog log) {
+    public Chassis() {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
-            modules[i] = new SwerveModule(Constants.MODULES[i], log, i);
+            modules[i] = new SwerveModule(Constants.MODULES[i], i);
         }
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
@@ -133,8 +130,6 @@ public class Chassis extends SubsystemBase {
                 Constants.MAX_AUTO_ANGULAR_ACCELERATION);
         config = new TrajectoryConfig(Constants.MAX_AUTO_VELOCITY, Constants.MAX_AUTO_ACCELERATION);
         config.setKinematics(kinematics);
-
-        this.log = log;
     }
 
     private SwerveModulePosition[] getModulePositions() {
@@ -160,10 +155,6 @@ public class Chassis extends SubsystemBase {
         double currentPitch = getPitchDegrees();
         pitchVelocity = currentPitch - lastPitch;
         lastPitch = currentPitch;
-
-        for (int i = 0; i < Constants.MODULES.length; i++) {
-            modules[i].periodic();
-        }
     }
 
     /****************** DRIVING ******************/
@@ -299,15 +290,9 @@ public class Chassis extends SubsystemBase {
         private final boolean rateLimit;
 
         private final RateLimiter rateLimiter;
-        private final DoubleLogEntry xInputLog;
-        private final DoubleLogEntry yInputLog;
-        private final DoubleLogEntry rInputLog;
-        private final DoubleLogEntry xActualLog;
-        private final DoubleLogEntry yActualLog;
-        private final DoubleLogEntry rActualLog;
 
         public DriveCommand(Chassis chassis, Supplier<ChassisSpeeds> commandSupplier,
-                Supplier<Boolean> slowModeSupplier, boolean fieldRelative, boolean rateLimit, DataLog log) {
+                Supplier<Boolean> slowModeSupplier, boolean fieldRelative, boolean rateLimit) {
             this.chassis = chassis;
             this.commandSupplier = commandSupplier;
             this.slowModeSupplier = slowModeSupplier;
@@ -315,12 +300,6 @@ public class Chassis extends SubsystemBase {
             this.rateLimit = rateLimit;
 
             rateLimiter = new RateLimiter();
-            xInputLog = new DoubleLogEntry(log, "Drive/Command/X-Input");
-            yInputLog = new DoubleLogEntry(log, "Drive/Command/Y-Input");
-            rInputLog = new DoubleLogEntry(log, "Drive/Command/R-Input");
-            xActualLog = new DoubleLogEntry(log, "Drive/Command/X-Actual");
-            yActualLog = new DoubleLogEntry(log, "Drive/Command/Y-Actual");
-            rActualLog = new DoubleLogEntry(log, "Drive/Command/R-Actual");
 
             addRequirements(chassis);
         }
@@ -328,10 +307,6 @@ public class Chassis extends SubsystemBase {
         @Override
         public void execute() {
             ChassisSpeeds command = commandSupplier.get();
-
-            xInputLog.append(command.vxMetersPerSecond);
-            yInputLog.append(command.vyMetersPerSecond);
-            rInputLog.append(command.omegaRadiansPerSecond);
 
             if (rateLimit) {
                 command = rateLimiter.calculate(command);
@@ -346,10 +321,6 @@ public class Chassis extends SubsystemBase {
                 command.vyMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
                 command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
-
-            xActualLog.append(command.vxMetersPerSecond);
-            yActualLog.append(command.vyMetersPerSecond);
-            rActualLog.append(command.omegaRadiansPerSecond);
 
             chassis.drive(command, fieldRelative);
         }

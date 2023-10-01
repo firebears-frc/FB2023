@@ -41,7 +41,7 @@ public class RobotContainer {
         joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
 
-        autoSelector = new LoggedDashboardChooser<>();
+        autoSelector = new LoggedDashboardChooser<>("Auto Routine");
         autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
                 new Pose2d(0, 0, new Rotation2d(0)),
                 List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
@@ -51,7 +51,7 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    private void configureButtonBindings(DataLog log) {
+    private void configureButtonBindings() {
         chassis.setDefaultCommand(new Chassis.DriveCommand(
                 chassis,
                 () -> new ChassisSpeeds(
@@ -60,8 +60,7 @@ public class RobotContainer {
                         -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND)),
                 () -> joystick_1.getHID().getRawButton(1),
                 true,
-                true,
-                log));
+                true));
 
         joystick_1.trigger().whileTrue(chassis.turtle());
         joystick_2.trigger().whileTrue(chassis.zeroHeading());
