@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -60,10 +61,12 @@ public class RobotContainer {
     private void configureButtonBindings(DataLog log) {
         chassis.setDefaultCommand(new Chassis.DriveCommand(
                 chassis,
-                () -> -MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
-                () -> -MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
-                () -> -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND),
+                () -> new ChassisSpeeds(
+                        -MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
+                        -MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
+                        -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND)),
                 () -> joystick_1.getHID().getRawButton(1),
+                true,
                 true,
                 log));
 
