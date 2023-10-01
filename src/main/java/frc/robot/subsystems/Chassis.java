@@ -27,7 +27,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
@@ -78,7 +80,6 @@ public class Chassis extends SubsystemBase {
     // Driving
     private final SwerveModule[] modules;
     private final SwerveDriveKinematics kinematics;
-    // TODO: Add slew rate limitations
 
     // Localization
     private AHRS navX;
@@ -93,9 +94,8 @@ public class Chassis extends SubsystemBase {
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
-    private final DoubleLogEntry commandedXLog;
-    private final DoubleLogEntry commandedYLog;
-    private final DoubleLogEntry commandedRLog;
+    // Logging
+    private final DataLog log;
 
     public Chassis(DataLog log) {
         // Build up modules array
@@ -128,9 +128,7 @@ public class Chassis extends SubsystemBase {
         config = new TrajectoryConfig(Constants.MAX_AUTO_VELOCITY, Constants.MAX_AUTO_ACCELERATION);
         config.setKinematics(kinematics);
 
-        commandedXLog = new DoubleLogEntry(log, "Drive/Command/X");
-        commandedYLog = new DoubleLogEntry(log, "Drive/Command/Y");
-        commandedRLog = new DoubleLogEntry(log, "Drive/Command/R");
+        this.log = log;
     }
 
     private SwerveModulePosition[] getModulePositions() {
@@ -280,7 +278,51 @@ public class Chassis extends SubsystemBase {
     public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
             Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier,
             boolean fieldRelative) {
+        return new DriveCommand(this, forwardSupplier, strafeSupplier, rotationSupplier, slowModeSupplier,
+                fieldRelative, log);
+    }
+
+    public Command turtle() {
+        return new RunCommand(this::setX, this);
+    }
+
+    public Command zeroHeading() {
         return new RunCommand(() -> {
+            setPose(new Pose2d());
+        }, this);
+    }
+
+    private static class DriveCommand extends CommandBase {
+        private final Chassis chassis;
+        private final Supplier<Double> forwardSupplier;
+        private final Supplier<Double> strafeSupplier;
+        private final Supplier<Double> rotationSupplier;
+        private final Supplier<Boolean> slowModeSupplier;
+        private final boolean fieldRelative;
+
+        private final DoubleLogEntry xLog;
+        private final DoubleLogEntry yLog;
+        private final DoubleLogEntry rLog;
+
+        public DriveCommand(Chassis chassis, Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
+                Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier, boolean fieldRelative,
+                DataLog log) {
+            this.chassis = chassis;
+            this.forwardSupplier = forwardSupplier;
+            this.strafeSupplier = strafeSupplier;
+            this.rotationSupplier = rotationSupplier;
+            this.slowModeSupplier = slowModeSupplier;
+            this.fieldRelative = fieldRelative;
+
+            xLog = new DoubleLogEntry(log, "Drive/Command/X");
+            yLog = new DoubleLogEntry(log, "Drive/Command/Y");
+            rLog = new DoubleLogEntry(log, "Drive/Command/R");
+
+            addRequirements(chassis);
+        }
+
+        @Override
+        public void execute() {
             double forward = forwardSupplier.get();
             double strafe = strafeSupplier.get();
             double rotation = rotationSupplier.get();
@@ -294,21 +336,11 @@ public class Chassis extends SubsystemBase {
                 strafe *= Constants.MAX_TELE_VELOCITY;
                 rotation *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
-            commandedXLog.append(forward);
-            commandedYLog.append(strafe);
-            commandedRLog.append(rotation);
+            xLog.append(forward);
+            yLog.append(strafe);
+            rLog.append(rotation);
 
-            drive(new ChassisSpeeds(forward, strafe, rotation), fieldRelative);
-        }, this);
-    }
-
-    public Command turtle() {
-        return new RunCommand(this::setX, this);
-    }
-
-    public Command zeroHeading() {
-        return new RunCommand(() -> {
-            setPose(new Pose2d());
-        }, this);
+            chassis.drive(new ChassisSpeeds(forward, strafe, rotation), fieldRelative);
+        }
     }
 }
