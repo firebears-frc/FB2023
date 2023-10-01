@@ -281,9 +281,9 @@ public class Chassis extends SubsystemBase {
             Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier,
             boolean fieldRelative) {
         return new RunCommand(() -> {
-            double forward = forwardSupplier.get() * -1.0;
-            double strafe = strafeSupplier.get() * -1.0;
-            double rotation = rotationSupplier.get() * -1.0;
+            double forward = forwardSupplier.get();
+            double strafe = strafeSupplier.get();
+            double rotation = rotationSupplier.get();
 
             if (slowModeSupplier.get()) {
                 forward *= Constants.SLOW_TELE_VELOCITY;

@@ -92,9 +92,9 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         chassis.setDefaultCommand(chassis.defaultCommand(
-                () -> MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
-                () -> MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
-                () -> MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND),
+                () -> -MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
+                () -> -MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
+                () -> -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND),
                 () -> joystick_1.getHID().getRawButton(1),
                 true));
 
