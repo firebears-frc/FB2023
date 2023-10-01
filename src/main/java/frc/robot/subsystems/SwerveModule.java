@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -12,8 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class SwerveModule {
     public static class SwerveModuleConfiguration {
@@ -21,13 +21,15 @@ public class SwerveModule {
         protected final int turningID;
         protected final double angleOffset;
         protected final Translation2d positionOffset;
+        protected final String name;
 
         public SwerveModuleConfiguration(int drivingID, int turningID, double angleOffset,
-                Translation2d positionOffset) {
+                Translation2d positionOffset, String name) {
             this.drivingID = drivingID;
             this.turningID = turningID;
             this.angleOffset = angleOffset;
             this.positionOffset = positionOffset;
+            this.name = name;
         }
     }
 
@@ -83,21 +85,20 @@ public class SwerveModule {
     }
 
     private final CANSparkMax drivingMotor;
-    private final CANSparkMax turningMotor;
-
     private final RelativeEncoder drivingEncoder;
-    private final AbsoluteEncoder turningEncoder;
-
     private final SparkMaxPIDController drivingController;
+
+    private final CANSparkMax turningMotor;
+    private final AbsoluteEncoder turningEncoder;
     private final SparkMaxPIDController turningController;
 
     private final double angleOffset;
+    private final String name;
+
     private SwerveModuleState desiredState;
 
     public SwerveModule(SwerveModuleConfiguration configuration, int id) {
         drivingMotor = new CANSparkMax(configuration.drivingID, MotorType.kBrushless);
-        turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
-
         drivingMotor.restoreFactoryDefaults();
         drivingMotor.setIdleMode(Constants.Driving.IDLE_MODE);
         drivingMotor.setSmartCurrentLimit(Constants.Driving.STALL_CURRENT_LIMIT, Constants.Driving.FREE_CURRENT_LIMIT);
@@ -114,6 +115,7 @@ public class SwerveModule {
         drivingController.setFF(Constants.Driving.FF);
         drivingController.setOutputRange(Constants.Driving.MIN, Constants.Driving.MAX);
 
+        turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
         turningMotor.restoreFactoryDefaults();
         turningMotor.setIdleMode(Constants.Turning.IDLE_MODE);
         turningMotor.setSmartCurrentLimit(Constants.Turning.STALL_CURRENT_LIMIT, Constants.Turning.FREE_CURRENT_LIMIT);
@@ -134,6 +136,7 @@ public class SwerveModule {
         turningController.setOutputRange(Constants.Turning.MIN, Constants.Turning.MAX);
 
         angleOffset = configuration.angleOffset;
+        name = configuration.name;
         desiredState = new SwerveModuleState(0.0, new Rotation2d(turningEncoder.getPosition()));
 
         drivingMotor.burnFlash();
@@ -154,5 +157,17 @@ public class SwerveModule {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
+    }
+
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(
+                drivingEncoder.getVelocity(),
+                new Rotation2d(turningEncoder.getPosition() - angleOffset));
+    }
+
+    public void periodic() {
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Chassis/" + name + "/Target", desiredState);
+        logger.recordOutput("Chassis/" + name + "/Actual", getState());
     }
 }

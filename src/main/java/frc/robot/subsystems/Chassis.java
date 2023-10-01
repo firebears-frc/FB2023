@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -23,8 +25,6 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -43,18 +43,14 @@ public class Chassis extends SubsystemBase {
         public static final double WHEEL_BASE = ROBOT_LENGTH - (Units.inchesToMeters(1.75) * 2);
 
         public static final SwerveModule.SwerveModuleConfiguration MODULES[] = {
-                // Front Left
                 new SwerveModule.SwerveModuleConfiguration(26, 27, -Math.PI / 2,
-                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2)),
-                // Front Right
+                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), "Front Left"),
                 new SwerveModule.SwerveModuleConfiguration(21, 20, 0,
-                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2)),
-                // Rear Left
+                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Front Right"),
                 new SwerveModule.SwerveModuleConfiguration(24, 25, Math.PI,
-                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)),
-                // Rear Right
+                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), "Rear Left"),
                 new SwerveModule.SwerveModuleConfiguration(23, 22, Math.PI / 2,
-                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2))
+                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Rear Right")
         };
 
         // Driving
@@ -134,8 +130,8 @@ public class Chassis extends SubsystemBase {
 
     private SwerveModulePosition[] getModulePositions() {
         // Build up position array
-        SwerveModulePosition result[] = new SwerveModulePosition[Constants.MODULES.length];
-        for (int i = 0; i < Constants.MODULES.length; i++) {
+        SwerveModulePosition result[] = new SwerveModulePosition[modules.length];
+        for (int i = 0; i < modules.length; i++) {
             result[i] = modules[i].getPosition();
         }
         return result;
@@ -155,6 +151,15 @@ public class Chassis extends SubsystemBase {
         double currentPitch = getPitchDegrees();
         pitchVelocity = currentPitch - lastPitch;
         lastPitch = currentPitch;
+
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].periodic();
+        }
+
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Chassis/Pose", getPose());
+        logger.recordOutput("Chassis/Pitch", currentPitch);
+        logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
     }
 
     /****************** DRIVING ******************/
@@ -308,6 +313,11 @@ public class Chassis extends SubsystemBase {
         public void execute() {
             ChassisSpeeds command = commandSupplier.get();
 
+            Logger logger = Logger.getInstance();
+            logger.recordOutput("Chassis/Input/X", command.vxMetersPerSecond);
+            logger.recordOutput("Chassis/Input/Y", command.vyMetersPerSecond);
+            logger.recordOutput("Chassis/Input/R", command.omegaRadiansPerSecond);
+
             if (rateLimit) {
                 command = rateLimiter.calculate(command);
             }
@@ -321,6 +331,10 @@ public class Chassis extends SubsystemBase {
                 command.vyMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
                 command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
+
+            logger.recordOutput("Chassis/Actual/X", command.vxMetersPerSecond);
+            logger.recordOutput("Chassis/Actual/Y", command.vyMetersPerSecond);
+            logger.recordOutput("Chassis/Actual/R", command.omegaRadiansPerSecond);
 
             chassis.drive(command, fieldRelative);
         }
@@ -411,6 +425,11 @@ public class Chassis extends SubsystemBase {
             command.vxMetersPerSecond = currentMagnitude * Math.cos(currentDirection);
             command.vyMetersPerSecond = currentMagnitude * Math.sin(currentDirection);
             command.omegaRadiansPerSecond = rotationLimiter.calculate(command.omegaRadiansPerSecond);
+
+            Logger logger = Logger.getInstance();
+            logger.recordOutput("Chassis/RateLimiter/Magnitude", currentMagnitude);
+            logger.recordOutput("Chassis/RateLimiter/Direction", currentDirection);
+
             return command;
         }
     }
