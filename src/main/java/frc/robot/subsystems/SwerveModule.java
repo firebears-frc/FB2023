@@ -97,7 +97,7 @@ public class SwerveModule {
 
     private SwerveModuleState desiredState;
 
-    public SwerveModule(SwerveModuleConfiguration configuration, int id) {
+    public SwerveModule(SwerveModuleConfiguration configuration) {
         drivingMotor = new CANSparkMax(configuration.drivingID, MotorType.kBrushless);
         drivingMotor.restoreFactoryDefaults();
         drivingMotor.setIdleMode(Constants.Driving.IDLE_MODE);

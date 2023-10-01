@@ -100,7 +100,7 @@ public class Chassis extends SubsystemBase {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
-            modules[i] = new SwerveModule(Constants.MODULES[i], i);
+            modules[i] = new SwerveModule(Constants.MODULES[i]);
         }
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
