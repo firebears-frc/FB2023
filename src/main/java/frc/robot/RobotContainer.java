@@ -91,7 +91,8 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings(DataLog log) {
-        chassis.setDefaultCommand(new Chassis.DriveCommand(chassis,
+        chassis.setDefaultCommand(new Chassis.DriveCommand(
+                chassis,
                 () -> -MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
                 () -> -MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
                 () -> -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND),

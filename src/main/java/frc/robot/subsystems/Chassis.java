@@ -9,6 +9,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -75,6 +77,11 @@ public class Chassis extends SubsystemBase {
         public static final double LEVEL_TOLERANCE = 2.0; // degrees
         public static final double ON_TOLERANCE = 10.0; // degrees
         public static final double PITCH_VELOCITY_MAX = 0.2; // degrees per cycle
+
+        // Slew Rate Limiting
+        public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
+        public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
+        public static final double ROTATION_SLEW_RATE = 2.0; // percent per second (1 = 100%)
     }
 
     // Driving
@@ -297,6 +304,13 @@ public class Chassis extends SubsystemBase {
         private final DoubleLogEntry yLog;
         private final DoubleLogEntry rLog;
 
+        private SlewRateLimiter magnitude = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
+        private SlewRateLimiter rotation = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
+        private double currentDirection = 0.0;
+        private double currentMagnitude = 0.0;
+        private double currentRotation = 0.0;
+        private double previousTime = WPIUtilJNI.now() * 1e-6;
+
         public DriveCommand(Chassis chassis, Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
                 Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier, boolean fieldRelative,
                 DataLog log) {
@@ -312,6 +326,51 @@ public class Chassis extends SubsystemBase {
             rLog = new DoubleLogEntry(log, "Drive/Command/R");
 
             addRequirements(chassis);
+        }
+
+        private void rateLimit(double forward, double strafe, double rotation) {
+            double forwardCommanded;
+            double strafeCommanded;
+
+            // Convert XY to polar for rate limiting
+            double inputTranslationDir = Math.atan2(strafe, forward);
+            double inputTranslationMag = Math.sqrt(Math.pow(forward, 2) + Math.pow(strafe, 2));
+
+            // Calculate the direction slew rate based on an estimate of the lateral acceleration
+            double directionSlewRate;
+            if (currentMagnitude != 0.0) {
+                directionSlewRate = Math.abs(Constants.DIRECTION_SLEW_RATE / currentMagnitude);
+            } else {
+                directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
+            }
+            
+
+            double currentTime = WPIUtilJNI.now() * 1e-6;
+            double elapsedTime = currentTime - previousTime;
+            double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, currentDirection);
+            if (angleDif < 0.45*Math.PI) {
+                currentDirection = SwerveUtils.StepTowardsCircular(currentDirection, inputTranslationDir, directionSlewRate * elapsedTime);
+                currentMagnitude = magnitude.calculate(inputTranslationMag);
+            }
+            else if (angleDif > 0.85*Math.PI) {
+                if (currentMagnitude > 1e-4) { //some small number to avoid floating-point errors with equality checking
+                // keep currentTranslationDir unchanged
+                currentMagnitude = magnitude.calculate(0.0);
+                }
+                else {
+                currentDirection = SwerveUtils.WrapAngle(currentDirection + Math.PI);
+                currentMagnitude = magnitude.calculate(inputTranslationMag);
+                }
+            }
+            else {
+                currentDirection = SwerveUtils.StepTowardsCircular(currentDirection, inputTranslationDir, directionSlewRate * elapsedTime);
+                currentMagnitude = magnitude.calculate(0.0);
+            }
+            previousTime = currentTime;
+            
+            forwardCommanded = currentMagnitude * Math.cos(currentDirection);
+            strafeCommanded = currentMagnitude * Math.sin(currentDirection);
+            currentRotation = this.rotation.calculate(rotation);
         }
 
         @Override
