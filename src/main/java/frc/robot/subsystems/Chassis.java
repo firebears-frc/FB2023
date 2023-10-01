@@ -299,6 +299,7 @@ public class Chassis extends SubsystemBase {
         private final Supplier<Double> rotationSupplier;
         private final Supplier<Boolean> slowModeSupplier;
         private final boolean fieldRelative;
+        private final boolean rateLimit;
 
         private final DoubleLogEntry xLog;
         private final DoubleLogEntry yLog;
@@ -313,6 +314,7 @@ public class Chassis extends SubsystemBase {
 
         public DriveCommand(Chassis chassis, Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
                 Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier, boolean fieldRelative,
+                boolean rateLimit,
                 DataLog log) {
             this.chassis = chassis;
             this.forwardSupplier = forwardSupplier;
@@ -320,6 +322,7 @@ public class Chassis extends SubsystemBase {
             this.rotationSupplier = rotationSupplier;
             this.slowModeSupplier = slowModeSupplier;
             this.fieldRelative = fieldRelative;
+            this.rateLimit = rateLimit;
 
             xLog = new DoubleLogEntry(log, "Drive/Command/X");
             yLog = new DoubleLogEntry(log, "Drive/Command/Y");
@@ -328,49 +331,83 @@ public class Chassis extends SubsystemBase {
             addRequirements(chassis);
         }
 
+        private static double angleDifference(double angleOne, double angleTwo) {
+            double difference = Math.abs(angleOne - angleTwo);
+            return difference > Math.PI ? (2 * Math.PI) - difference : difference;
+        }
+
+        private static double wrapAngle(double angle) {
+            if (angle == (Math.PI * 2)) {
+                return 0.0;
+            } else if (angle > (Math.PI * 2)) {
+                return angle - (Math.PI * 2) * Math.floor(angle / (Math.PI * 2));
+            } else if (angle < 0.0) {
+                return angle + (Math.PI * 2) * Math.floor((-angle / (Math.PI * 2)) + 1);
+            } else {
+                return angle;
+            }
+        }
+
+        private static double stepTowardsCircular(double current, double target, double step) {
+            current = wrapAngle(current);
+            target = wrapAngle(target);
+
+            double direction = Math.signum(target - current);
+            double difference = Math.abs(current - target);
+
+            if (difference <= step) {
+                return target;
+            }
+
+            if (difference > Math.PI) {
+                if (current + (2 * Math.PI) - target < step || target + (2 * Math.PI) - current < step) {
+                    return target;
+                } else {
+                    return wrapAngle(current - direction * step);
+                }
+            }
+
+            return current + direction * step;
+        }
+
         private void rateLimit(double forward, double strafe, double rotation) {
-            double forwardCommanded;
-            double strafeCommanded;
-
             // Convert XY to polar for rate limiting
-            double inputTranslationDir = Math.atan2(strafe, forward);
-            double inputTranslationMag = Math.sqrt(Math.pow(forward, 2) + Math.pow(strafe, 2));
+            double inputDirection = Math.atan2(strafe, forward);
+            double inputMagnitude = Math.sqrt(Math.pow(forward, 2) + Math.pow(strafe, 2));
 
-            // Calculate the direction slew rate based on an estimate of the lateral acceleration
+            // Calculate the direction slew rate based on an estimate of the lateral
+            // acceleration
             double directionSlewRate;
             if (currentMagnitude != 0.0) {
                 directionSlewRate = Math.abs(Constants.DIRECTION_SLEW_RATE / currentMagnitude);
             } else {
-                directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
+                directionSlewRate = 500.0; // some high number that means the slew rate is effectively instantaneous
             }
-            
 
             double currentTime = WPIUtilJNI.now() * 1e-6;
             double elapsedTime = currentTime - previousTime;
-            double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, currentDirection);
-            if (angleDif < 0.45*Math.PI) {
-                currentDirection = SwerveUtils.StepTowardsCircular(currentDirection, inputTranslationDir, directionSlewRate * elapsedTime);
-                currentMagnitude = magnitude.calculate(inputTranslationMag);
-            }
-            else if (angleDif > 0.85*Math.PI) {
-                if (currentMagnitude > 1e-4) { //some small number to avoid floating-point errors with equality checking
-                // keep currentTranslationDir unchanged
-                currentMagnitude = magnitude.calculate(0.0);
+            double angleDif = angleDifference(inputDirection, currentDirection);
+            if (angleDif < 0.45 * Math.PI) {
+                currentDirection = stepTowardsCircular(currentDirection, inputDirection,
+                        directionSlewRate * elapsedTime);
+                currentMagnitude = magnitude.calculate(inputMagnitude);
+            } else if (angleDif > 0.85 * Math.PI) {
+                if (currentMagnitude > 0.01) {
+                    currentMagnitude = magnitude.calculate(0.0);
+                } else {
+                    currentDirection = wrapAngle(currentDirection + Math.PI);
+                    currentMagnitude = magnitude.calculate(inputMagnitude);
                 }
-                else {
-                currentDirection = SwerveUtils.WrapAngle(currentDirection + Math.PI);
-                currentMagnitude = magnitude.calculate(inputTranslationMag);
-                }
-            }
-            else {
-                currentDirection = SwerveUtils.StepTowardsCircular(currentDirection, inputTranslationDir, directionSlewRate * elapsedTime);
+            } else {
+                currentDirection = stepTowardsCircular(currentDirection, inputDirection,
+                        directionSlewRate * elapsedTime);
                 currentMagnitude = magnitude.calculate(0.0);
             }
             previousTime = currentTime;
-            
-            forwardCommanded = currentMagnitude * Math.cos(currentDirection);
-            strafeCommanded = currentMagnitude * Math.sin(currentDirection);
-            currentRotation = this.rotation.calculate(rotation);
+
+            forward = currentMagnitude * Math.cos(currentDirection);
+            strafe = currentMagnitude * Math.sin(currentDirection);
+            rotation = this.rotation.calculate(rotation);
         }
 
         @Override
