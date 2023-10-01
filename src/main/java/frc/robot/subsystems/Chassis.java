@@ -24,6 +24,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -297,11 +298,13 @@ public class Chassis extends SubsystemBase {
         private final boolean fieldRelative;
         private final boolean rateLimit;
 
-        private SlewRateLimiter magnitude = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
-        private SlewRateLimiter rotation = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
-        private double currentDirection = 0.0;
-        private double currentMagnitude = 0.0;
-        private double previousTime = WPIUtilJNI.now() * 1e-6;
+        private final RateLimiter rateLimiter;
+        private final DoubleLogEntry xInputLog;
+        private final DoubleLogEntry yInputLog;
+        private final DoubleLogEntry rInputLog;
+        private final DoubleLogEntry xActualLog;
+        private final DoubleLogEntry yActualLog;
+        private final DoubleLogEntry rActualLog;
 
         public DriveCommand(Chassis chassis, Supplier<ChassisSpeeds> commandSupplier,
                 Supplier<Boolean> slowModeSupplier, boolean fieldRelative, boolean rateLimit, DataLog log) {
@@ -311,8 +314,53 @@ public class Chassis extends SubsystemBase {
             this.fieldRelative = fieldRelative;
             this.rateLimit = rateLimit;
 
+            rateLimiter = new RateLimiter();
+            xInputLog = new DoubleLogEntry(log, "Drive/Command/X-Input");
+            yInputLog = new DoubleLogEntry(log, "Drive/Command/Y-Input");
+            rInputLog = new DoubleLogEntry(log, "Drive/Command/R-Input");
+            xActualLog = new DoubleLogEntry(log, "Drive/Command/X-Actual");
+            yActualLog = new DoubleLogEntry(log, "Drive/Command/Y-Actual");
+            rActualLog = new DoubleLogEntry(log, "Drive/Command/R-Actual");
+
             addRequirements(chassis);
         }
+
+        @Override
+        public void execute() {
+            ChassisSpeeds command = commandSupplier.get();
+
+            xInputLog.append(command.vxMetersPerSecond);
+            yInputLog.append(command.vyMetersPerSecond);
+            rInputLog.append(command.omegaRadiansPerSecond);
+
+            if (rateLimit) {
+                command = rateLimiter.calculate(command);
+            }
+
+            if (slowModeSupplier.get()) {
+                command.vxMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
+                command.vyMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
+                command.omegaRadiansPerSecond *= Constants.SLOW_TELE_ANGULAR_VELOCITY;
+            } else {
+                command.vxMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
+                command.vyMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
+                command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
+            }
+
+            xActualLog.append(command.vxMetersPerSecond);
+            yActualLog.append(command.vyMetersPerSecond);
+            rActualLog.append(command.omegaRadiansPerSecond);
+
+            chassis.drive(command, fieldRelative);
+        }
+    }
+
+    private static class RateLimiter {
+        private SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
+        private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
+        private double currentDirection = 0.0;
+        private double currentMagnitude = 0.0;
+        private double previousTime = WPIUtilJNI.now() * 1e-6;
 
         private static double angleDifference(double angleOne, double angleTwo) {
             double difference = Math.abs(angleOne - angleTwo);
@@ -353,7 +401,7 @@ public class Chassis extends SubsystemBase {
             return current + direction * step;
         }
 
-        private ChassisSpeeds rateLimit(ChassisSpeeds command) {
+        public ChassisSpeeds calculate(ChassisSpeeds command) {
             // Convert XY to polar for rate limiting
             double inputDirection = Math.atan2(command.vyMetersPerSecond, command.vxMetersPerSecond);
             double inputMagnitude = Math
@@ -374,46 +422,25 @@ public class Chassis extends SubsystemBase {
             if (angleDif < 0.45 * Math.PI) {
                 currentDirection = stepTowardsCircular(currentDirection, inputDirection,
                         directionSlewRate * elapsedTime);
-                currentMagnitude = magnitude.calculate(inputMagnitude);
+                currentMagnitude = magnitudeLimiter.calculate(inputMagnitude);
             } else if (angleDif > 0.85 * Math.PI) {
                 if (currentMagnitude > 0.01) {
-                    currentMagnitude = magnitude.calculate(0.0);
+                    currentMagnitude = magnitudeLimiter.calculate(0.0);
                 } else {
                     currentDirection = wrapAngle(currentDirection + Math.PI);
-                    currentMagnitude = magnitude.calculate(inputMagnitude);
+                    currentMagnitude = magnitudeLimiter.calculate(inputMagnitude);
                 }
             } else {
                 currentDirection = stepTowardsCircular(currentDirection, inputDirection,
                         directionSlewRate * elapsedTime);
-                currentMagnitude = magnitude.calculate(0.0);
+                currentMagnitude = magnitudeLimiter.calculate(0.0);
             }
             previousTime = currentTime;
 
             command.vxMetersPerSecond = currentMagnitude * Math.cos(currentDirection);
             command.vyMetersPerSecond = currentMagnitude * Math.sin(currentDirection);
-            command.omegaRadiansPerSecond = this.rotation.calculate(command.omegaRadiansPerSecond);
+            command.omegaRadiansPerSecond = rotationLimiter.calculate(command.omegaRadiansPerSecond);
             return command;
-        }
-
-        @Override
-        public void execute() {
-            ChassisSpeeds command = commandSupplier.get();
-
-            if (rateLimit) {
-                command = rateLimit(command);
-            }
-
-            if (slowModeSupplier.get()) {
-                command.vxMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
-                command.vyMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
-                command.omegaRadiansPerSecond *= Constants.SLOW_TELE_ANGULAR_VELOCITY;
-            } else {
-                command.vxMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
-                command.vyMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
-                command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
-            }
-
-            chassis.drive(command, fieldRelative);
         }
     }
 }
