@@ -8,6 +8,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -30,7 +33,7 @@ public class RobotContainer {
     private final PowerDistribution pdh;
     private final CommandJoystick joystick_1;
     private final CommandJoystick joystick_2;
-    private final SendableChooser<Command> autoSelector;
+    private final LoggedDashboardChooser<Command> autoSelector;
 
     public RobotContainer() {
         chassis = new Chassis();
@@ -38,7 +41,7 @@ public class RobotContainer {
         joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
 
-        autoSelector = new SendableChooser<>();
+        autoSelector = new LoggedDashboardChooser<>();
         autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
                 new Pose2d(0, 0, new Rotation2d(0)),
                 List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
@@ -65,7 +68,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        Command auto = autoSelector.getSelected();
+        Command auto = autoSelector.get();
         return auto;
     }
 }
