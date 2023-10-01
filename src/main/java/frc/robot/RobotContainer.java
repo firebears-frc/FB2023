@@ -85,18 +85,19 @@ public class RobotContainer {
                 false));
         autoLog = new StringLogEntry(log, "/Auto/Command");
 
-        configureButtonBindings();
+        configureButtonBindings(log);
 
         displayGitInfo(log);
     }
 
-    private void configureButtonBindings() {
-        chassis.setDefaultCommand(chassis.defaultCommand(
+    private void configureButtonBindings(DataLog log) {
+        chassis.setDefaultCommand(new Chassis.DriveCommand(chassis,
                 () -> -MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
                 () -> -MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
                 () -> -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND),
                 () -> joystick_1.getHID().getRawButton(1),
-                true));
+                true,
+                log));
 
         joystick_1.trigger().whileTrue(chassis.turtle());
         joystick_2.trigger().whileTrue(chassis.zeroHeading());

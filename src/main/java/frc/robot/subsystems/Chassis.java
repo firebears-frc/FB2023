@@ -275,13 +275,6 @@ public class Chassis extends SubsystemBase {
     }
 
     /****************** COMMANDS ******************/
-    public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
-            Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier,
-            boolean fieldRelative) {
-        return new DriveCommand(this, forwardSupplier, strafeSupplier, rotationSupplier, slowModeSupplier,
-                fieldRelative, log);
-    }
-
     public Command turtle() {
         return new RunCommand(this::setX, this);
     }
@@ -292,7 +285,7 @@ public class Chassis extends SubsystemBase {
         }, this);
     }
 
-    private static class DriveCommand extends CommandBase {
+    public static class DriveCommand extends CommandBase {
         private final Chassis chassis;
         private final Supplier<Double> forwardSupplier;
         private final Supplier<Double> strafeSupplier;
