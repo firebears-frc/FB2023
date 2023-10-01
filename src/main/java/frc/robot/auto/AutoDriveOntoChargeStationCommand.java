@@ -14,7 +14,8 @@ public class AutoDriveOntoChargeStationCommand extends SequentialCommandGroup {
                         () -> chassis.drive(new ChassisSpeeds(
                                 1.0,
                                 0.0,
-                                0.0)),
+                                0.0),
+                                false),
                         null,
                         null,
                         chassis::isOnChargeStation,

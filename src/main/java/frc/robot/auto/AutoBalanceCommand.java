@@ -15,28 +15,28 @@ public class AutoBalanceCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
+        chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0), false);
     }
 
     @Override
     public void execute() {
         if (!chassis.isNotPitching()) {
             // Charge station is moving, stop!
-            chassis.drive(new ChassisSpeeds());
+            chassis.drive(new ChassisSpeeds(), false);
             return;
         }
 
         // Depending on what way the charge station is tipped, go to middle
         if (chassis.getPitchDegrees() > 0) {
-            chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0));
+            chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0), false);
         } else {
-            chassis.drive(new ChassisSpeeds(-1.0 * BALANCE_SPEED, 0, 0));
+            chassis.drive(new ChassisSpeeds(-1.0 * BALANCE_SPEED, 0, 0), false);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        chassis.drive(new ChassisSpeeds());
+        chassis.drive(new ChassisSpeeds(), false);
         if (!interrupted) {
             chassis.setX();
         }

@@ -163,10 +163,6 @@ public class Chassis extends SubsystemBase {
     }
 
     /****************** DRIVING ******************/
-    public void drive(ChassisSpeeds chassisSpeeds) {
-        drive(chassisSpeeds, false);
-    }
-
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
         if (fieldRelative && navX != null)
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, navX.getRotation2d());
