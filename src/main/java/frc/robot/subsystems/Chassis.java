@@ -105,6 +105,7 @@ public class Chassis extends SubsystemBase {
         }
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
+        target = new SwerveModuleState[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             positionOffsets[i] = Constants.MODULES[i].positionOffset;
             target[i] = new SwerveModuleState();
