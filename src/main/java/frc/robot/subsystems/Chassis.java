@@ -82,6 +82,7 @@ public class Chassis extends SubsystemBase {
     // Driving
     private final SwerveModule[] modules;
     private final SwerveDriveKinematics kinematics;
+    private SwerveModuleState[] target;
 
     // Localization
     private AHRS navX;
@@ -170,6 +171,7 @@ public class Chassis extends SubsystemBase {
         logger.recordOutput("Chassis/Pitch", currentPitch);
         logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
         logger.recordOutput("Chassis/Actual", getModuleStates());
+        logger.recordOutput("Chassis/Target", target);
     }
 
     /****************** DRIVING ******************/
@@ -186,11 +188,14 @@ public class Chassis extends SubsystemBase {
                     "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
-        Logger.getInstance().recordOutput("Chassis/Target", states);
 
         for (int i = 0; i < Constants.MODULES.length; i++) {
+            if (states[i].speedMetersPerSecond < 0.05) {
+                states[i].angle = target[i].angle;
+            }
             modules[i].setDesiredState(states[i]);
         }
+        target = states;
     }
 
     public void setX() {
