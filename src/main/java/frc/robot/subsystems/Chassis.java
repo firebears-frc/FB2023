@@ -186,11 +186,11 @@ public class Chassis extends SubsystemBase {
                     "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
+        Logger.getInstance().recordOutput("Chassis/Target", states);
 
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i].setDesiredState(states[i]);
         }
-        Logger.getInstance().recordOutput("Chassis/Target", states);
     }
 
     public void setX() {
