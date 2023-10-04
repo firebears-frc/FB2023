@@ -107,6 +107,7 @@ public class Chassis extends SubsystemBase {
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             positionOffsets[i] = Constants.MODULES[i].positionOffset;
+            target[i] = new SwerveModuleState();
         }
         kinematics = new SwerveDriveKinematics(positionOffsets);
 
