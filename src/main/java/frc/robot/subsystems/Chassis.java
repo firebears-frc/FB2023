@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,11 +24,12 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -39,18 +43,14 @@ public class Chassis extends SubsystemBase {
         public static final double WHEEL_BASE = ROBOT_LENGTH - (Units.inchesToMeters(1.75) * 2);
 
         public static final SwerveModule.SwerveModuleConfiguration MODULES[] = {
-                // Front Left
                 new SwerveModule.SwerveModuleConfiguration(26, 27, -Math.PI / 2,
-                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2)),
-                // Front Right
+                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), "Front Left"),
                 new SwerveModule.SwerveModuleConfiguration(21, 20, 0,
-                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2)),
-                // Rear Left
+                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Front Right"),
                 new SwerveModule.SwerveModuleConfiguration(24, 25, Math.PI,
-                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)),
-                // Rear Right
+                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), "Rear Left"),
                 new SwerveModule.SwerveModuleConfiguration(23, 22, Math.PI / 2,
-                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2))
+                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Rear Right")
         };
 
         // Driving
@@ -72,12 +72,16 @@ public class Chassis extends SubsystemBase {
         public static final double LEVEL_TOLERANCE = 2.0; // degrees
         public static final double ON_TOLERANCE = 10.0; // degrees
         public static final double PITCH_VELOCITY_MAX = 0.2; // degrees per cycle
+
+        // Slew Rate Limiting
+        public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
+        public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
+        public static final double ROTATION_SLEW_RATE = 2.0; // percent per second (1 = 100%)
     }
 
     // Driving
     private final SwerveModule[] modules;
     private final SwerveDriveKinematics kinematics;
-    // TODO: Add slew rate limitations
 
     // Localization
     private AHRS navX;
@@ -92,11 +96,11 @@ public class Chassis extends SubsystemBase {
     private double lastPitch = 0;
     private double pitchVelocity = 0;
 
-    public Chassis(DataLog log) {
+    public Chassis() {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
-            modules[i] = new SwerveModule(Constants.MODULES[i], log, i);
+            modules[i] = new SwerveModule(Constants.MODULES[i]);
         }
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
@@ -126,9 +130,18 @@ public class Chassis extends SubsystemBase {
 
     private SwerveModulePosition[] getModulePositions() {
         // Build up position array
-        SwerveModulePosition result[] = new SwerveModulePosition[Constants.MODULES.length];
-        for (int i = 0; i < Constants.MODULES.length; i++) {
+        SwerveModulePosition result[] = new SwerveModulePosition[modules.length];
+        for (int i = 0; i < modules.length; i++) {
             result[i] = modules[i].getPosition();
+        }
+        return result;
+    }
+
+    private SwerveModuleState[] getModuleStates() {
+        // Build up state array
+        SwerveModuleState result[] = new SwerveModuleState[modules.length];
+        for (int i = 0; i < modules.length; i++) {
+            result[i] = modules[i].getState();
         }
         return result;
     }
@@ -147,13 +160,19 @@ public class Chassis extends SubsystemBase {
         double currentPitch = getPitchDegrees();
         pitchVelocity = currentPitch - lastPitch;
         lastPitch = currentPitch;
+
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].periodic();
+        }
+
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Chassis/Pose", getPose());
+        logger.recordOutput("Chassis/Pitch", currentPitch);
+        logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
+        logger.recordOutput("Chassis/Actual", getModuleStates());
     }
 
     /****************** DRIVING ******************/
-    public void drive(ChassisSpeeds chassisSpeeds) {
-        drive(chassisSpeeds, false);
-    }
-
     public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
         if (fieldRelative && navX != null)
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, navX.getRotation2d());
@@ -168,6 +187,7 @@ public class Chassis extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
 
+        Logger.getInstance().recordOutput("Chassis/Target", states);
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i].setDesiredState(states[i]);
         }
@@ -187,6 +207,10 @@ public class Chassis extends SubsystemBase {
 
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    public void setPose(Pose2d pose) {
+        poseEstimator.resetPosition(navX.getRotation2d(), getModulePositions(), pose);
     }
 
     /****************** TRAJECTORIES ******************/
@@ -264,25 +288,160 @@ public class Chassis extends SubsystemBase {
     }
 
     /****************** COMMANDS ******************/
-    public Command defaultCommand(Supplier<Double> forwardSupplier, Supplier<Double> strafeSupplier,
-            Supplier<Double> rotationSupplier, Supplier<Boolean> slowModeSupplier) {
-        // TODO: Improve this to handle field relative driving
-        return new RunCommand(() -> {
-            double forward = forwardSupplier.get() * -1.0;
-            double strafe = strafeSupplier.get() * -1.0;
-            double rotation = rotationSupplier.get() * -1.0;
+    public Command turtle() {
+        return new RunCommand(this::setX, this);
+    }
 
-            if (slowModeSupplier.get()) {
-                forward *= Constants.SLOW_TELE_VELOCITY;
-                strafe *= Constants.SLOW_TELE_VELOCITY;
-                rotation *= Constants.SLOW_TELE_ANGULAR_VELOCITY;
-            } else {
-                forward *= Constants.MAX_TELE_VELOCITY;
-                strafe *= Constants.MAX_TELE_VELOCITY;
-                rotation *= Constants.MAX_TELE_ANGULAR_VELOCITY;
+    public Command zeroHeading() {
+        return new RunCommand(() -> {
+            setPose(new Pose2d());
+        }, this);
+    }
+
+    public static class DriveCommand extends CommandBase {
+        private final Chassis chassis;
+        private final Supplier<ChassisSpeeds> commandSupplier;
+        private final Supplier<Boolean> slowModeSupplier;
+        private final boolean fieldRelative;
+        private final boolean rateLimit;
+
+        private final RateLimiter rateLimiter;
+
+        public DriveCommand(Chassis chassis, Supplier<ChassisSpeeds> commandSupplier,
+                Supplier<Boolean> slowModeSupplier, boolean fieldRelative, boolean rateLimit) {
+            this.chassis = chassis;
+            this.commandSupplier = commandSupplier;
+            this.slowModeSupplier = slowModeSupplier;
+            this.fieldRelative = fieldRelative;
+            this.rateLimit = rateLimit;
+
+            rateLimiter = new RateLimiter();
+
+            addRequirements(chassis);
+        }
+
+        @Override
+        public void execute() {
+            ChassisSpeeds command = commandSupplier.get();
+
+            Logger logger = Logger.getInstance();
+            logger.recordOutput("Chassis/Input/X", command.vxMetersPerSecond);
+            logger.recordOutput("Chassis/Input/Y", command.vyMetersPerSecond);
+            logger.recordOutput("Chassis/Input/R", command.omegaRadiansPerSecond);
+
+            if (rateLimit) {
+                command = rateLimiter.calculate(command);
             }
 
-            drive(new ChassisSpeeds(forward, strafe, rotation));
-        }, this);
+            if (slowModeSupplier.get()) {
+                command.vxMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
+                command.vyMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
+                command.omegaRadiansPerSecond *= Constants.SLOW_TELE_ANGULAR_VELOCITY;
+            } else {
+                command.vxMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
+                command.vyMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
+                command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
+            }
+
+            logger.recordOutput("Chassis/Actual/X", command.vxMetersPerSecond);
+            logger.recordOutput("Chassis/Actual/Y", command.vyMetersPerSecond);
+            logger.recordOutput("Chassis/Actual/R", command.omegaRadiansPerSecond);
+
+            chassis.drive(command, fieldRelative);
+        }
+    }
+
+    private static class RateLimiter {
+        private SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
+        private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
+        private double currentDirection = 0.0;
+        private double currentMagnitude = 0.0;
+        private double previousTime = WPIUtilJNI.now() * 1e-6;
+
+        private static double angleDifference(double angleOne, double angleTwo) {
+            double difference = Math.abs(angleOne - angleTwo);
+            return difference > Math.PI ? (2 * Math.PI) - difference : difference;
+        }
+
+        private static double wrapAngle(double angle) {
+            if (angle == (Math.PI * 2)) {
+                return 0.0;
+            } else if (angle > (Math.PI * 2)) {
+                return angle - (Math.PI * 2) * Math.floor(angle / (Math.PI * 2));
+            } else if (angle < 0.0) {
+                return angle + (Math.PI * 2) * Math.floor((-angle / (Math.PI * 2)) + 1);
+            } else {
+                return angle;
+            }
+        }
+
+        private static double stepTowardsCircular(double current, double target, double step) {
+            current = wrapAngle(current);
+            target = wrapAngle(target);
+
+            double direction = Math.signum(target - current);
+            double difference = Math.abs(current - target);
+
+            if (difference <= step) {
+                return target;
+            }
+
+            if (difference > Math.PI) {
+                if (current + (2 * Math.PI) - target < step || target + (2 * Math.PI) - current < step) {
+                    return target;
+                } else {
+                    return wrapAngle(current - direction * step);
+                }
+            }
+
+            return current + direction * step;
+        }
+
+        public ChassisSpeeds calculate(ChassisSpeeds command) {
+            // Convert XY to polar for rate limiting
+            double inputDirection = Math.atan2(command.vyMetersPerSecond, command.vxMetersPerSecond);
+            double inputMagnitude = Math
+                    .sqrt(Math.pow(command.vxMetersPerSecond, 2) + Math.pow(command.vyMetersPerSecond, 2));
+
+            // Calculate the direction slew rate based on an estimate of the lateral
+            // acceleration
+            double directionSlewRate;
+            if (currentMagnitude != 0.0) {
+                directionSlewRate = Math.abs(Constants.DIRECTION_SLEW_RATE / currentMagnitude);
+            } else {
+                directionSlewRate = 500.0; // some high number that means the slew rate is effectively instantaneous
+            }
+
+            double currentTime = WPIUtilJNI.now() * 1e-6;
+            double elapsedTime = currentTime - previousTime;
+            double angleDif = angleDifference(inputDirection, currentDirection);
+            if (angleDif < 0.45 * Math.PI) {
+                currentDirection = stepTowardsCircular(currentDirection, inputDirection,
+                        directionSlewRate * elapsedTime);
+                currentMagnitude = magnitudeLimiter.calculate(inputMagnitude);
+            } else if (angleDif > 0.85 * Math.PI) {
+                if (currentMagnitude > 0.01) {
+                    currentMagnitude = magnitudeLimiter.calculate(0.0);
+                } else {
+                    currentDirection = wrapAngle(currentDirection + Math.PI);
+                    currentMagnitude = magnitudeLimiter.calculate(inputMagnitude);
+                }
+            } else {
+                currentDirection = stepTowardsCircular(currentDirection, inputDirection,
+                        directionSlewRate * elapsedTime);
+                currentMagnitude = magnitudeLimiter.calculate(0.0);
+            }
+            previousTime = currentTime;
+
+            command.vxMetersPerSecond = currentMagnitude * Math.cos(currentDirection);
+            command.vyMetersPerSecond = currentMagnitude * Math.sin(currentDirection);
+            command.omegaRadiansPerSecond = rotationLimiter.calculate(command.omegaRadiansPerSecond);
+
+            Logger logger = Logger.getInstance();
+            logger.recordOutput("Chassis/RateLimiter/Magnitude", currentMagnitude);
+            logger.recordOutput("Chassis/RateLimiter/Direction", currentDirection);
+
+            return command;
+        }
     }
 }
