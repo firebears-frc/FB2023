@@ -82,7 +82,6 @@ public class Chassis extends SubsystemBase {
     // Driving
     private final SwerveModule[] modules;
     private final SwerveDriveKinematics kinematics;
-    private SwerveModuleState[] target;
 
     // Localization
     private AHRS navX;
@@ -105,10 +104,8 @@ public class Chassis extends SubsystemBase {
         }
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
-        target = new SwerveModuleState[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             positionOffsets[i] = Constants.MODULES[i].positionOffset;
-            target[i] = new SwerveModuleState();
         }
         kinematics = new SwerveDriveKinematics(positionOffsets);
 
@@ -141,7 +138,7 @@ public class Chassis extends SubsystemBase {
     }
 
     private SwerveModuleState[] getModuleStates() {
-        // Build up position array
+        // Build up state array
         SwerveModuleState result[] = new SwerveModuleState[modules.length];
         for (int i = 0; i < modules.length; i++) {
             result[i] = modules[i].getState();
@@ -173,7 +170,6 @@ public class Chassis extends SubsystemBase {
         logger.recordOutput("Chassis/Pitch", currentPitch);
         logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
         logger.recordOutput("Chassis/Actual", getModuleStates());
-        logger.recordOutput("Chassis/Target", target);
     }
 
     /****************** DRIVING ******************/
@@ -191,13 +187,10 @@ public class Chassis extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
 
+        Logger.getInstance().recordOutput("Chassis/Target", states);
         for (int i = 0; i < Constants.MODULES.length; i++) {
-            if (states[i].speedMetersPerSecond < 0.05) {
-                states[i].angle = target[i].angle;
-            }
             modules[i].setDesiredState(states[i]);
         }
-        target = states;
     }
 
     public void setX() {
