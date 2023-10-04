@@ -137,6 +137,15 @@ public class Chassis extends SubsystemBase {
         return result;
     }
 
+    private SwerveModuleState[] getModuleStates() {
+        // Build up position array
+        SwerveModuleState result[] = new SwerveModuleState[modules.length];
+        for (int i = 0; i < modules.length; i++) {
+            result[i] = modules[i].getState();
+        }
+        return result;
+    }
+
     @Override
     public void periodic() {
         // Update pose estimate
@@ -160,6 +169,7 @@ public class Chassis extends SubsystemBase {
         logger.recordOutput("Chassis/Pose", getPose());
         logger.recordOutput("Chassis/Pitch", currentPitch);
         logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
+        logger.recordOutput("Chassis/Actual", getModuleStates());
     }
 
     /****************** DRIVING ******************/
@@ -180,6 +190,7 @@ public class Chassis extends SubsystemBase {
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i].setDesiredState(states[i]);
         }
+        Logger.getInstance().recordOutput("Chassis/Target", states);
     }
 
     public void setX() {
