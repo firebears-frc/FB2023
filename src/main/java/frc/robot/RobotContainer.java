@@ -1,6 +1,16 @@
 package frc.robot;
 
+import frc.robot.auto.OneElementWithMobility;
+import frc.robot.auto.OneElementWithMobilityAndEngaged;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Schlucker;
+import frc.robot.subsystems.SchluckerBag;
+import frc.robot.subsystems.SchluckerNeo550;
+import frc.robot.subsystems.Vision;
+import frc.robot.util.GamePiece;
+
 import java.util.List;
 
 import edu.wpi.first.math.MathUtil;
@@ -15,6 +25,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
     public class Constants {
@@ -52,7 +63,7 @@ public class RobotContainer {
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
         autoSelector = new LoggedDashboardChooser<>("Auto Routine");
-        autoSelector.setDefaultOption("1 Cone w/ Mobility & Engage",
+        autoSelector.addDefaultOption("1 Cone w/ Mobility & Engage",
                 new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility & Engage",
                 new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CUBE));
