@@ -40,7 +40,11 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our
         // autonomous chooser on the dashboard.
-        m_robotContainer = new RobotContainer();
+        Constants.init("/home/lvuser/deploy/config.properties",
+                "/home/lvuser/config.properties",
+                "/u/config.properties");
+        m_robotContainer = RobotContainer.getInstance();
+        m_robotContainer.armReset();
     }
 
     /**
@@ -82,17 +86,13 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() {
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-        /*
-         * String autoSelected = SmartDashboard.getString("Auto Selector",
-         * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-         * = new MyAutoCommand(); break; case "Default Auto": default:
-         * autonomousCommand = new ExampleCommand(); break; }
-         */
-
         // schedule the autonomous command (example)
+        //m_robotContainer.armReset();
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
+        m_robotContainer.m_chassis.setBrakemode(false);
+        
     }
 
     /** This function is called periodically during autonomous. */
@@ -109,6 +109,8 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+        m_robotContainer.armReset();
+        m_robotContainer.m_chassis.setBrakemode(false);
     }
 
     /** This function is called periodically during operator control. */
