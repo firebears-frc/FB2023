@@ -43,6 +43,12 @@ public class Robot extends LoggedRobot {
         logger.recordMetadata("Commit Hash (Short)", BuildConstants.GIT_SHA.substring(0, 8));
         logger.recordMetadata("Commit Hash (Full)", BuildConstants.GIT_SHA);
         logger.recordMetadata("Build Time", BuildConstants.BUILD_DATE);
+        logger.recordMetadata("Dirty",
+                switch (BuildConstants.DIRTY) {
+                    case 0 -> "All changes committed";
+                    case 1 -> "Uncommitted changes";
+                    default -> "Unknown";
+                });
 
         if (isReal()) {
             // Log to USB & Network Tables
