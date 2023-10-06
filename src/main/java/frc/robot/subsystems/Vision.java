@@ -30,10 +30,10 @@ public class Vision extends SubsystemBase {
 
   private boolean hasTarget = false;
 
-  private final Chassis m_chassis;
+  private final DriveSubsystem m_chassis;
 
   /** Creates a new Vision. */
-  public Vision(String CamName,Chassis chassis) {
+  public Vision(String CamName, DriveSubsystem chassis) {
     Camera = new PhotonCamera(CamName);
     VM = new VisionMap();
     //SmartDashboard.putData("VisionEyes",Field);
