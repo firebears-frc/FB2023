@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -7,9 +9,6 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class ArmShoulder {
     private static class Constants {
@@ -36,10 +35,8 @@ public class ArmShoulder {
     private final SparkMaxPIDController pid;
     private double setpoint;
     private double position;
-    private final DoubleLogEntry setpointLog;
-    private final DoubleLogEntry positionLog;
-    
-    public ArmShoulder(DataLog log) {
+
+    public ArmShoulder() {
         motorRight = new CANSparkMax(Constants.RIGHT_CAN_ID, MotorType.kBrushless);
         motorRight.restoreFactoryDefaults();
         motorRight.setInverted(true);
@@ -66,9 +63,6 @@ public class ArmShoulder {
         motorLeft.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         motorLeft.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         motorLeft.follow(motorRight, true);
-
-        setpointLog = new DoubleLogEntry(log, "Arm/Shoulder/Setpoint");
-        positionLog = new DoubleLogEntry(log, "Arm/Shoulder/Position");
 
         motorRight.burnFlash();
         motorLeft.burnFlash();
@@ -100,7 +94,8 @@ public class ArmShoulder {
         position = encoder.getPosition();
         pid.setReference(setpoint, ControlType.kPosition);
 
-        setpointLog.append(setpoint);
-        positionLog.append(position);
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Arm/Shoulder/Setpoint", setpoint);
+        logger.recordOutput("Arm/Shoulder/Position", position);
     }
 }

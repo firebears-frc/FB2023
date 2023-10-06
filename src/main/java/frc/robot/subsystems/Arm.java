@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -34,9 +33,9 @@ public class Arm extends SubsystemBase {
     private final ArmElbow elbow;
     private final ArmShoulder shoulder;
 
-    public Arm(DataLog log) {
-        elbow = new ArmElbow(log);
-        shoulder = new ArmShoulder(log);
+    public Arm() {
+        elbow = new ArmElbow();
+        shoulder = new ArmShoulder();
     }
 
     private boolean onTarget() {

@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.StringLogEntry;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,25 +19,13 @@ public class Schlucker extends SubsystemBase {
         STOP
     }
 
-    protected final StringLogEntry typeLog;
-    protected final StringLogEntry stateLog;
-    protected final StringLogEntry itemHeldLog;
-    protected final StringLogEntry lastItemHeldLog;
-    protected final StringLogEntry itemWantedLog;
-
     protected SchluckerState state = SchluckerState.STOP;
     protected GamePiece itemHeld = GamePiece.NONE;
     protected GamePiece lastItemHeld = GamePiece.NONE;
     protected GamePiece itemWanted = GamePiece.NONE;
 
-    public Schlucker(DataLog log) {
-        typeLog = new StringLogEntry(log, "Schlucker/Type");
-        typeLog.append("Schlucker");
-
-        stateLog = new StringLogEntry(log, "Schlucker/State");
-        itemHeldLog = new StringLogEntry(log, "Schlucker/ItemHeld");
-        lastItemHeldLog = new StringLogEntry(log, "Schlucker/LastItemHeld");
-        itemWantedLog = new StringLogEntry(log, "Schlucker/ItemWanted");
+    public Schlucker() {
+        Logger.getInstance().recordMetadata("Schlucker/Type", "Schlucker");
     }
 
     public Command intakeCone() {
@@ -99,9 +87,10 @@ public class Schlucker extends SubsystemBase {
 
     @Override
     public void periodic() {
-        stateLog.append(state.name());
-        itemHeldLog.append(itemHeld.name());
-        lastItemHeldLog.append(lastItemHeld.name());
-        itemWantedLog.append(itemWanted.name());
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Schlucker/State", state.name());
+        logger.recordOutput("Schlucker/ItemHeld", itemHeld.name());
+        logger.recordOutput("Schlucker/LastItemHeld", lastItemHeld.name());
+        logger.recordOutput("Schlucker/ItemWanted", itemWanted.name());
     }
 }

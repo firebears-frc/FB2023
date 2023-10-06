@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -7,9 +9,6 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class ArmElbow {
     private static class Constants {
@@ -34,10 +33,8 @@ public class ArmElbow {
     private final SparkMaxPIDController pid;
     private double setpoint;
     private double position;
-    private final DoubleLogEntry setpointLog;
-    private final DoubleLogEntry positionLog;
 
-    public ArmElbow(DataLog log) {
+    public ArmElbow() {
         motor = new CANSparkMax(Constants.PORT, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(true);
@@ -56,9 +53,6 @@ public class ArmElbow {
         pid.setP(Constants.P, 0);
         pid.setI(Constants.I, 0);
         pid.setD(Constants.D, 0);
-
-        setpointLog = new DoubleLogEntry(log, "Arm/Elbow/Setpoint");
-        positionLog = new DoubleLogEntry(log, "Arm/Elbow/Position");
 
         motor.burnFlash();
     }
@@ -89,7 +83,8 @@ public class ArmElbow {
         position = encoder.getPosition();
         pid.setReference(setpoint, ControlType.kPosition);
 
-        setpointLog.append(setpoint);
-        positionLog.append(position);
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Arm/Elbow/Setpoint", setpoint);
+        logger.recordOutput("Arm/Elbow/Position", position);
     }
 }

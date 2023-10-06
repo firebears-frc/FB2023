@@ -1,14 +1,13 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class SchluckerNeo550 extends Schlucker {
     public static class Constants {
@@ -26,12 +25,9 @@ public class SchluckerNeo550 extends Schlucker {
     private final CANSparkMax motor;
     private final RelativeEncoder encoder;
     private final SparkMaxPIDController pid;
-    private final DoubleLogEntry speedLog;
-    private final DoubleLogEntry positionLog;
 
-    public SchluckerNeo550(DataLog log) {
-        super(log);
-        typeLog.append("Neo550");
+    public SchluckerNeo550() {
+        Logger.getInstance().recordMetadata("Schlucker/Type", "Neo550");
 
         motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
@@ -44,9 +40,6 @@ public class SchluckerNeo550 extends Schlucker {
         pid.setP(Constants.P);
         pid.setI(Constants.I);
         pid.setD(Constants.D);
-
-        speedLog = new DoubleLogEntry(log, "Schlucker/Speed");
-        positionLog = new DoubleLogEntry(log, "Schlucker/Position");
 
         motor.burnFlash();
     }
@@ -106,7 +99,8 @@ public class SchluckerNeo550 extends Schlucker {
         position += speed;
         pid.setReference(position, ControlType.kPosition);
 
-        speedLog.append(speed);
-        positionLog.append(position);
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Schlucker/Speed", speed);
+        logger.recordOutput("Schlucker/Position", position);
     }
 }

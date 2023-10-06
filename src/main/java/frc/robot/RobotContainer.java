@@ -52,11 +52,12 @@ public class RobotContainer {
 
     public RobotContainer() {
         chassis = new Chassis();
-        arm = new Arm(log);
-        schlucker = new SchluckerBag(log); // new SchluckerNeo550();
+        arm = new Arm();
+        schlucker = new SchluckerBag(); // new SchluckerNeo550();
         vision = new Vision(chassis::visionPose);
         lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
+        pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
         joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
@@ -71,11 +72,12 @@ public class RobotContainer {
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
         autoSelector.addOption("1 Cube w/ Mobility",
                 new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector = new LoggedDashboardChooser<>("Auto Routine");
         autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
-                new Pose2d(0, 0, new Rotation2d(0)),
-                List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-                new Pose2d(3, 0, new Rotation2d(0)),
+                new Pose2d(),
+                List.of(
+                        new Translation2d(1, 1),
+                        new Translation2d(2, -1)),
+                new Pose2d(3, 0, new Rotation2d()),
                 false));
 
         configureButtonBindings();
@@ -122,7 +124,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        Command auto = autoSelector.get();
-        return auto;
+        return autoSelector.get();
     }
 }

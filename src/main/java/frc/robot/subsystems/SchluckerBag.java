@@ -1,11 +1,10 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 
 public class SchluckerBag extends Schlucker {
     public static class Constants {
@@ -18,20 +17,15 @@ public class SchluckerBag extends Schlucker {
     }
 
     private final CANSparkMax motor;
-    private final DoubleLogEntry speedLog;
 
-    public SchluckerBag(DataLog log) {
-        super(log);
-        typeLog.append("Bag Motor");
-
+    public SchluckerBag() {
+        Logger.getInstance().recordMetadata("Schlucker/Type", "Bag");
         motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         motor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-
-        speedLog = new DoubleLogEntry(log, "Schlucker/Speed");
 
         motor.burnFlash();
     }
@@ -99,6 +93,6 @@ public class SchluckerBag extends Schlucker {
         }
 
         motor.set(speed);
-        speedLog.append(speed);
+        Logger.getInstance().recordOutput("Schlucker/Speed", speed);
     }
 }
