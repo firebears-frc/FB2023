@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Schlucker;
 
 public class AutoConeAndBalanceCommand extends SequentialCommandGroup {
-  Chassis m_chassis;
+  DriveSubsystem m_chassis;
   Schlucker m_schlucker;
   Arm m_arm;
 
-  public AutoConeAndBalanceCommand(Chassis chassis, Schlucker schlucker, Arm arm) {
+  public AutoConeAndBalanceCommand(DriveSubsystem chassis, Schlucker schlucker, Arm arm) {
     m_chassis = chassis;
     m_schlucker = schlucker;
     m_arm = arm;

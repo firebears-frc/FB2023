@@ -7,16 +7,16 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class ChassisRotateToAngleCommand extends CommandBase {
   /** Creates a new DriveToPositionCommand. */
   private double rotation;
-  private Chassis m_chassis;
+  private DriveSubsystem m_chassis;
   private double initialangle;
   private double testangle;
 
-  public ChassisRotateToAngleCommand(double r, Chassis c) {
+  public ChassisRotateToAngleCommand(double r, DriveSubsystem c) {
     rotation = r;
     m_chassis = c;
     testangle = m_chassis.getAngle();

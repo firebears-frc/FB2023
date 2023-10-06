@@ -7,13 +7,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.DriveSubsystem;
 
 
 public class AutoBalanceRoutine extends SequentialCommandGroup {
   /** Creates a new AutoBalanceRoutine. */
-  private Chassis m_chassis;
-  public AutoBalanceRoutine(Chassis c) {
+  private DriveSubsystem m_chassis;
+  public AutoBalanceRoutine(DriveSubsystem c) {
     m_chassis = c;
 
     // Add your commands in the addCommands() call, e.g.

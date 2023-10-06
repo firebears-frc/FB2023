@@ -5,22 +5,22 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class ChassisDriveToDistanceCommand extends CommandBase {
   /** Creates a new DriveToPositionCommand. */
   private double distance;
-  private Chassis m_chassis;
+  private DriveSubsystem m_chassis;
   private double speed = 0.6;
 
-  public ChassisDriveToDistanceCommand(double d, Chassis c) {
+  public ChassisDriveToDistanceCommand(double d, DriveSubsystem c) {
     distance = d;
     m_chassis = c;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_chassis);
   }
 
-  public ChassisDriveToDistanceCommand(double d, double s, Chassis c) {
+  public ChassisDriveToDistanceCommand(double d, double s, DriveSubsystem c) {
     distance = d;
     m_chassis = c;
     speed = s;

@@ -7,17 +7,17 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class AutonomousBalanceCommand extends CommandBase {
-  Chassis m_chassis;
+  DriveSubsystem m_chassis;
   Timer timer;
   double lastPitch;
   double speed;
   Timer timer2;
   boolean moveForward;
   /** Creates a new ChassisAutoBalanceCommand. */
-  public AutonomousBalanceCommand(Chassis chassis) {
+  public AutonomousBalanceCommand(DriveSubsystem chassis) {
     m_chassis = chassis;
     timer = new Timer();
     timer2 = new Timer();
