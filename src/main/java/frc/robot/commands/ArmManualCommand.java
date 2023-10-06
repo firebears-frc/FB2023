@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm;
 
@@ -15,8 +14,6 @@ public class ArmManualCommand extends CommandBase {
   private final Arm m_arm;
   private double shoulderSetPoint = 0;
   private double elbowSetPoint = 0;
-  private double shoulderAngle;
-  private double elbowAngle;
   XboxController controller;
   
   public ArmManualCommand(Arm subsystem, XboxController x) {

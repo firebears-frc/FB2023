@@ -12,6 +12,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.util.WPIUtilJNI;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
@@ -66,6 +68,10 @@ public class DriveSubsystem extends SubsystemBase {
     private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
     private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
+    private double lastPitch;
+    private double pitchVelocity;
+    private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
+
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
             DriveConstants.kDriveKinematics,
@@ -92,6 +98,9 @@ public class DriveSubsystem extends SubsystemBase {
                         m_rearLeft.getPosition(),
                         m_rearRight.getPosition()
                 });
+
+        pitchVelocity = pitchVelolcityFilter.calculate(getPitch() - lastPitch);
+        lastPitch = getPitch();
 
         Logger logger = Logger.getInstance();
         logger.recordOutput("Chassis/Actual", new SwerveModuleState[] {
@@ -127,6 +136,15 @@ public class DriveSubsystem extends SubsystemBase {
                         m_rearRight.getPosition()
                 },
                 pose);
+    }
+
+    public double getPitch() {
+        int m = Constants.PRACTICE_ROBOT ? -1 : 1;
+        return (m_gyro.getPitch()) * m;
+    }
+
+    public double getpitchVelocity() {
+        return pitchVelocity;
     }
 
     /**
@@ -256,44 +274,49 @@ public class DriveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(m_gyro.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
     }
 
-  public Command getDriveCommand(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
-    // Create config for trajectory
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
+    public Command getDriveCommand(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
+        // Create config for trajectory
+        TrajectoryConfig config = new TrajectoryConfig(
+                AutoConstants.kMaxSpeedMetersPerSecond,
+                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                // Add kinematics to ensure max speed is actually obeyed
+                .setKinematics(DriveConstants.kDriveKinematics);
 
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        start,
-        // Pass through these two interior waypoints, making an 's' curve path
-        interiorWaypoints,
-        // End 3 meters straight ahead of where we started, facing forward
-        end,
-        config);
+        // An example trajectory to follow. All units in meters.
+        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+                // Start at the origin facing the +X direction
+                start,
+                // Pass through these two interior waypoints, making an 's' curve path
+                interiorWaypoints,
+                // End 3 meters straight ahead of where we started, facing forward
+                end,
+                config);
 
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        var thetaController = new ProfiledPIDController(
+                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        this::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
+        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+                exampleTrajectory,
+                this::getPose, // Functional interface to feed supplier
+                DriveConstants.kDriveKinematics,
 
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        this::setModuleStates,
-        this);
+                // Position controllers
+                new PIDController(AutoConstants.kPXController, 0, 0),
+                new PIDController(AutoConstants.kPYController, 0, 0),
+                thetaController,
+                this::setModuleStates,
+                this);
 
-    // Reset odometry to the starting pose of the trajectory.
-    this.resetOdometry(exampleTrajectory.getInitialPose());
+        // Reset odometry to the starting pose of the trajectory.
+        this.resetOdometry(exampleTrajectory.getInitialPose());
 
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> this.drive(0, 0, 0, false, false));
-  }
+        // Run path following command, then stop at the end.
+        return swerveControllerCommand.andThen(() -> this.drive(0, 0, 0, false, false));
+    }
+
+    // Stub function to maintain compatibility with old chassis, this should only be used for autos
+    public void arcadeDrive(double speed, double rotation) {
+        drive(speed, 0, rotation, false, false);
+    }
 }

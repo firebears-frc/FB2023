@@ -57,7 +57,6 @@ public class Vision extends SubsystemBase {
       poseEstimator.setLastPose(new Pose3d());
       
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
