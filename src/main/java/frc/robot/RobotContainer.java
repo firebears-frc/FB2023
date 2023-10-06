@@ -120,7 +120,7 @@ public class RobotContainer {
     one.button(6).onTrue(new InstantCommand(m_lights::showCone, m_lights));
 
     one.button(7).onTrue(new InstantCommand(m_lights::showCube, m_lights));
-    one.button(2).onTrue(new InstantCommand(m_robotDrive::toggleSlowMode, m_robotDrive));
+    //one.button(2).onTrue(new InstantCommand(m_robotDrive::toggleSlowMode, m_robotDrive));
 
     one.trigger().onTrue(new InstantCommand(m_robotDrive::toggleBrakeMode, m_robotDrive));
 

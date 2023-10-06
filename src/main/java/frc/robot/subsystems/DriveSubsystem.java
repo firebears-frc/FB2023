@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -71,6 +72,7 @@ public class DriveSubsystem extends SubsystemBase {
     private double lastPitch;
     private double pitchVelocity;
     private LinearFilter pitchVelolcityFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
+    private boolean currentBrakeMode = false;
 
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -318,5 +320,18 @@ public class DriveSubsystem extends SubsystemBase {
     // Stub function to maintain compatibility with old chassis, this should only be used for autos
     public void arcadeDrive(double speed, double rotation) {
         drive(speed, 0, rotation, false, false);
+    }
+
+    public void toggleBrakeMode() {
+        currentBrakeMode = !currentBrakeMode;
+        setBrakemode(currentBrakeMode);
+    }
+
+    public void setBrakemode(boolean DaBrake) {
+        currentBrakeMode = DaBrake;
+        SmartDashboard.putBoolean("Brake Mode", DaBrake);
+        if (DaBrake) {
+            setX();
+        }
     }
 }
