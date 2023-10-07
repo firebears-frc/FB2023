@@ -45,8 +45,8 @@ public class RobotContainer {
     private final Lights lights;
 
     private final PowerDistribution pdh;
-    private final CommandJoystick joystick_1;
-    private final CommandJoystick joystick_2;
+    private final CommandJoystick one;
+    private final CommandJoystick two;
     private final CommandXboxController controller;
     private final LoggedDashboardChooser<Command> autoSelector;
 
@@ -59,8 +59,8 @@ public class RobotContainer {
                 chassis::isOnChargeStation, chassis::isNotPitching);
         pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
-        joystick_1 = new CommandJoystick(Constants.JOYSTICK_1_PORT);
-        joystick_2 = new CommandJoystick(Constants.JOYSTICK_2_PORT);
+        one = new CommandJoystick(Constants.JOYSTICK_1_PORT);
+        two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
         autoSelector = new LoggedDashboardChooser<>("Auto Routine");
@@ -84,19 +84,8 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        chassis.setDefaultCommand(new Chassis.DriveCommand(
-                chassis,
-                () -> new ChassisSpeeds(
-                        -MathUtil.applyDeadband(joystick_1.getY(), Constants.JOYSTICK_DEADBAND),
-                        -MathUtil.applyDeadband(joystick_1.getX(), Constants.JOYSTICK_DEADBAND),
-                        -MathUtil.applyDeadband(joystick_2.getX(), Constants.JOYSTICK_DEADBAND)),
-                () -> joystick_1.getHID().getRawButton(2),
-                true,
-                true));
-
+        // Arm commands
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
-
-        // Arm target point commands
         controller.povUp().onTrue(arm.substation());
         controller.povRight()
                 .onTrue(arm.mid().andThen(schlucker.eject()))
@@ -108,6 +97,30 @@ public class RobotContainer {
         controller.leftBumper().onTrue(arm.groundCube());
         controller.b().onTrue(arm.stow());
 
+        // Chassis commands
+        chassis.setDefaultCommand(chassis.defaultCommand(
+                () -> new ChassisSpeeds(
+                        -MathUtil.applyDeadband(one.getY(), Constants.JOYSTICK_DEADBAND),
+                        -MathUtil.applyDeadband(one.getX(), Constants.JOYSTICK_DEADBAND),
+                        -MathUtil.applyDeadband(two.getX(), Constants.JOYSTICK_DEADBAND)),
+                false,
+                true,
+                true));
+        one.button(2).toggleOnTrue(chassis.defaultCommand(
+                () -> new ChassisSpeeds(
+                        -MathUtil.applyDeadband(one.getY(), Constants.JOYSTICK_DEADBAND),
+                        -MathUtil.applyDeadband(one.getX(), Constants.JOYSTICK_DEADBAND),
+                        -MathUtil.applyDeadband(two.getX(), Constants.JOYSTICK_DEADBAND)),
+                true,
+                true,
+                true));
+        one.trigger().toggleOnTrue(chassis.turtle());
+        two.trigger().onTrue(chassis.zeroHeading());
+
+        // Lights commands
+        one.button(3).onTrue(schlucker.wantCone());
+        one.button(4).onTrue(schlucker.wantCube());
+
         // Schlucker commands
         controller.a()
                 .onTrue(schlucker.intakeCone())
@@ -118,9 +131,6 @@ public class RobotContainer {
         controller.y()
                 .onTrue(schlucker.eject())
                 .onFalse(schlucker.stop());
-
-        joystick_1.button(3).onTrue(schlucker.wantCone());
-        joystick_1.button(4).onTrue(schlucker.wantCube());
     }
 
     public Command getAutonomousCommand() {

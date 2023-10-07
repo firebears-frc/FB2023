@@ -1,15 +1,15 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,7 +18,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
@@ -29,7 +28,7 @@ public class Vision extends SubsystemBase {
 
     public Vision(BiConsumer<Pose2d, Double> consumer) {
         this.consumer = consumer;
-        lastResult = null;
+        lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of());
 
         camera = new PhotonCamera("MainC");
 
@@ -54,29 +53,47 @@ public class Vision extends SubsystemBase {
         poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     }
 
-    @Override
-    public void periodic() {
+    private enum Status {
+        NOT_CONNECTED,
+        NO_TARGETS,
+        NO_POSE_RESULT,
+        NO_CONSUMER,
+        POSE_FOUND
+    }
+
+    private Status updatePose() {
         boolean connected = camera.isConnected();
-        SmartDashboard.putBoolean("Vision Connected", connected);
-        if (!connected)
-            return;
+        if (connected)
+            return Status.NOT_CONNECTED;
 
         PhotonPipelineResult result = camera.getLatestResult();
         if (!result.hasTargets())
-            return;
+            return Status.NOT_CONNECTED;
 
         Optional<EstimatedRobotPose> poseResult = poseEstimator.update();
         if (!poseResult.isPresent())
-            return;
+            return Status.NO_POSE_RESULT;
 
         lastResult = poseResult.get();
         if (consumer == null)
-            return;
+            return Status.NO_CONSUMER;
 
         consumer.accept(lastResult.estimatedPose.toPose2d(), lastResult.timestampSeconds);
+        return Status.POSE_FOUND;
     }
 
-    public Pose3d getLastResult() {
-        return lastResult.estimatedPose;
+    @Override
+    public void periodic() {
+        Status status = updatePose();
+
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Vision/Status", status.name());
+        logger.recordOutput("Vision/Pose", lastResult.estimatedPose);
+        logger.recordOutput("Vision/Timestamp", lastResult.timestampSeconds);
+        logger.recordOutput("Vision/TargetsFound", lastResult.targetsUsed.size());
+        // Map the target objects to their integer ID, sort them, then map the integer
+        // ID to a string, then join with commas
+        logger.recordOutput("Vision/TargetIDs", String.join(", ", lastResult.targetsUsed.stream()
+                .map(target -> target.getFiducialId()).sorted().map(id -> id.toString()).toList()));
     }
 }

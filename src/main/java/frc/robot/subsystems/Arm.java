@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -54,74 +54,49 @@ public class Arm extends SubsystemBase {
         shoulder.periodic();
     }
 
-    private class PositionCommand extends CommandBase {
-        private final Arm arm;
-        private final double elbowSetpoint;
-        private final double shoulderSetpoint;
-
-        public PositionCommand(Arm arm, double elbowSetpoint, double shoulderSetpoint) {
-            this.arm = arm;
-            this.elbowSetpoint = elbowSetpoint;
-            this.shoulderSetpoint = shoulderSetpoint;
-            addRequirements(arm);
-        }
-
-        @Override
-        public void execute() {
-            arm.setAngles(elbowSetpoint, shoulderSetpoint);
-        }
-
-        @Override
-        public boolean isFinished() {
-            return arm.onTarget();
-        }
+    private Command positionCommand(double elbowSetpoint, double shoulderSetpoint) {
+        return new FunctionalCommand(null, () -> setAngles(elbowSetpoint, shoulderSetpoint), null, this::onTarget,
+                this);
     }
 
     public Command groundCone() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_GROUND_CONE,
                 Constants.SHOULDER_GROUND_CONE);
     }
 
     public Command groundCube() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_GROUND_CUBE,
                 Constants.SHOULDER_GROUND_CUBE);
     }
 
     public Command high() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_HIGH,
                 Constants.SHOULDER_HIGH);
     }
 
     public Command mid() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_MID,
                 Constants.SHOULDER_MID);
     }
 
     public Command ready() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_READY,
                 Constants.SHOULDER_READY);
     }
 
     public Command stow() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_STOW,
                 Constants.SHOULDER_STOW);
     }
 
     public Command substation() {
-        return new PositionCommand(
-                this,
+        return positionCommand(
                 Constants.ELBOW_SUBSTATION,
                 Constants.SHOULDER_SUBSTATION);
     }

@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
@@ -57,8 +57,8 @@ public class Chassis extends SubsystemBase {
         // Driving
         public static final double MAX_TELE_VELOCITY = 4.8; // meters per second
         public static final double SLOW_TELE_VELOCITY = 1.0; // meters per second
-        public static final double MAX_TELE_ANGULAR_VELOCITY = 2 * Math.PI; // radians per second
-        public static final double SLOW_TELE_ANGULAR_VELOCITY = Math.PI; // radians per second
+        public static final double MAX_TELE_ANGULAR_VELOCITY = 1.5 * Math.PI; // radians per second
+        public static final double SLOW_TELE_ANGULAR_VELOCITY = Math.PI / 2; // radians per second
 
         // Trajectories
         public static final double MAX_AUTO_VELOCITY = 3.0; // meters per second
@@ -195,10 +195,11 @@ public class Chassis extends SubsystemBase {
     }
 
     public void setX() {
-        modules[0].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        modules[1].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        modules[2].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        modules[3].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        SwerveModuleState[] states = new SwerveModuleState[Constants.MODULES.length];
+        for (int i = 0; i < Constants.MODULES.length; i++) {
+            states[i] = new SwerveModuleState(0, Constants.MODULES[i].positionOffset.getAngle());
+        }
+        swerveDrive(states);
     }
 
     /****************** LOCALIZATION ******************/
@@ -290,7 +291,7 @@ public class Chassis extends SubsystemBase {
 
     /****************** COMMANDS ******************/
     public Command turtle() {
-        return new RunCommand(this::setX, this);
+        return new StartEndCommand(this::setX, null, this);
     }
 
     public Command zeroHeading() {
@@ -299,20 +300,25 @@ public class Chassis extends SubsystemBase {
         }, this);
     }
 
-    public static class DriveCommand extends CommandBase {
+    public Command defaultCommand(Supplier<ChassisSpeeds> commandSupplier, boolean slowMode, boolean fieldRelative,
+            boolean rateLimit) {
+        return new DefaultCommand(this, commandSupplier, slowMode, fieldRelative, rateLimit);
+    }
+
+    private class DefaultCommand extends CommandBase {
         private final Chassis chassis;
         private final Supplier<ChassisSpeeds> commandSupplier;
-        private final Supplier<Boolean> slowModeSupplier;
+        private final boolean slowMode;
         private final boolean fieldRelative;
         private final boolean rateLimit;
 
         private final RateLimiter rateLimiter;
 
-        public DriveCommand(Chassis chassis, Supplier<ChassisSpeeds> commandSupplier,
-                Supplier<Boolean> slowModeSupplier, boolean fieldRelative, boolean rateLimit) {
+        public DefaultCommand(Chassis chassis, Supplier<ChassisSpeeds> commandSupplier,
+                boolean slowMode, boolean fieldRelative, boolean rateLimit) {
             this.chassis = chassis;
             this.commandSupplier = commandSupplier;
-            this.slowModeSupplier = slowModeSupplier;
+            this.slowMode = slowMode;
             this.fieldRelative = fieldRelative;
             this.rateLimit = rateLimit;
 
@@ -334,7 +340,7 @@ public class Chassis extends SubsystemBase {
                 command = rateLimiter.calculate(command);
             }
 
-            if (slowModeSupplier.get()) {
+            if (slowMode) {
                 command.vxMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
                 command.vyMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
                 command.omegaRadiansPerSecond *= Constants.SLOW_TELE_ANGULAR_VELOCITY;

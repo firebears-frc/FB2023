@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -176,7 +178,19 @@ public class Lights extends SubsystemBase {
 
     @Override
     public void periodic() {
-        communication.set(getStatus().ordinal());
+        Status status = getStatus();
+        communication.set(status.ordinal());
+
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Lights/Status", status.name());
+        logger.recordOutput("Lights/Tx", status.ordinal());
+        logger.recordOutput("Lights/ChargeStation/Status", chargeStationStatus.name());
+        if (levelSupplier != null)
+            logger.recordOutput("Lights/ChargeStation/Level", levelSupplier.get());
+        if (onChargeStationSupplier != null)
+            logger.recordOutput("Lights/ChargeStation/OnChargeStation", onChargeStationSupplier.get());
+        if (isNotPitchingSupplier != null)
+            logger.recordOutput("Lights/ChargeStation/IsNotPitching", isNotPitchingSupplier.get());
     }
 
     private static class ParallelBus {
@@ -195,7 +209,6 @@ public class Lights extends SubsystemBase {
         }
 
         public void set(int tx) {
-            tx--;
             outputA.set((tx & 0x01) == 0x01);
             outputB.set((tx & 0x02) == 0x02);
             outputC.set((tx & 0x04) == 0x04);
