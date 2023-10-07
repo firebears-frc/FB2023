@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -33,11 +37,11 @@ public class AutoConeAndBalanceCommand extends SequentialCommandGroup {
       (new ArmElbowSetpointCommand(350, m_arm)),
       (new WaitCommand(0.5)),
       (new InstantCommand(m_schlucker::stop, m_schlucker)),
-      (new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis)),
+      m_chassis.getDriveCommand(new Pose2d(), List.of(), new Pose2d(-0.5, 0, new Rotation2d())),
       (new ArmShoulderSetpointCommand(20, m_arm)),
       (new ArmElbowSetpointCommand(220, m_arm)),
       (new WaitCommand(0.5)),
-      (new ChassisDriveToDistanceCommand(-3.5, 0.3, m_chassis)),
+      m_chassis.getDriveCommand(new Pose2d(), List.of(), new Pose2d(-3.5, 0, new Rotation2d())),
       (new AutoBalanceRoutine(m_chassis)))
     
       
