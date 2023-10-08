@@ -2,6 +2,12 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -28,14 +34,25 @@ public class Arm extends SubsystemBase {
         public static final double ELBOW_MID = 267.0; // degrees
 
         public static final double ANGLE_TOLERANCE = 2.5; // degrees
+
+        public static final double UPPER_ARM_LENGTH = Units.inchesToMeters(30);
+        public static final double FORE_ARM_LENGTH = Units.inchesToMeters(30);
     }
 
     private final ArmElbow elbow;
     private final ArmShoulder shoulder;
+    private final Mechanism2d arm;
+    private final MechanismRoot2d armPivot;
+    private final MechanismLigament2d upperArm, foreArm;
 
     public Arm() {
         elbow = new ArmElbow();
         shoulder = new ArmShoulder();
+
+        arm = new Mechanism2d(0, 0);
+        armPivot = arm.getRoot("Arm Pivot", 0, 0);
+        upperArm = armPivot.append(new MechanismLigament2d("Upper Arm", Constants.UPPER_ARM_LENGTH, shoulder.getAngle()));
+        foreArm = upperArm.append(new MechanismLigament2d("Fore Arm", Constants.FORE_ARM_LENGTH, elbow.getAngle()));
     }
 
     private boolean onTarget() {
@@ -52,6 +69,10 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         elbow.periodic();
         shoulder.periodic();
+
+        upperArm.setAngle(shoulder.getAngle());
+        foreArm.setAngle(elbow.getAngle());
+        Logger.getInstance().recordOutput("Arm/Mechanism", arm);
     }
 
     private Command positionCommand(double elbowSetpoint, double shoulderSetpoint) {
