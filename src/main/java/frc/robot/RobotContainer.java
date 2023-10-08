@@ -83,7 +83,7 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    private ChassisSpeeds getTeleopSpeeds() {
+    private ChassisSpeeds getChassisSpeeds() {
         return new ChassisSpeeds(
                 -MathUtil.applyDeadband(one.getY(), Constants.JOYSTICK_DEADBAND),
                 -MathUtil.applyDeadband(one.getX(), Constants.JOYSTICK_DEADBAND),
@@ -106,12 +106,12 @@ public class RobotContainer {
 
         // Chassis commands
         chassis.setDefaultCommand(chassis.defaultCommand(
-                this::getTeleopSpeeds,
+                this::getChassisSpeeds,
                 false,
                 true,
                 true));
         one.button(2).toggleOnTrue(chassis.defaultCommand(
-                this::getTeleopSpeeds,
+                this::getChassisSpeeds,
                 true,
                 true,
                 true));
