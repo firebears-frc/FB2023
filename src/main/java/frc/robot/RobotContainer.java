@@ -27,6 +27,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -48,7 +49,7 @@ public class RobotContainer {
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   private final UsbCamera usbcamera;
-  private final XboxController xboxController = new XboxController(1);
+  private final XboxController xboxController = new XboxController(2);
   // The driver's controller
   private final CommandJoystick one = new CommandJoystick(0);
   private final CommandJoystick two = new CommandJoystick(1);
