@@ -22,7 +22,7 @@ public class AutoBalanceCommand extends CommandBase {
     public void execute() {
         if (!chassis.isNotPitching()) {
             // Charge station is moving, stop!
-            chassis.drive(new ChassisSpeeds(), false);
+            chassis.setX();
             return;
         }
 
@@ -31,14 +31,6 @@ public class AutoBalanceCommand extends CommandBase {
             chassis.drive(new ChassisSpeeds(BALANCE_SPEED, 0, 0), false);
         } else {
             chassis.drive(new ChassisSpeeds(-1.0 * BALANCE_SPEED, 0, 0), false);
-        }
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        chassis.drive(new ChassisSpeeds(), false);
-        if (!interrupted) {
-            chassis.setX();
         }
     }
 

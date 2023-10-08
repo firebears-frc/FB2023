@@ -21,6 +21,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
+    private static class Constants {
+        public static final String NAME = "MainC";
+    }
+
     PhotonCamera camera;
     PhotonPoseEstimator poseEstimator;
     EstimatedRobotPose lastResult;
@@ -30,7 +34,7 @@ public class Vision extends SubsystemBase {
         this.consumer = consumer;
         lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of());
 
-        camera = new PhotonCamera("MainC");
+        camera = new PhotonCamera(Constants.NAME);
 
         AprilTagFieldLayout fieldLayout = null;
         try {

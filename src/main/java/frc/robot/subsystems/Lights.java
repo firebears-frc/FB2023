@@ -63,15 +63,12 @@ public class Lights extends SubsystemBase {
         if (!DriverStation.isFMSAttached())
             return none;
 
-        switch (DriverStation.getAlliance()) {
-            case Red:
-                return red;
-            case Blue:
-                return blue;
-            case Invalid:
-            default:
-                return none;
-        }
+        return switch (DriverStation.getAlliance()) {
+            case Red -> red;
+            case Blue -> blue;
+            case Invalid -> none;
+            default -> none;
+        };
     }
 
     private void updateChargeStationStatus() {
@@ -194,26 +191,23 @@ public class Lights extends SubsystemBase {
     }
 
     private static class ParallelBus {
-        private final DigitalOutput outputA;
-        private final DigitalOutput outputB;
-        private final DigitalOutput outputC;
-        private final DigitalOutput outputD;
-        private final DigitalOutput outputE;
+        public static final int OUTPUT_COUNT = 5;
+        public static final int BASE_CHANNEL = 10;
+        private final DigitalOutput[] outputs;
 
         public ParallelBus() {
-            outputA = new DigitalOutput(10);
-            outputB = new DigitalOutput(11);
-            outputC = new DigitalOutput(12);
-            outputD = new DigitalOutput(13);
-            outputE = new DigitalOutput(14);
+            assert Status.values().length <= (2 ^ OUTPUT_COUNT);
+
+            outputs = new DigitalOutput[OUTPUT_COUNT];
+            for (int i = 0; i < OUTPUT_COUNT; i++) {
+                outputs[i] = new DigitalOutput(BASE_CHANNEL + i);
+            }
         }
 
         public void set(int tx) {
-            outputA.set((tx & 0x01) == 0x01);
-            outputB.set((tx & 0x02) == 0x02);
-            outputC.set((tx & 0x04) == 0x04);
-            outputD.set((tx & 0x08) == 0x08);
-            outputE.set((tx & 0x10) == 0x10);
+            for (int i = 0; i < OUTPUT_COUNT; i++) {
+                outputs[i].set((tx & (1 << i)) == (1 << i));
+            }
         }
     }
 }

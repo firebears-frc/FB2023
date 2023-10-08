@@ -15,7 +15,7 @@ public class OneElementWithMobilityAndEngaged extends SequentialCommandGroup {
                 new AutoPlaceOneElementCommand(chassis, arm, schlucker, gamePiece),
                 chassis.driveDistance(-2.0),
                 chassis.driveDistance(1.0),
-                new AutoBalanceCommand(chassis));
+                new AutoBalanceRoutineCommand(chassis));
     }
 
     @Override

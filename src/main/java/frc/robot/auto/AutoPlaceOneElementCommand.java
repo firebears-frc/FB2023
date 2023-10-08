@@ -9,20 +9,11 @@ import frc.robot.util.GamePiece;
 
 public class AutoPlaceOneElementCommand extends SequentialCommandGroup {
     public AutoPlaceOneElementCommand(Chassis chassis, Arm arm, Schlucker schlucker, GamePiece gamePiece) {
-        boolean cone;
-        switch (gamePiece) {
-            case CONE:
-                cone = true;
-                break;
-            case CUBE:
-            case NONE:
-            default:
-                cone = false;
-                break;
-        }
-
         addCommands(
-                (cone ? schlucker.intakeCone() : schlucker.intakeCube()),
+                switch (gamePiece) {
+                    case CONE -> schlucker.intakeCone();
+                    case CUBE, NONE -> schlucker.intakeCube();
+                },
                 schlucker.hold(),
                 arm.ready(),
                 new WaitCommand(0.5),

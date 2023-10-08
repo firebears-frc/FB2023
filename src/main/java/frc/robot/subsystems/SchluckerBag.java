@@ -35,64 +35,31 @@ public class SchluckerBag extends Schlucker {
         super.periodic();
 
         // Figure out what speed we should be running
-        double speed;
-        switch (state) {
-            case INTAKE:
-                switch (itemHeld) {
-                    case CUBE:
-                        speed = Constants.INTAKE_SPEED;
-                        break;
-                    case CONE:
-                    case NONE:
-                    default:
-                        speed = -1.0 * Constants.INTAKE_SPEED;
-                        break;
-                }
-                break;
+        double speed = switch (state) {
+            case INTAKE -> switch (itemHeld) {
+                case CUBE -> Constants.INTAKE_SPEED;
+                case CONE, NONE -> -1.0 * Constants.INTAKE_SPEED;
+            };
 
-            case EJECT:
-                switch (itemHeld) {
-                    case CUBE:
-                        speed = -1.0 * Constants.INTAKE_SPEED;
-                        break;
-                    case CONE:
-                        speed = Constants.INTAKE_SPEED;
-                        break;
-                    case NONE:
-                    default:
-                        switch (lastItemHeld) {
-                            case CUBE:
-                                speed = -1.0 * Constants.INTAKE_SPEED;
-                                break;
-                            case CONE:
-                            case NONE:
-                            default:
-                                speed = Constants.INTAKE_SPEED;
-                                break;
-                        }
-                }
-                break;
+            case EJECT -> switch (itemHeld) {
+                case CUBE -> -1.0 * Constants.INTAKE_SPEED;
+                case CONE -> Constants.INTAKE_SPEED;
+                case NONE -> switch (lastItemHeld) {
+                    case CUBE -> -1.0 * Constants.INTAKE_SPEED;
+                    case CONE, NONE -> Constants.INTAKE_SPEED;
+                };
+            };
 
-            case HOLD:
-                switch (itemHeld) {
-                    case CUBE:
-                        speed = Constants.HOLD_SPEED;
-                        break;
-                    case CONE:
-                    case NONE:
-                    default:
-                        speed = -1.0 * Constants.HOLD_SPEED;
-                        break;
-                }
-                break;
+            case HOLD -> switch (itemHeld) {
+                case CUBE -> Constants.HOLD_SPEED;
+                case CONE, NONE -> -1.0 * Constants.HOLD_SPEED;
+            };
 
-            case STOP:
-            default:
-                speed = 0;
-                break;
-        }
+            case STOP -> 0;
+        };
 
         motor.set(speed);
+
         Logger.getInstance().recordOutput("Schlucker/Speed", speed);
     }
 }

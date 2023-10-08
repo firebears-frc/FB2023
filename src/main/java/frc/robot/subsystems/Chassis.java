@@ -61,7 +61,7 @@ public class Chassis extends SubsystemBase {
         public static final double SLOW_TELE_ANGULAR_VELOCITY = Math.PI / 2; // radians per second
 
         // Trajectories
-        public static final double MAX_AUTO_VELOCITY = 3.0; // meters per second
+        public static final double MAX_AUTO_VELOCITY = 4.5; // meters per second
         public static final double MAX_AUTO_ACCELERATION = 3.0; // meters per second squared
         public static final double MAX_AUTO_ANGULAR_VELOCITY = Math.PI; // radians per second
         public static final double MAX_AUTO_ANGULAR_ACCELERATION = Math.PI; // radians per second squared
