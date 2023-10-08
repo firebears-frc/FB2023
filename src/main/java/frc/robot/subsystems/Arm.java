@@ -196,7 +196,7 @@ public class Arm extends SubsystemBase {
         logger.recordOutput("Arm/Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
         logger.recordOutput("Arm/Elbow/Angle", getElbowAngle());
         logger.recordOutput("Arm/Elbow/Setpoint", elbowSetpoint);
-        logger.recordOutput("Arm/Elbow/LeftOutput", elbowMotor.getAppliedOutput());
+        logger.recordOutput("Arm/Elbow/Output", elbowMotor.getAppliedOutput());
 
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);

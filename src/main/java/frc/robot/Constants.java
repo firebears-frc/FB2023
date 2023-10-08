@@ -134,7 +134,7 @@ public class Constants {
         public static final double shoulderD = 0.005;
 
         public static final double elbowP = 0.02;
-        public static final double elbowI = 0.000001;
+        public static final double elbowI = 0.0;
         public static final double elbowD = 0.005;
     }
 
