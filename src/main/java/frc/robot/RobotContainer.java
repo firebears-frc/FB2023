@@ -28,16 +28,13 @@ import edu.wpi.first.wpilibj.XboxController;
 public class RobotContainer {
   private static RobotContainer m_robotContainer = null;
 
-  // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-
   public final Lights m_lights;
   public final Vision m_vision;
   public final Schlucker m_schlucker;
   public final Arm m_arm;
   private final UsbCamera usbcamera;
   private final XboxController xboxController = new XboxController(2);
-  // The driver's controller
   private final CommandJoystick one = new CommandJoystick(0);
   private final CommandJoystick two = new CommandJoystick(1);
 
@@ -125,10 +122,10 @@ public class RobotContainer {
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue(
         (new ArmShoulderSetpointCommand(20, m_arm))
-            .andThen(new ArmElbowSetpointCommand(220, m_arm)
-                .andThen(new WaitCommand(1))
-                .andThen(new ArmShoulderSetpointCommand(0, m_arm))
-                .andThen(new ArmElbowSetpointCommand(209, m_arm))));
+        .andThen(new ArmElbowSetpointCommand(220, m_arm)
+        .andThen(new WaitCommand(1))
+        .andThen(new ArmShoulderSetpointCommand(0, m_arm))
+        .andThen(new ArmElbowSetpointCommand(209, m_arm))));
 
     // X button = picks up cube and drops cone
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
@@ -145,7 +142,7 @@ public class RobotContainer {
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
-        .andThen(new ArmElbowSetpointCommand(264, m_arm)));
+          .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
