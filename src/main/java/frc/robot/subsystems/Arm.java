@@ -62,7 +62,6 @@ public class Arm extends SubsystemBase {
         elbowPID.setPositionPIDWrappingMinInput(0.0);
         elbowPID.setPositionPIDWrappingMaxInput(360);
         elbowEncoder.setPositionConversionFactor(360);
-        elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowEncoder.setInverted(true);
         elbowMotor.burnFlash();
 
@@ -102,7 +101,6 @@ public class Arm extends SubsystemBase {
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
         shoulderPID.setPositionPIDWrappingMaxInput(360);
         shoulderEncoder.setPositionConversionFactor(360);
-        shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
         shoulderMotorRight.burnFlash();
 
     }

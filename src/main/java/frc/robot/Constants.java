@@ -18,9 +18,6 @@ public class Constants {
 
     public static boolean PRACTICE_ROBOT = true;
 
-    public static double ELBOW_ENCODER_OFFSET;
-    public static double SHOULDER_ENCODER_OFFSET;
-
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
@@ -175,8 +172,6 @@ public class Constants {
         // The following values should be pulled from a config.properties file:
         DEBUG = Preferences.getBoolean("DEBUG", false);
         PRACTICE_ROBOT = Preferences.getBoolean("PRACTICE_ROBOT", true);
-        ELBOW_ENCODER_OFFSET = Preferences.getDouble("ELBOW_ENCODER_OFFSET", 0.0);
-        SHOULDER_ENCODER_OFFSET = Preferences.getDouble("SHOULDER_ENCODER_OFFSET", 0.0);
 
         /*
         if (PRACTICE_ROBOT) {
