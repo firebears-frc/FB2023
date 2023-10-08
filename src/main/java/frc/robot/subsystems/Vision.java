@@ -95,9 +95,17 @@ public class Vision extends SubsystemBase {
         logger.recordOutput("Vision/Pose", lastResult.estimatedPose);
         logger.recordOutput("Vision/Timestamp", lastResult.timestampSeconds);
         logger.recordOutput("Vision/TargetsFound", lastResult.targetsUsed.size());
-        // Map the target objects to their integer ID, sort them, then map the integer
-        // ID to a string, then join with commas
-        logger.recordOutput("Vision/TargetIDs", String.join(", ", lastResult.targetsUsed.stream()
-                .map(target -> target.getFiducialId()).sorted().map(id -> id.toString()).toList()));
+
+        // Map the target objects to their integer ID, sort them, then store in a list
+        List<Integer> visibleTags = lastResult.targetsUsed.stream().map(target -> target.getFiducialId()).sorted()
+                .toList();
+        // Map the IDs to a string, then join with commas
+        logger.recordOutput("Vision/VisibleIDs",
+                String.join(", ", visibleTags.stream().map(id -> id.toString()).toList()));
+
+        // Set only the IDs for the visible tags
+        boolean[] tags = new boolean[poseEstimator.getFieldTags().getTags().size()];
+        visibleTags.stream().forEach(id -> tags[id] = true);
+        logger.recordOutput("Vision/VisibleTargets", tags);
     }
 }
