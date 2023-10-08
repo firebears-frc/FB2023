@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.SparkMotor;
@@ -13,6 +12,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import static frc.robot.Constants.*;
+
+import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
     private static int STALL_CURRENT_LIMIT_SHOULDER = 30;
@@ -200,18 +201,16 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (DEBUG) {
-            SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
-            SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
-            SmartDashboard.putNumber("shoulder left output", shoulderMotorRight.getAppliedOutput());
-            SmartDashboard.putNumber("shoulder right output", shoulderMotorLeft.getAppliedOutput());
-            SmartDashboard.putNumber("shoulder X", getArmPosition(getShoulderAngle(), getElbowAngle()).getX());
-            SmartDashboard.putNumber("shoulder Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
-
-            SmartDashboard.putNumber("elbow angle", getElbowAngle());
-            SmartDashboard.putNumber("elbow setpoint", elbowSetpoint);
-            SmartDashboard.putNumber("elbow output", elbowMotor.getAppliedOutput());
-        }
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Arm/Shoulder/Angle", getShoulderAngle());
+        logger.recordOutput("Arm/Shoulder/Setpoint", shoulderSetpoint);
+        logger.recordOutput("Arm/Shoulder/LeftOutput", shoulderMotorRight.getAppliedOutput());
+        logger.recordOutput("Arm/Shoulder/RightOutput", shoulderMotorLeft.getAppliedOutput());
+        logger.recordOutput("Arm/X", getArmPosition(getShoulderAngle(), getElbowAngle()).getX());
+        logger.recordOutput("Arm/Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
+        logger.recordOutput("Arm/Elbow/Angle", getElbowAngle());
+        logger.recordOutput("Arm/Elbow/Setpoint", elbowSetpoint);
+        logger.recordOutput("Arm/Elbow/LeftOutput", elbowMotor.getAppliedOutput());
 
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);
