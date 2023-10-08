@@ -83,6 +83,13 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
+    private ChassisSpeeds getTeleopSpeeds() {
+        return new ChassisSpeeds(
+                -MathUtil.applyDeadband(one.getY(), Constants.JOYSTICK_DEADBAND),
+                -MathUtil.applyDeadband(one.getX(), Constants.JOYSTICK_DEADBAND),
+                -MathUtil.applyDeadband(two.getX(), Constants.JOYSTICK_DEADBAND));
+    }
+
     private void configureButtonBindings() {
         // Arm commands
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
@@ -99,18 +106,12 @@ public class RobotContainer {
 
         // Chassis commands
         chassis.setDefaultCommand(chassis.defaultCommand(
-                () -> new ChassisSpeeds(
-                        -MathUtil.applyDeadband(one.getY(), Constants.JOYSTICK_DEADBAND),
-                        -MathUtil.applyDeadband(one.getX(), Constants.JOYSTICK_DEADBAND),
-                        -MathUtil.applyDeadband(two.getX(), Constants.JOYSTICK_DEADBAND)),
+                this::getTeleopSpeeds,
                 false,
                 true,
                 true));
         one.button(2).toggleOnTrue(chassis.defaultCommand(
-                () -> new ChassisSpeeds(
-                        -MathUtil.applyDeadband(one.getY(), Constants.JOYSTICK_DEADBAND),
-                        -MathUtil.applyDeadband(one.getX(), Constants.JOYSTICK_DEADBAND),
-                        -MathUtil.applyDeadband(two.getX(), Constants.JOYSTICK_DEADBAND)),
+                this::getTeleopSpeeds,
                 true,
                 true,
                 true));
