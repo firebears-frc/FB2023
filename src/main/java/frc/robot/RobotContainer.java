@@ -1,20 +1,8 @@
 package frc.robot;
 
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.ArmElbowSetpointCommand;
-import frc.robot.commands.ArmManualCommand;
-import frc.robot.commands.ArmShoulderSetpointCommand;
-import frc.robot.commands.AutoBalanceRoutine;
-import frc.robot.commands.AutoConeAndBalanceCommand;
-import frc.robot.commands.AutoConeGetOutCommand;
-import frc.robot.commands.AutoCubeAndBalanceCommand;
-import frc.robot.commands.AutoCubeGetOutCommand;
-import frc.robot.commands.AutonomousBalanceCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Schlucker;
-import frc.robot.subsystems.Vision;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -27,6 +15,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -66,25 +55,25 @@ public class RobotContainer {
 
     m_arm.setDefaultCommand(new ArmManualCommand(m_arm, xboxController));
 
-    m_chooser.addDefaultOption("Auto CUBE and Balance", new AutoCubeAndBalanceCommand(m_robotDrive, m_schlucker, m_arm));
+    m_chooser.addDefaultOption("Auto CUBE and Balance",
+        new AutoCubeAndBalanceCommand(m_robotDrive, m_schlucker, m_arm));
     m_chooser.addOption("Auto cone and Balance", new AutoConeAndBalanceCommand(m_robotDrive, m_schlucker, m_arm));
     m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
-  
-    m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_robotDrive));
 
+    m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_robotDrive));
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
-            // The left stick controls translation of the robot.
-            // Turning is controlled by the X axis of the right stick.
-            new RunCommand(
-                    () -> m_robotDrive.drive(
-                            -MathUtil.applyDeadband(one.getY(), OIConstants.kDriveDeadband),
-                            -MathUtil.applyDeadband(one.getX(), OIConstants.kDriveDeadband),
-                            -MathUtil.applyDeadband(two.getX(), OIConstants.kDriveDeadband),
-                            true, true),
-                    m_robotDrive));
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () -> m_robotDrive.drive(
+                -MathUtil.applyDeadband(one.getY(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(one.getX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(two.getX(), OIConstants.kDriveDeadband),
+                true, true),
+            m_robotDrive));
   }
 
   public void armReset() {
@@ -107,22 +96,21 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     one.trigger().whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+        () -> m_robotDrive.setX(),
+        m_robotDrive));
 
     two.trigger().whileTrue(new RunCommand(
-            () -> m_robotDrive.zeroHeading(), m_robotDrive));
+        () -> m_robotDrive.zeroHeading(), m_robotDrive));
 
     one.button(5).onTrue(new AutonomousBalanceCommand(m_robotDrive)); // DO NOT DELETE
 
-  
-  
     /* Lights Controls */
     one.button(5).onTrue(new InstantCommand(m_lights::showTeam, m_lights));
     one.button(6).onTrue(new InstantCommand(m_lights::showCone, m_lights));
 
     one.button(7).onTrue(new InstantCommand(m_lights::showCube, m_lights));
-    //one.button(2).onTrue(new InstantCommand(m_robotDrive::toggleSlowMode, m_robotDrive));
+    // one.button(2).onTrue(new InstantCommand(m_robotDrive::toggleSlowMode,
+    // m_robotDrive));
 
     one.trigger().onTrue(new InstantCommand(m_robotDrive::toggleBrakeMode, m_robotDrive));
 
@@ -137,11 +125,10 @@ public class RobotContainer {
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue(
         (new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm)
-        .andThen(new WaitCommand(1))
-        .andThen(new ArmShoulderSetpointCommand(0, m_arm))
-        .andThen(new ArmElbowSetpointCommand(209, m_arm)
-        )));
+            .andThen(new ArmElbowSetpointCommand(220, m_arm)
+                .andThen(new WaitCommand(1))
+                .andThen(new ArmShoulderSetpointCommand(0, m_arm))
+                .andThen(new ArmElbowSetpointCommand(209, m_arm))));
 
     // X button = picks up cube and drops cone
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
@@ -173,7 +160,7 @@ public class RobotContainer {
     // Cone Ground pickup
     JoystickButton xboxLeftBumperButton = new JoystickButton(xboxController, XboxController.Button.kLeftBumper.value);
     xboxLeftBumperButton.onTrue((new ArmShoulderSetpointCommand(127, m_arm))
-          .andThen(new ArmElbowSetpointCommand(224, m_arm)));
+        .andThen(new ArmElbowSetpointCommand(224, m_arm)));
 
     // High level mode
     POVButton xboxDpadLeftButton = new POVButton(xboxController, 270);
