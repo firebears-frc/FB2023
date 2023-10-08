@@ -10,6 +10,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 public class ArmShoulder {
     private static class Constants {
         public static final int RIGHT_CAN_ID = 12;
@@ -33,8 +35,8 @@ public class ArmShoulder {
     private final CANSparkMax motorLeft;
     private final SparkMaxAbsoluteEncoder encoder;
     private final SparkMaxPIDController pid;
-    private double setpoint;
-    private double position;
+    private Rotation2d setpoint;
+    private Rotation2d position;
 
     public ArmShoulder() {
         motorRight = new CANSparkMax(Constants.RIGHT_CAN_ID, MotorType.kBrushless);
@@ -68,34 +70,28 @@ public class ArmShoulder {
         motorLeft.burnFlash();
     }
 
-    public void setAngle(double angle) {
-        while (angle > 360) {
-            angle -= 360;
-        }
-        while (angle < 0) {
-            angle += 360;
-        }
+    public void setAngle(Rotation2d angle) {
         setpoint = angle;
     }
 
-    public double getTargetAngle() {
+    public Rotation2d getTargetAngle() {
         return setpoint;
     }
 
-    public double getAngle() {
+    public Rotation2d getAngle() {
         return position;
     }
 
-    public double getError() {
-        return getAngle() - getTargetAngle();
+    public Rotation2d getError() {
+        return getAngle().minus(getTargetAngle());
     }
 
     public void periodic() {
-        position = encoder.getPosition();
-        pid.setReference(setpoint, ControlType.kPosition);
+        position = Rotation2d.fromDegrees(encoder.getPosition());
+        pid.setReference(setpoint.getDegrees(), ControlType.kPosition);
 
         Logger logger = Logger.getInstance();
-        logger.recordOutput("Arm/Shoulder/Setpoint", setpoint);
-        logger.recordOutput("Arm/Shoulder/Position", position);
+        logger.recordOutput("Arm/Shoulder/Setpoint", setpoint.getDegrees());
+        logger.recordOutput("Arm/Shoulder/Position", position.getDegrees());
     }
 }
