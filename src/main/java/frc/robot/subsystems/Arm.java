@@ -2,10 +2,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.util.SparkMotor;
 
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -24,9 +24,9 @@ public class Arm extends SubsystemBase {
     private static int FREE_CURRENT_LIMIT_ELBOW = 35;
     private static int SECONDARY_CURRENT_LIMIT_ELBOW = 45;
 
-    private SparkMotor elbowMotor;
-    private SparkMotor shoulderMotorRight;
-    private SparkMotor shoulderMotorLeft;
+    private CANSparkMax elbowMotor;
+    private CANSparkMax shoulderMotorRight;
+    private CANSparkMax shoulderMotorLeft;
     private static SparkMaxAbsoluteEncoder elbowEncoder;
     private static SparkMaxAbsoluteEncoder shoulderEncoder;
     private static SparkMaxPIDController elbowPID;
@@ -36,7 +36,7 @@ public class Arm extends SubsystemBase {
 
     public Arm() {
 
-        elbowMotor = new SparkMotor(7, MotorType.kBrushless);
+        elbowMotor = new CANSparkMax(7, MotorType.kBrushless);
 
         elbowMotor.restoreFactoryDefaults();
         elbowMotor.setInverted(true);
@@ -66,7 +66,7 @@ public class Arm extends SubsystemBase {
         elbowEncoder.setInverted(true);
         elbowMotor.burnFlash();
 
-        shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
+        shoulderMotorRight = new CANSparkMax(8, MotorType.kBrushless);
 
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
@@ -74,7 +74,7 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
         shoulderMotorRight.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
 
-        shoulderMotorLeft = new SparkMotor(9, MotorType.kBrushless);
+        shoulderMotorLeft = new CANSparkMax(9, MotorType.kBrushless);
 
         shoulderMotorLeft.restoreFactoryDefaults();
         shoulderMotorLeft.setInverted(false);
