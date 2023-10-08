@@ -93,7 +93,7 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    one.trigger().toggleOnTrue(new StartEndCommand(() -> m_robotDrive.setX(), null, m_robotDrive));
+    one.trigger().whileTrue(new StartEndCommand(m_robotDrive::setX, () -> {}, m_robotDrive));
 
     two.trigger().onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
 
@@ -106,8 +106,6 @@ public class RobotContainer {
     one.button(7).onTrue(new InstantCommand(m_lights::showCube, m_lights));
     // one.button(2).onTrue(new InstantCommand(m_robotDrive::toggleSlowMode,
     // m_robotDrive));
-
-    one.trigger().onTrue(new InstantCommand(m_robotDrive::toggleBrakeMode, m_robotDrive));
 
     // Buttons
 
