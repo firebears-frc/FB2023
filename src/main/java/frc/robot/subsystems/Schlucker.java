@@ -13,11 +13,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import static frc.robot.Constants.*;
 
 public class Schlucker extends SubsystemBase {
-
     private CANSparkMax shluckerMotor;
     private SparkMaxPIDController pid;
-
-    private double schluckerHoldPercent = COMP_SCHLUCKER_HOLD_PERCENT;
 
     public enum ItemHeld {
         CONE,
@@ -42,10 +39,6 @@ public class Schlucker extends SubsystemBase {
         pid.setI(0);
         pid.setD(0);
         shluckerMotor.burnFlash();
-
-        if (PRACTICE_ROBOT) {
-            schluckerHoldPercent = PRACTICE_SCHLUCKER_HOLD_PERCENT;
-        }
     }
 
 
@@ -78,10 +71,10 @@ public class Schlucker extends SubsystemBase {
     public void hold() {
         switch(item_held) {
         case CONE:
-            pid.setReference(-schluckerHoldPercent, ControlType.kDutyCycle);
+            pid.setReference(-SCHLUCKER_HOLD_PERCENT, ControlType.kDutyCycle);
             break;
         case CUBE:
-            pid.setReference(schluckerHoldPercent, ControlType.kDutyCycle);
+            pid.setReference(SCHLUCKER_HOLD_PERCENT, ControlType.kDutyCycle);
             break;
         default:
             break;

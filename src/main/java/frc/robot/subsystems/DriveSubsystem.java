@@ -141,8 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public double getPitch() {
-        int m = Constants.PRACTICE_ROBOT ? -1 : 1;
-        return (m_gyro.getPitch()) * m;
+        return m_gyro.getPitch();
     }
 
     public double getpitchVelocity() {

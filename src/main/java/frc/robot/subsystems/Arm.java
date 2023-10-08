@@ -47,15 +47,9 @@ public class Arm extends SubsystemBase {
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
-        if (PRACTICE_ROBOT) {
-            elbowPID.setP(PracticeArmConstants.elbowP);
-            elbowPID.setI(PracticeArmConstants.elbowI);
-            elbowPID.setD(PracticeArmConstants.elbowD);
-        } else {
-            elbowPID.setP(CompArmConstants.elbowP);
-            elbowPID.setI(CompArmConstants.elbowI);
-            elbowPID.setD(CompArmConstants.elbowD);
-        }
+        elbowPID.setP(ArmConstants.elbowP);
+        elbowPID.setI(ArmConstants.elbowI);
+        elbowPID.setD(ArmConstants.elbowD);
 
         elbowPID.setFeedbackDevice(elbowEncoder);
         elbowPID.setPositionPIDWrappingEnabled(true);
@@ -86,15 +80,9 @@ public class Arm extends SubsystemBase {
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderEncoder.setInverted(true);
-        if (PRACTICE_ROBOT) {
-            shoulderPID.setP(PracticeArmConstants.shoulderP);
-            shoulderPID.setI(PracticeArmConstants.shoulderI);
-            shoulderPID.setD(PracticeArmConstants.shoulderD);
-        } else {
-            shoulderPID.setP(CompArmConstants.shoulderP);
-            shoulderPID.setI(CompArmConstants.shoulderI);
-            shoulderPID.setD(CompArmConstants.shoulderD);
-        }
+        shoulderPID.setP(ArmConstants.shoulderP);
+        shoulderPID.setI(ArmConstants.shoulderI);
+        shoulderPID.setD(ArmConstants.shoulderD);
 
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);

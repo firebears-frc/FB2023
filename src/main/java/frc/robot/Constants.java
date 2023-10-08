@@ -4,20 +4,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Preferences;
-
-import static frc.robot.util.Config.cleanAllPreferences;
-import static frc.robot.util.Config.loadConfiguration;
-import static frc.robot.util.Config.printPreferences;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
 public class Constants {
-    /** DEBUG enables extra logging and Shuffleboard widgets. */
-    public static boolean DEBUG = false;
-
-    public static boolean PRACTICE_ROBOT = true;
-
     public static final class DriveConstants {
         // Driving Parameters - Note that these are not the maximum capable speeds of
         // the robot, rather the allowed maximum speeds
@@ -137,17 +127,8 @@ public class Constants {
     public static final class NeoMotorConstants {
         public static final double kFreeSpeedRpm = 5676;
     }
-    public static final class PracticeArmConstants {
-        public static final double shoulderP = 0.0175;
-        public static final double shoulderI = 0.0;
-        public static final double shoulderD = 0.005;
 
-        public static final double elbowP = 0.02;
-        public static final double elbowI = 0.000001;
-        public static final double elbowD = 0.001;
-    }
-
-    public static final class CompArmConstants {
+    public static final class ArmConstants {
         public static final double shoulderP = 0.0175;
         public static final double shoulderI = 0.0;
         public static final double shoulderD = 0.005;
@@ -161,26 +142,5 @@ public class Constants {
     public static int ARM_SHOULDER_LENGTH = 28;
     public static int ARM_ELBOW_LENGTH = 32;
 
-    public static final double PRACTICE_SCHLUCKER_HOLD_PERCENT = 0.15;
-    public static final double COMP_SCHLUCKER_HOLD_PERCENT = 0.3;
-
-    public static void init(String... fileNames) {
-        cleanAllPreferences();
-        loadConfiguration(fileNames);
-        printPreferences(System.out);
-
-        // The following values should be pulled from a config.properties file:
-        DEBUG = Preferences.getBoolean("DEBUG", false);
-        PRACTICE_ROBOT = Preferences.getBoolean("PRACTICE_ROBOT", true);
-
-        /*
-        if (PRACTICE_ROBOT) {
-            kFeetToMeterFactor = 20;
-        } else { 
-            // Competition bot
-            kFeetToMeterFactor = 20;
-            
-        }
-        */
-    }
+    public static final double SCHLUCKER_HOLD_PERCENT = 0.3;
 }

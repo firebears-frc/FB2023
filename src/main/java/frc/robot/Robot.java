@@ -40,9 +40,6 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our
         // autonomous chooser on the dashboard.
-        Constants.init("/home/lvuser/deploy/config.properties",
-                "/home/lvuser/config.properties",
-                "/u/config.properties");
         m_robotContainer = RobotContainer.getInstance();
         m_robotContainer.armReset();
     }
