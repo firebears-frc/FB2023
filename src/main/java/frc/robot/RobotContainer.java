@@ -14,6 +14,10 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
+import java.util.List;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -58,7 +62,15 @@ public class RobotContainer {
     m_chooser.addOption("Auto cone and Balance", new AutoConeAndBalanceCommand(m_robotDrive, m_schlucker, m_arm));
     m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
-
+    m_chooser.addOption("Curve", m_robotDrive.getDriveCommand(
+        new Pose2d(),
+        List.of(),
+        new Pose2d(-2, 0.5, Rotation2d.fromDegrees(90))
+    ).andThen(m_robotDrive.getDriveCommand(
+        new Pose2d(-2, 0.5, Rotation2d.fromDegrees(90)),
+        List.of(),
+        new Pose2d(-4, 0, Rotation2d.fromDegrees(180))
+    )));
     m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_robotDrive));
 
     // Configure default commands
