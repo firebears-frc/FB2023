@@ -60,6 +60,7 @@ public class RobotContainer {
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
 
     m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_robotDrive));
+    m_chooser.addOption("lebron", new AutoPickCubeTest(m_robotDrive, m_schlucker, m_arm));
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
