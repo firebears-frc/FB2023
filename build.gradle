@@ -3,10 +3,21 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2023.4.3"
+    id "com.peterabeles.gversion" version "1.10"
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
+        credentials {
+            username = "Mechanical-Advantage-Bot"
+            password = "\u0067\u0068\u0070\u005f\u006e\u0056\u0051\u006a\u0055\u004f\u004c\u0061\u0079\u0066\u006e\u0078\u006e\u0037\u0051\u0049\u0054\u0042\u0032\u004c\u004a\u006d\u0055\u0070\u0073\u0031\u006d\u0037\u004c\u005a\u0030\u0076\u0062\u0070\u0063\u0051"
+        }
+    }
+}
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
@@ -102,45 +113,13 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
-// Setup a task to write the branch name to a file
-tasks.register("writeBranchName") {
-   // Define an output stream to write to instead of terminal
-   def stdout = new ByteArrayOutputStream()
-
-   // Execute the git command
-   exec {
-      commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
-      // Write to the output stream instead of terminal
-      standardOutput = stdout
-   }
-
-   // Parse the output into a string
-   def branch = stdout.toString().trim()
-
-   // Create a new file
-   new File(
-      // Join project directory and deploy directory
-      projectDir.toString() + "/src/main/deploy",
-      // File name to write to
-      "branch.txt"
-   ).text = branch // Set the contents of the file to the variable branch
+project.compileJava.dependsOn(createVersionFile)
+gversion {
+    srcDir       = "src/main/java/"
+    classPackage = "frc.robot"
+    className    = "BuildConstants"
+    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+    timeZone     = "America/Chicago" // Use preferred time zone
+    indent       = "    "
 }
-deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeBranchName)
 
-// Setup a task to write the commit hash to a file
-tasks.register("writeCommitHash") {
-   def stdout = new ByteArrayOutputStream()
-
-   exec {
-     commandLine "git", "rev-parse", "HEAD"
-     standardOutput = stdout
-   }
-
-   def commitHash = stdout.toString().trim()
-
-   new File(
-      projectDir.toString() + "/src/main/deploy",
-      "commit.txt"
-   ).text = commitHash
-}
-deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeCommitHash)

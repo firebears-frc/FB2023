@@ -5,22 +5,22 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Chassis;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class BalanceTake2Command extends CommandBase {
 
-  Chassis m_chassis;
+  DriveSubsystem m_chassis;
   double speed;
   double lastPitch;
 
   /** Creates a new BalanceTake2Command. */
-  public BalanceTake2Command(Chassis chassis) {
+  public BalanceTake2Command(DriveSubsystem chassis) {
     m_chassis = chassis;
     speed = 0.07;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_chassis);
   }
-  public BalanceTake2Command(double s, Chassis chassis) {
+  public BalanceTake2Command(double s, DriveSubsystem chassis) {
     m_chassis = chassis;
     speed = s;
     // Use addRequirements() here to declare subsystem dependencies.

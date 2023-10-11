@@ -1,18 +1,19 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.util.SparkMotor;
 
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import static frc.robot.Constants.*;
+
+import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
     private static int STALL_CURRENT_LIMIT_SHOULDER = 30;
@@ -23,9 +24,9 @@ public class Arm extends SubsystemBase {
     private static int FREE_CURRENT_LIMIT_ELBOW = 35;
     private static int SECONDARY_CURRENT_LIMIT_ELBOW = 45;
 
-    private SparkMotor elbowMotor;
-    private SparkMotor shoulderMotorRight;
-    private SparkMotor shoulderMotorLeft;
+    private CANSparkMax elbowMotor;
+    private CANSparkMax shoulderMotorRight;
+    private CANSparkMax shoulderMotorLeft;
     private static SparkMaxAbsoluteEncoder elbowEncoder;
     private static SparkMaxAbsoluteEncoder shoulderEncoder;
     private static SparkMaxPIDController elbowPID;
@@ -35,7 +36,7 @@ public class Arm extends SubsystemBase {
 
     public Arm() {
 
-        elbowMotor = new SparkMotor(7, MotorType.kBrushless);
+        elbowMotor = new CANSparkMax(7, MotorType.kBrushless);
 
         elbowMotor.restoreFactoryDefaults();
         elbowMotor.setInverted(true);
@@ -46,26 +47,19 @@ public class Arm extends SubsystemBase {
         elbowPID = elbowMotor.getPIDController();
         elbowEncoder = elbowMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
-        if (PRACTICE_ROBOT) {
-            elbowPID.setP(PracticeArmConstants.elbowP);
-            elbowPID.setI(PracticeArmConstants.elbowI);
-            elbowPID.setD(PracticeArmConstants.elbowD);
-        } else {
-            elbowPID.setP(CompArmConstants.elbowP);
-            elbowPID.setI(CompArmConstants.elbowI);
-            elbowPID.setD(CompArmConstants.elbowD);
-        }
+        elbowPID.setP(ArmConstants.elbowP);
+        elbowPID.setI(ArmConstants.elbowI);
+        elbowPID.setD(ArmConstants.elbowD);
 
         elbowPID.setFeedbackDevice(elbowEncoder);
         elbowPID.setPositionPIDWrappingEnabled(true);
         elbowPID.setPositionPIDWrappingMinInput(0.0);
         elbowPID.setPositionPIDWrappingMaxInput(360);
         elbowEncoder.setPositionConversionFactor(360);
-        elbowEncoder.setZeroOffset(ELBOW_ENCODER_OFFSET);
         elbowEncoder.setInverted(true);
         elbowMotor.burnFlash();
 
-        shoulderMotorRight = new SparkMotor(8, MotorType.kBrushless);
+        shoulderMotorRight = new CANSparkMax(8, MotorType.kBrushless);
 
         shoulderMotorRight.restoreFactoryDefaults();
         shoulderMotorRight.setInverted(true);
@@ -73,7 +67,7 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight.setSmartCurrentLimit(STALL_CURRENT_LIMIT_SHOULDER, FREE_CURRENT_LIMIT_SHOULDER);
         shoulderMotorRight.setSecondaryCurrentLimit(SECONDARY_CURRENT_LIMIT_SHOULDER);
 
-        shoulderMotorLeft = new SparkMotor(9, MotorType.kBrushless);
+        shoulderMotorLeft = new CANSparkMax(9, MotorType.kBrushless);
 
         shoulderMotorLeft.restoreFactoryDefaults();
         shoulderMotorLeft.setInverted(false);
@@ -86,22 +80,15 @@ public class Arm extends SubsystemBase {
         shoulderPID = shoulderMotorRight.getPIDController();
         shoulderEncoder = shoulderMotorRight.getAbsoluteEncoder(Type.kDutyCycle);
         shoulderEncoder.setInverted(true);
-        if (PRACTICE_ROBOT) {
-            shoulderPID.setP(PracticeArmConstants.shoulderP);
-            shoulderPID.setI(PracticeArmConstants.shoulderI);
-            shoulderPID.setD(PracticeArmConstants.shoulderD);
-        } else {
-            shoulderPID.setP(CompArmConstants.shoulderP);
-            shoulderPID.setI(CompArmConstants.shoulderI);
-            shoulderPID.setD(CompArmConstants.shoulderD);
-        }
+        shoulderPID.setP(ArmConstants.shoulderP);
+        shoulderPID.setI(ArmConstants.shoulderI);
+        shoulderPID.setD(ArmConstants.shoulderD);
 
         shoulderPID.setFeedbackDevice(shoulderEncoder);
         shoulderPID.setPositionPIDWrappingEnabled(true);
         shoulderPID.setPositionPIDWrappingMinInput(0.0);
         shoulderPID.setPositionPIDWrappingMaxInput(360);
         shoulderEncoder.setPositionConversionFactor(360);
-        shoulderEncoder.setZeroOffset(SHOULDER_ENCODER_OFFSET);
         shoulderMotorRight.burnFlash();
 
     }
@@ -200,18 +187,16 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (DEBUG) {
-            SmartDashboard.putNumber("shoulder angle", getShoulderAngle());
-            SmartDashboard.putNumber("shoulder setpoint", shoulderSetpoint);
-            SmartDashboard.putNumber("shoulder left output", shoulderMotorRight.getAppliedOutput());
-            SmartDashboard.putNumber("shoulder right output", shoulderMotorLeft.getAppliedOutput());
-            SmartDashboard.putNumber("shoulder X", getArmPosition(getShoulderAngle(), getElbowAngle()).getX());
-            SmartDashboard.putNumber("shoulder Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
-
-            SmartDashboard.putNumber("elbow angle", getElbowAngle());
-            SmartDashboard.putNumber("elbow setpoint", elbowSetpoint);
-            SmartDashboard.putNumber("elbow output", elbowMotor.getAppliedOutput());
-        }
+        Logger logger = Logger.getInstance();
+        logger.recordOutput("Arm/Shoulder/Angle", getShoulderAngle());
+        logger.recordOutput("Arm/Shoulder/Setpoint", shoulderSetpoint);
+        logger.recordOutput("Arm/Shoulder/LeftOutput", shoulderMotorRight.getAppliedOutput());
+        logger.recordOutput("Arm/Shoulder/RightOutput", shoulderMotorLeft.getAppliedOutput());
+        logger.recordOutput("Arm/X", getArmPosition(getShoulderAngle(), getElbowAngle()).getX());
+        logger.recordOutput("Arm/Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
+        logger.recordOutput("Arm/Elbow/Angle", getElbowAngle());
+        logger.recordOutput("Arm/Elbow/Setpoint", elbowSetpoint);
+        logger.recordOutput("Arm/Elbow/Output", elbowMotor.getAppliedOutput());
 
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);

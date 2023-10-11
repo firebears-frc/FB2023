@@ -8,7 +8,6 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import frc.robot.util.VisionMap;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,21 +21,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
   PhotonCamera Camera;
-  VisionMap VM;
-
   PhotonPoseEstimator poseEstimator;
-  //public Field2d Field = new Field2d();
   AprilTagFieldLayout layout;
 
   private boolean hasTarget = false;
 
-  private final Chassis m_chassis;
+  private final DriveSubsystem m_chassis;
 
   /** Creates a new Vision. */
-  public Vision(String CamName,Chassis chassis) {
+  public Vision(String CamName, DriveSubsystem chassis) {
     Camera = new PhotonCamera(CamName);
-    VM = new VisionMap();
-    //SmartDashboard.putData("VisionEyes",Field);
     m_chassis = chassis;
     
     try {
@@ -57,7 +51,6 @@ public class Vision extends SubsystemBase {
       poseEstimator.setLastPose(new Pose3d());
       
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
