@@ -277,7 +277,7 @@ public class DriveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(m_gyro.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
     }
 
-    public Command getDriveCommand(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
+    public Command getDriveCommand(String name, Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
         // Create config for trajectory
         TrajectoryConfig config = new TrajectoryConfig(
                 AutoConstants.kMaxSpeedMetersPerSecond,
@@ -294,6 +294,7 @@ public class DriveSubsystem extends SubsystemBase {
                 // End 3 meters straight ahead of where we started, facing forward
                 end,
                 config);
+        Logger.getInstance().recordOutput("Chassis/Trajectories/" + name, exampleTrajectory);
 
         var thetaController = new ProfiledPIDController(
                 AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
