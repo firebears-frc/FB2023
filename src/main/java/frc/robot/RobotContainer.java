@@ -89,6 +89,17 @@ public class RobotContainer {
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(180))
     );
+    m_chooser.addOption("1/-1 meter", m_robotDrive.getDriveCommand(
+        "0m p1",
+        new Pose2d(),
+        List.of(),
+        new Pose2d(1, 0, new Rotation2d())
+    ).andThen(m_robotDrive.getDriveCommand(
+        "0m p1",
+        new Pose2d(1, 0, new Rotation2d()),
+        List.of(),
+        new Pose2d()
+    )));
 
     addAuto("1 meter, 90 degrees",
         new Pose2d(),
