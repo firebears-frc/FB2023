@@ -27,7 +27,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.util.WPIUtilJNI;
-import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
@@ -233,10 +232,12 @@ public class DriveSubsystem extends SubsystemBase {
      * Sets the wheels into an X formation to prevent movement.
      */
     public void setX() {
-        m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        SwerveModuleState[] states = new SwerveModuleState[4];
+        states[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        states[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        states[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        states[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        setModuleStates(states);
     }
 
     /**
@@ -251,6 +252,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_frontRight.setDesiredState(desiredStates[1]);
         m_rearLeft.setDesiredState(desiredStates[2]);
         m_rearRight.setDesiredState(desiredStates[3]);
+        Logger.getInstance().recordOutput("Chassis/Target", desiredStates);
     }
 
     /** Resets the drive encoders to currently read a position of 0. */
