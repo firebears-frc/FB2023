@@ -83,11 +83,11 @@ public class RobotContainer {
     //    new Pose2d(-2, 0, new Rotation2d())
     //);
     addAuto("3 meter curve",
-        new Pose2d(0, 0, new Rotation2d(0)),
+        new Pose2d(0, 0, new Rotation2d()),
         // Pass through these two interior waypoints, making an 's' curve path
         List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(180))
+        new Pose2d(3, 0, new Rotation2d())
     );
     //m_chooser.addOption("1/-1 meter", m_robotDrive.getDriveCommand(
     //    "0m p1",
