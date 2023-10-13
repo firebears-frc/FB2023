@@ -14,11 +14,6 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-
-import java.util.List;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -64,104 +59,7 @@ public class RobotContainer {
     m_chooser.addOption("Cube", new AutoCubeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
     m_chooser.addOption("Cone", new AutoConeGetOutCommand(m_robotDrive, m_schlucker, m_arm));
 
-    // Try a number of auto paths per this post:
-    // https://www.chiefdelphi.com/t/assistance-troubleshooting-swerve-auto/431550/2
-    addAuto("1 meter",
-        new Pose2d(),
-        new Pose2d(1, 0, new Rotation2d())
-    );
-    //addAuto("-1 meter",
-    //    new Pose2d(),
-    //    new Pose2d(-1, 0, new Rotation2d())
-    //);
-    addAuto("2 meter",
-        new Pose2d(),
-        new Pose2d(2, 0, new Rotation2d())
-    );
-    //addAuto("-2 meter",
-    //    new Pose2d(),
-    //    new Pose2d(-2, 0, new Rotation2d())
-    //);
-    addAuto("3 meter curve",
-        new Pose2d(0, 0, new Rotation2d()),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d())
-    );
-    //m_chooser.addOption("1/-1 meter", m_robotDrive.getDriveCommand(
-    //    "0m p1",
-    //    new Pose2d(),
-    //    List.of(),
-    //    new Pose2d(1, 0, new Rotation2d())
-    //).andThen(m_robotDrive.getDriveCommand(
-    //    "0m p1",
-    //    new Pose2d(1, 0, new Rotation2d()),
-    //    List.of(),
-    //    new Pose2d()
-    //)));
-
-    addAuto("1 meter, 90 degrees",
-        new Pose2d(),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(90))
-    );
-    addAuto("1 meter, -90 degrees",
-        new Pose2d(),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(-90))
-    );
-    addAuto("1 meter, 180 degrees",
-        new Pose2d(),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(180))
-    );
-    m_chooser.addOption("2 meter, 0/90/0 degree spin", m_robotDrive.getDriveCommand(
-        "2m 0-90-0 p1",
-        new Pose2d(),
-        List.of(),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(90))
-    ).andThen(m_robotDrive.getDriveCommand(
-        "2m 0-90-0 p2",
-        new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
-        List.of(),
-        new Pose2d(2, 0, new Rotation2d())
-    )));
-    m_chooser.addOption("2 meter, 0/-90/0 degree spin", m_robotDrive.getDriveCommand(
-        "2m 0--90-0 p1",
-        new Pose2d(),
-        List.of(),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(-90))
-    ).andThen(m_robotDrive.getDriveCommand(
-        "2m 0--90-0 p2",
-        new Pose2d(1, 0, Rotation2d.fromDegrees(-90)),
-        List.of(),
-        new Pose2d(2, 0, new Rotation2d())
-    )));
-    m_chooser.addOption("2 meter, 0/90/180 degree spin", m_robotDrive.getDriveCommand(
-        "2m 0-180-0 p1",
-        new Pose2d(),
-        List.of(),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(90))
-    ).andThen(m_robotDrive.getDriveCommand(
-        "2m 0-180-0 p2",
-        new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
-        List.of(),
-        new Pose2d(2, 0, Rotation2d.fromDegrees(180))
-    )));
-    m_chooser.addOption("3 meter curve, 0/90/180/270 degree spin", m_robotDrive.getDriveCommand(
-        "3m 0-90-180-270 p1",
-        new Pose2d(),
-        List.of(),
-        new Pose2d(1, 1, Rotation2d.fromDegrees(90))
-    ).andThen(m_robotDrive.getDriveCommand(
-        "3m 0-90-180-270 p2",
-        new Pose2d(1, 1, Rotation2d.fromDegrees(90)),
-        List.of(),
-        new Pose2d(2, -1, Rotation2d.fromDegrees(180))
-    )).andThen(m_robotDrive.getDriveCommand(
-        "3m 0-90-180-270 p3",
-        new Pose2d(2, -1, Rotation2d.fromDegrees(180)),
-        List.of(),
-        new Pose2d(3, 0, Rotation2d.fromDegrees(270))
-    )));
+    m_chooser.addOption("Auto Balance", new AutoBalanceRoutine(m_robotDrive));
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -174,15 +72,6 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(two.getX(), OIConstants.kDriveDeadband),
                 true, true),
             m_robotDrive));
-  }
-
-  private void addAuto(String name, Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
-    m_chooser.addOption(name, new InstantCommand(() -> m_robotDrive.resetOdometry(new Pose2d()), m_robotDrive)
-        .andThen(m_robotDrive.getDriveCommand(name, start, interiorWaypoints, end)));
-  }
-
-  private void addAuto(String name, Pose2d start, Pose2d end) {
-    addAuto(name, start, List.of(), end);
   }
 
   public void armReset() {

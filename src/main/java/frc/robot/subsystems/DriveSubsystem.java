@@ -31,7 +31,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
@@ -278,7 +277,7 @@ public class DriveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(m_gyro.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
     }
 
-    public Command getDriveCommand(String name, Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
+    public Command getDriveCommand(Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
         // Create config for trajectory
         TrajectoryConfig config = new TrajectoryConfig(
                 AutoConstants.kMaxSpeedMetersPerSecond,
@@ -295,7 +294,6 @@ public class DriveSubsystem extends SubsystemBase {
                 // End 3 meters straight ahead of where we started, facing forward
                 end,
                 config);
-        Logger.getInstance().recordOutput("Chassis/Trajectories/" + name, exampleTrajectory);
 
         var thetaController = new ProfiledPIDController(
                 AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
@@ -313,7 +311,7 @@ public class DriveSubsystem extends SubsystemBase {
                 this::setModuleStates,
                 this);
 
-        // Reset odometry to the starting pose of the trajectory, run path following command, then stop at the end.
+        // Run path following command, then stop at the end.
         return swerveControllerCommand.andThen(() -> this.drive(0, 0, 0, false, false));
     }
 
