@@ -89,17 +89,17 @@ public class RobotContainer {
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(180))
     );
-    m_chooser.addOption("1/-1 meter", m_robotDrive.getDriveCommand(
-        "0m p1",
-        new Pose2d(),
-        List.of(),
-        new Pose2d(1, 0, new Rotation2d())
-    ).andThen(m_robotDrive.getDriveCommand(
-        "0m p1",
-        new Pose2d(1, 0, new Rotation2d()),
-        List.of(),
-        new Pose2d()
-    )));
+    //m_chooser.addOption("1/-1 meter", m_robotDrive.getDriveCommand(
+    //    "0m p1",
+    //    new Pose2d(),
+    //    List.of(),
+    //    new Pose2d(1, 0, new Rotation2d())
+    //).andThen(m_robotDrive.getDriveCommand(
+    //    "0m p1",
+    //    new Pose2d(1, 0, new Rotation2d()),
+    //    List.of(),
+    //    new Pose2d()
+    //)));
 
     addAuto("1 meter, 90 degrees",
         new Pose2d(),
@@ -177,7 +177,8 @@ public class RobotContainer {
   }
 
   private void addAuto(String name, Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end) {
-    m_chooser.addOption(name, m_robotDrive.getDriveCommand(name, start, interiorWaypoints, end));
+    m_chooser.addOption(name, new InstantCommand(() -> m_robotDrive.resetOdometry(new Pose2d()), m_robotDrive)
+        .andThen(m_robotDrive.getDriveCommand(name, start, interiorWaypoints, end)));
   }
 
   private void addAuto(String name, Pose2d start, Pose2d end) {

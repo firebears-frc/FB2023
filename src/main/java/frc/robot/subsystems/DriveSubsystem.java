@@ -314,8 +314,7 @@ public class DriveSubsystem extends SubsystemBase {
                 this);
 
         // Reset odometry to the starting pose of the trajectory, run path following command, then stop at the end.
-        return new InstantCommand(() -> resetOdometry(exampleTrajectory.getInitialPose()), this)
-                .andThen(swerveControllerCommand.andThen(() -> this.drive(0, 0, 0, false, false)));
+        return swerveControllerCommand.andThen(() -> this.drive(0, 0, 0, false, false));
     }
 
     // Stub function to maintain compatibility with old chassis, this should only be used for autos
