@@ -70,18 +70,18 @@ public class RobotContainer {
         new Pose2d(),
         new Pose2d(1, 0, new Rotation2d())
     );
-    addAuto("-1 meter",
-        new Pose2d(),
-        new Pose2d(-1, 0, new Rotation2d())
-    );
+    //addAuto("-1 meter",
+    //    new Pose2d(),
+    //    new Pose2d(-1, 0, new Rotation2d())
+    //);
     addAuto("2 meter",
         new Pose2d(),
         new Pose2d(2, 0, new Rotation2d())
     );
-    addAuto("-2 meter",
-        new Pose2d(),
-        new Pose2d(-2, 0, new Rotation2d())
-    );
+    //addAuto("-2 meter",
+    //    new Pose2d(),
+    //    new Pose2d(-2, 0, new Rotation2d())
+    //);
     addAuto("3 meter curve",
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
