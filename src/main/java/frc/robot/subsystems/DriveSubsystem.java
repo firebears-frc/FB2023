@@ -311,9 +311,6 @@ public class DriveSubsystem extends SubsystemBase {
                 this::setModuleStates,
                 this);
 
-        // Reset odometry to the starting pose of the trajectory.
-        this.resetOdometry(exampleTrajectory.getInitialPose());
-
         // Run path following command, then stop at the end.
         return swerveControllerCommand.andThen(() -> this.drive(0, 0, 0, false, false));
     }
