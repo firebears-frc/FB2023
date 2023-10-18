@@ -1,9 +1,5 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
-  
+
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Arm;
 
@@ -11,18 +7,17 @@ import frc.robot.subsystems.Arm;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ArmElbowSetpointCommand extends InstantCommand {
-  Arm m_arm;
-  double setPoint;
-  public ArmElbowSetpointCommand(double s, Arm arm) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    m_arm = arm;
-    addRequirements(arm);
-    setPoint = s;
-  }
+    Arm m_arm;
+    double setPoint;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_arm.setElbowSetpoint(setPoint);
-  }
+    public ArmElbowSetpointCommand(double s, Arm arm) {
+        m_arm = arm;
+        addRequirements(arm);
+        setPoint = s;
+    }
+
+    @Override
+    public void initialize() {
+        m_arm.setElbowSetpoint(setPoint);
+    }
 }

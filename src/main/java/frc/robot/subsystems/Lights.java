@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 /*
  * Both low = Fire
  * One low = Cone / Cube
@@ -15,7 +14,6 @@ public class Lights extends SubsystemBase {
     DigitalOutput conePin;
     DigitalOutput cubePin;
 
- 
     public Lights() {
         conePin = new DigitalOutput(11);
         cubePin = new DigitalOutput(12);
@@ -23,7 +21,7 @@ public class Lights extends SubsystemBase {
         cubePin.set(false);
         System.out.println("Setup lights");
         DriverStation.getAlliance();
-        
+
     }
 
     public Alliance getTeamColor() {
@@ -33,13 +31,13 @@ public class Lights extends SubsystemBase {
             case Red:
             case Invalid:
             default:
-            return Alliance.Red;
+                return Alliance.Red;
         }
     }
 
     public void showTeam() {
         System.out.println("Show team");
-        switch(getTeamColor()) {
+        switch (getTeamColor()) {
             case Blue:
                 showBlue();
                 break;
@@ -56,6 +54,7 @@ public class Lights extends SubsystemBase {
         conePin.set(false);
         cubePin.set(false);
     }
+
     private void showRed() {
         conePin.set(true);
         cubePin.set(true);
@@ -72,7 +71,7 @@ public class Lights extends SubsystemBase {
         conePin.set(false);
         cubePin.set(true);
     }
-    
+
     @Override
     public void periodic() {
 

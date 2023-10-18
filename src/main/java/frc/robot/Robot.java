@@ -76,7 +76,7 @@ public class Robot extends LoggedRobot {
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
-        //m_robotContainer.armReset();
+        // m_robotContainer.armReset();
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
