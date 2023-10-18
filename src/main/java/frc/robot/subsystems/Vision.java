@@ -12,6 +12,8 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -25,16 +27,19 @@ public class Vision extends SubsystemBase {
         public static final String NAME = "MainC";
     }
 
-    PhotonCamera camera;
+    UsbCamera driverCamera;
+    PhotonCamera visionSystem;
     PhotonPoseEstimator poseEstimator;
     EstimatedRobotPose lastResult;
     BiConsumer<Pose2d, Double> consumer;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) {
+        driverCamera = CameraServer.startAutomaticCapture();
+        driverCamera.setResolution(320, 240);
         this.consumer = consumer;
         lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of());
 
-        camera = new PhotonCamera(Constants.NAME);
+        visionSystem = new PhotonCamera(Constants.NAME);
 
         AprilTagFieldLayout fieldLayout = null;
         try {
@@ -48,7 +53,7 @@ public class Vision extends SubsystemBase {
         poseEstimator = new PhotonPoseEstimator(
                 fieldLayout,
                 PoseStrategy.MULTI_TAG_PNP,
-                camera,
+                visionSystem,
                 new Transform3d(new Translation3d(
                         Units.inchesToMeters(0),
                         Units.inchesToMeters(0),
@@ -66,11 +71,11 @@ public class Vision extends SubsystemBase {
     }
 
     private Status updatePose() {
-        boolean connected = camera.isConnected();
+        boolean connected = visionSystem.isConnected();
         if (connected)
             return Status.NOT_CONNECTED;
 
-        PhotonPipelineResult result = camera.getLatestResult();
+        PhotonPipelineResult result = visionSystem.getLatestResult();
         if (!result.hasTargets())
             return Status.NOT_CONNECTED;
 
