@@ -12,7 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class ArmElbow {
+public class ArmElbow extends ArmLigament {
     private static class Constants {
         public static final int PORT = 7;
 
@@ -33,8 +33,6 @@ public class ArmElbow {
     private final CANSparkMax motor;
     private final SparkMaxAbsoluteEncoder encoder;
     private final SparkMaxPIDController pid;
-    private Rotation2d setpoint;
-    private Rotation2d position;
 
     public ArmElbow() {
         motor = new CANSparkMax(Constants.PORT, MotorType.kBrushless);
@@ -57,22 +55,6 @@ public class ArmElbow {
         pid.setD(Constants.D, 0);
 
         motor.burnFlash();
-    }
-
-    public void setAngle(Rotation2d angle) {
-        setpoint = angle;
-    }
-
-    public Rotation2d getTargetAngle() {
-        return setpoint;
-    }
-
-    public Rotation2d getAngle() {
-        return position;
-    }
-
-    public Rotation2d getError() {
-        return getAngle().minus(getTargetAngle());
     }
 
     public void periodic() {

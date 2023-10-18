@@ -12,7 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class ArmShoulder {
+public class ArmShoulder extends ArmLigament {
     private static class Constants {
         public static final int RIGHT_CAN_ID = 12;
         public static final int LEFT_CAN_ID = 13;
@@ -35,8 +35,6 @@ public class ArmShoulder {
     private final CANSparkMax motorLeft;
     private final SparkMaxAbsoluteEncoder encoder;
     private final SparkMaxPIDController pid;
-    private Rotation2d setpoint;
-    private Rotation2d position;
 
     public ArmShoulder() {
         motorRight = new CANSparkMax(Constants.RIGHT_CAN_ID, MotorType.kBrushless);
@@ -68,22 +66,6 @@ public class ArmShoulder {
 
         motorRight.burnFlash();
         motorLeft.burnFlash();
-    }
-
-    public void setAngle(Rotation2d angle) {
-        setpoint = angle;
-    }
-
-    public Rotation2d getTargetAngle() {
-        return setpoint;
-    }
-
-    public Rotation2d getAngle() {
-        return position;
-    }
-
-    public Rotation2d getError() {
-        return getAngle().minus(getTargetAngle());
     }
 
     public void periodic() {
