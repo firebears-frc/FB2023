@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -305,7 +304,7 @@ public class Chassis extends SubsystemBase {
         return new DefaultCommand(this, commandSupplier, slowMode, fieldRelative, rateLimit);
     }
 
-    private class DefaultCommand extends CommandBase {
+    private class DefaultCommand extends Command {
         private final Chassis chassis;
         private final Supplier<ChassisSpeeds> commandSupplier;
         private final boolean slowMode;
