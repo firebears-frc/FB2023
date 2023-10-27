@@ -7,27 +7,22 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Schlucker;
 
-class Multithreading extends Thread {
-    public void run () {
-        try {
+// This file is being used as a for creating syncronised parrallel movement
 
-            System.out.println(
-                Thread.currentThread().getId()
-            );
-        }
-        catch (Exception e) {
-            System.out.println("Failed");
-        }
-    }
-}
+//(    new ArmShoulderSetpointCommand())
+// s: double -> Point to go to
+// Arm: Arm -> Arm to use
+
+//    (new ArmElbowSetpointCommand())
+// s: double -> Point to go to
+// Arm: Arm -> Arm to use
+
+
+//    (new ChassisDriveToDistanceCommand()) 
+// s: double -> Point to go to
+// Arm: Arm -> Arm to use
 
 public class AutoMoveArmPickup {
-    public static void Main(String[] args) {
-        int n=8;
-        for (int i = 0; i < n; i++) {
-            Multithreading object = new Multithreading();
-            object.start();
-        }
-    }
+
+    
 }
-   
