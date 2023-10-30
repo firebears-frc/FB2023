@@ -37,7 +37,7 @@ public class Vision extends SubsystemBase {
         driverCamera = CameraServer.startAutomaticCapture();
         driverCamera.setResolution(320, 240);
         this.consumer = consumer;
-        lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of());
+        lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of(), PoseStrategy.LOWEST_AMBIGUITY);
 
         visionSystem = new PhotonCamera(Constants.NAME);
 
@@ -52,7 +52,7 @@ public class Vision extends SubsystemBase {
 
         poseEstimator = new PhotonPoseEstimator(
                 fieldLayout,
-                PoseStrategy.MULTI_TAG_PNP,
+                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 visionSystem,
                 new Transform3d(new Translation3d(
                         Units.inchesToMeters(0),
