@@ -37,13 +37,12 @@ public class Robot extends LoggedRobot {
     }
 
     private void initializeLogging() {
-        Logger logger = Logger.getInstance();
-        logger.recordMetadata("Project Name", BuildConstants.MAVEN_NAME);
-        logger.recordMetadata("Branch Name", BuildConstants.GIT_BRANCH);
-        logger.recordMetadata("Commit Hash (Short)", BuildConstants.GIT_SHA.substring(0, 8));
-        logger.recordMetadata("Commit Hash (Full)", BuildConstants.GIT_SHA);
-        logger.recordMetadata("Build Time", BuildConstants.BUILD_DATE);
-        logger.recordMetadata("Dirty",
+        Logger.recordMetadata("Project Name", BuildConstants.MAVEN_NAME);
+        Logger.recordMetadata("Branch Name", BuildConstants.GIT_BRANCH);
+        Logger.recordMetadata("Commit Hash (Short)", BuildConstants.GIT_SHA.substring(0, 8));
+        Logger.recordMetadata("Commit Hash (Full)", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("Build Time", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("Dirty",
                 switch (BuildConstants.DIRTY) {
                     case 0 -> "All changes committed";
                     case 1 -> "Uncommitted changes";
@@ -52,16 +51,16 @@ public class Robot extends LoggedRobot {
 
         if (isReal()) {
             // Log to USB & Network Tables
-            logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
-            logger.addDataReceiver(new NT4Publisher());
+            Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+            Logger.addDataReceiver(new NT4Publisher());
         } else {
             // Replay from log and save to file
             setUseTiming(false);
             String logPath = LogFileUtil.findReplayLog();
-            logger.setReplaySource(new WPILOGReader(logPath));
-            logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+            Logger.setReplaySource(new WPILOGReader(logPath));
+            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         }
 
-        logger.start();
+        Logger.start();
     }
 }

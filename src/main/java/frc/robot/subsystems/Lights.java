@@ -60,13 +60,12 @@ public class Lights extends SubsystemBase {
     }
 
     private Status getAlliance(Status red, Status blue, Status none) {
-        if (!DriverStation.isFMSAttached())
+        if (!DriverStation.isFMSAttached() || !DriverStation.getAlliance().isPresent())
             return none;
 
-        return switch (DriverStation.getAlliance()) {
+        return switch (DriverStation.getAlliance().get()) {
             case Red -> red;
             case Blue -> blue;
-            case Invalid -> none;
             default -> none;
         };
     }

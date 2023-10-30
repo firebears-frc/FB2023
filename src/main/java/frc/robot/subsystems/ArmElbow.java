@@ -61,8 +61,7 @@ public class ArmElbow extends ArmLigament {
         position = Rotation2d.fromDegrees(encoder.getPosition());
         pid.setReference(setpoint.getDegrees(), ControlType.kPosition);
 
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Arm/Elbow/Setpoint", setpoint.getDegrees());
-        logger.recordOutput("Arm/Elbow/Position", position.getDegrees());
+        Logger.recordOutput("Arm/Elbow/Setpoint", setpoint.getDegrees());
+        Logger.recordOutput("Arm/Elbow/Position", position.getDegrees());
     }
 }

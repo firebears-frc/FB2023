@@ -166,8 +166,7 @@ public class SwerveModule {
     }
 
     public void periodic() {
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Chassis/" + name + "/Target", desiredState);
-        logger.recordOutput("Chassis/" + name + "/Actual", getState());
+        Logger.recordOutput("Chassis/" + name + "/Target", desiredState);
+        Logger.recordOutput("Chassis/" + name + "/Actual", getState());
     }
 }

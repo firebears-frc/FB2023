@@ -29,9 +29,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
@@ -166,11 +163,10 @@ public class Chassis extends SubsystemBase {
             modules[i].periodic();
         }
 
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Chassis/Pose", getPose());
-        logger.recordOutput("Chassis/Pitch", currentPitch);
-        logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
-        logger.recordOutput("Chassis/Actual", getModuleStates());
+        Logger.recordOutput("Chassis/Pose", getPose());
+        Logger.recordOutput("Chassis/Pitch", currentPitch);
+        Logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
+        Logger.recordOutput("Chassis/Actual", getModuleStates());
     }
 
     /****************** DRIVING ******************/
@@ -188,7 +184,7 @@ public class Chassis extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
 
-        Logger.getInstance().recordOutput("Chassis/Target", states);
+        Logger.recordOutput("Chassis/Target", states);
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i].setDesiredState(states[i]);
         }
@@ -291,13 +287,13 @@ public class Chassis extends SubsystemBase {
 
     /****************** COMMANDS ******************/
     public Command turtle() {
-        return new StartEndCommand(this::setX, null, this);
+        return startEnd(this::setX, null);
     }
 
     public Command zeroHeading() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             setPose(new Pose2d());
-        }, this);
+        });
     }
 
     public Command defaultCommand(Supplier<ChassisSpeeds> commandSupplier, boolean slowMode, boolean fieldRelative,
@@ -305,7 +301,7 @@ public class Chassis extends SubsystemBase {
         return new DefaultCommand(this, commandSupplier, slowMode, fieldRelative, rateLimit);
     }
 
-    private class DefaultCommand extends CommandBase {
+    private class DefaultCommand extends Command {
         private final Chassis chassis;
         private final Supplier<ChassisSpeeds> commandSupplier;
         private final boolean slowMode;
@@ -331,10 +327,9 @@ public class Chassis extends SubsystemBase {
         public void execute() {
             ChassisSpeeds command = commandSupplier.get();
 
-            Logger logger = Logger.getInstance();
-            logger.recordOutput("Chassis/Input/X", command.vxMetersPerSecond);
-            logger.recordOutput("Chassis/Input/Y", command.vyMetersPerSecond);
-            logger.recordOutput("Chassis/Input/R", command.omegaRadiansPerSecond);
+            Logger.recordOutput("Chassis/Input/X", command.vxMetersPerSecond);
+            Logger.recordOutput("Chassis/Input/Y", command.vyMetersPerSecond);
+            Logger.recordOutput("Chassis/Input/R", command.omegaRadiansPerSecond);
 
             if (rateLimit) {
                 command = rateLimiter.calculate(command);
@@ -350,9 +345,9 @@ public class Chassis extends SubsystemBase {
                 command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
 
-            logger.recordOutput("Chassis/Actual/X", command.vxMetersPerSecond);
-            logger.recordOutput("Chassis/Actual/Y", command.vyMetersPerSecond);
-            logger.recordOutput("Chassis/Actual/R", command.omegaRadiansPerSecond);
+            Logger.recordOutput("Chassis/Actual/X", command.vxMetersPerSecond);
+            Logger.recordOutput("Chassis/Actual/Y", command.vyMetersPerSecond);
+            Logger.recordOutput("Chassis/Actual/R", command.omegaRadiansPerSecond);
 
             chassis.drive(command, fieldRelative);
         }
@@ -444,9 +439,8 @@ public class Chassis extends SubsystemBase {
             command.vyMetersPerSecond = currentMagnitude * Math.sin(currentDirection);
             command.omegaRadiansPerSecond = rotationLimiter.calculate(command.omegaRadiansPerSecond);
 
-            Logger logger = Logger.getInstance();
-            logger.recordOutput("Chassis/RateLimiter/Magnitude", currentMagnitude);
-            logger.recordOutput("Chassis/RateLimiter/Direction", currentDirection);
+            Logger.recordOutput("Chassis/RateLimiter/Magnitude", currentMagnitude);
+            Logger.recordOutput("Chassis/RateLimiter/Direction", currentDirection);
 
             return command;
         }

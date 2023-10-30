@@ -19,7 +19,7 @@ public class SchluckerBag extends Schlucker {
     private final CANSparkMax motor;
 
     public SchluckerBag() {
-        Logger.getInstance().recordMetadata("Schlucker/Type", "Bag");
+        Logger.recordMetadata("Schlucker/Type", "Bag");
         motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
@@ -60,6 +60,6 @@ public class SchluckerBag extends Schlucker {
 
         motor.set(speed);
 
-        Logger.getInstance().recordOutput("Schlucker/Speed", speed);
+        Logger.recordOutput("Schlucker/Speed", speed);
     }
 }
