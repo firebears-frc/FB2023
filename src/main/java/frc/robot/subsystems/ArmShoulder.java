@@ -72,8 +72,7 @@ public class ArmShoulder extends ArmLigament {
         position = Rotation2d.fromDegrees(encoder.getPosition());
         pid.setReference(setpoint.getDegrees(), ControlType.kPosition);
 
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Arm/Shoulder/Setpoint", setpoint.getDegrees());
-        logger.recordOutput("Arm/Shoulder/Position", position.getDegrees());
+        Logger.recordOutput("Arm/Shoulder/Setpoint", setpoint.getDegrees());
+        Logger.recordOutput("Arm/Shoulder/Position", position.getDegrees());
     }
 }

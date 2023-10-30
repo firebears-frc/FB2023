@@ -27,7 +27,7 @@ public class SchluckerNeo550 extends Schlucker {
     private final SparkMaxPIDController pid;
 
     public SchluckerNeo550() {
-        Logger.getInstance().recordMetadata("Schlucker/Type", "Neo550");
+        Logger.recordMetadata("Schlucker/Type", "Neo550");
 
         motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
@@ -72,8 +72,7 @@ public class SchluckerNeo550 extends Schlucker {
         position += speed;
         pid.setReference(position, ControlType.kPosition);
 
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Schlucker/Speed", speed);
-        logger.recordOutput("Schlucker/Position", position);
+        Logger.recordOutput("Schlucker/Speed", speed);
+        Logger.recordOutput("Schlucker/Position", position);
     }
 }

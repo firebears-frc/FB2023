@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.GamePiece;
 
@@ -25,56 +24,56 @@ public class Schlucker extends SubsystemBase {
     protected GamePiece itemWanted = GamePiece.NONE;
 
     public Schlucker() {
-        Logger.getInstance().recordMetadata("Schlucker/Type", "Schlucker");
+        Logger.recordMetadata("Schlucker/Type", "Schlucker");
     }
 
     public Command intakeCone() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             state = SchluckerState.INTAKE;
             itemHeld = GamePiece.CONE;
             lastItemHeld = GamePiece.CONE;
             itemWanted = GamePiece.NONE;
-        }, this);
+        });
     }
 
     public Command intakeCube() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             state = SchluckerState.INTAKE;
             itemHeld = GamePiece.CUBE;
             lastItemHeld = GamePiece.CUBE;
             itemWanted = GamePiece.NONE;
-        }, this);
+        });
     }
 
     public Command hold() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             state = SchluckerState.HOLD;
-        }, this);
+        });
     }
 
     public Command eject() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             state = SchluckerState.EJECT;
             itemHeld = GamePiece.NONE;
-        }, this);
+        });
     }
 
     public Command stop() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             state = SchluckerState.STOP;
-        }, this);
+        });
     }
 
     public Command wantCone() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             itemWanted = GamePiece.CONE;
-        }, this);
+        });
     }
 
     public Command wantCube() {
-        return new InstantCommand(() -> {
+        return runOnce(() -> {
             itemWanted = GamePiece.CUBE;
-        }, this);
+        });
     }
 
     public GamePiece getHeldItem() {
@@ -87,10 +86,9 @@ public class Schlucker extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Schlucker/State", state.name());
-        logger.recordOutput("Schlucker/ItemHeld", itemHeld.name());
-        logger.recordOutput("Schlucker/LastItemHeld", lastItemHeld.name());
-        logger.recordOutput("Schlucker/ItemWanted", itemWanted.name());
+        Logger.recordOutput("Schlucker/State", state.name());
+        Logger.recordOutput("Schlucker/ItemHeld", itemHeld.name());
+        Logger.recordOutput("Schlucker/LastItemHeld", lastItemHeld.name());
+        Logger.recordOutput("Schlucker/ItemWanted", itemWanted.name());
     }
 }

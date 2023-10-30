@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -75,7 +74,7 @@ public class Arm extends SubsystemBase {
 
         upperArm.setAngle(shoulder.getAngle());
         foreArm.setAngle(elbow.getAngle());
-        Logger.getInstance().recordOutput("Arm/Mechanism", arm);
+        Logger.recordOutput("Arm/Mechanism", arm);
     }
 
     private Command positionCommand(Rotation2d elbowSetpoint, Rotation2d shoulderSetpoint) {
@@ -126,7 +125,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Command defaultCommand(Supplier<Double> elbowChange, Supplier<Double> shoulderChange) {
-        return new RunCommand(() -> {
+        return run(() -> {
             Rotation2d elbowAngle = elbow.getTargetAngle();
             elbowAngle = elbowAngle.plus(Constants.ELBOW_MANUAL_SPEED.times(elbowChange.get()));
 
@@ -134,6 +133,6 @@ public class Arm extends SubsystemBase {
             shoulderAngle = shoulderAngle.plus(Constants.SHOULDER_MANUAL_SPEED.times(shoulderChange.get()));
 
             setAngles(elbowAngle, shoulderAngle);
-        }, this);
+        });
     }
 }
