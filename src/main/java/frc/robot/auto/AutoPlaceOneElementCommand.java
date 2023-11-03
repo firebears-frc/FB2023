@@ -1,7 +1,6 @@
 package frc.robot.auto;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Schlucker;
@@ -16,12 +15,8 @@ public class AutoPlaceOneElementCommand extends SequentialCommandGroup {
                 },
                 schlucker.hold(),
                 arm.ready(),
-                new WaitCommand(0.5),
                 arm.high(),
                 schlucker.eject(),
-                new WaitCommand(0.5),
-                chassis.driveDistance(-0.5),
-                schlucker.stop(),
-                arm.stow());
+                chassis.driveDistance(-0.5).alongWith(schlucker.stop(), arm.stow()));
     }
 }
