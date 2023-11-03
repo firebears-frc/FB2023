@@ -4,12 +4,19 @@
 
 package frc.robot.commands;
 
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Schlucker;
+
+
 
 public class AutoCubeGetOutCommand extends SequentialCommandGroup {
   DriveSubsystem m_chassis;
@@ -37,17 +44,22 @@ public class AutoCubeGetOutCommand extends SequentialCommandGroup {
         (new ArmShoulderSetpointCommand(20, m_arm)),
         (new ArmElbowSetpointCommand(220, m_arm)),
         (new WaitCommand(1)),
-        (new ChassisDriveToDistanceCommand(, 0.4, )),
-        (new ArmShoulderSetpointCommand(, m_arm)),
-        (new ArmElbowSetpointCommand(, m_arm)),
+        (m_chassis.getDriveCommand(
+          new Pose2d(-0.5, 0, new Rotation2d()),
+          List.of( ), new Pose2d(-4.953, 0, Rotation2d.fromDegrees(180))
+        )),
+        (new ArmShoulderSetpointCommand(127, m_arm)),
+        (new ArmElbowSetpointCommand(230, m_arm)),
         (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
+         (m_chassis.getDriveCommand(
+          new Pose2d(-4.953, 0, new Rotation2d()),
+          List.of( ), new Pose2d(0, 0, Rotation2d.fromDegrees(180))
+        )),
         (new InstantCommand(m_schlucker::hold, m_schlucker)),
-        (new ChassisDriveToDistanceCommand()),
         (new ArmShoulderSetpointCommand(79, m_arm)),
         (new ArmElbowSetpointCommand(265, m_arm)),
         (new WaitCommand(0.5)),
         (new InstantCommand(m_schlucker::eject, m_schlucker)),
-        (new ChassisDriveTODistanceCommand()),
         (new ArmShoulderSetpointCommand(20, m_arm)),
         (new ArmElbowSetpointCommand(220, m_arm)));
 
