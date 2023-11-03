@@ -13,7 +13,7 @@ public class OneElementWithMobility extends SequentialCommandGroup {
         this.gamePiece = gamePiece;
         addCommands(
                 new AutoPlaceOneElementCommand(chassis, arm, schlucker, gamePiece),
-                chassis.driveDistance(-4.0));
+                chassis.driveDistance(-4.0).alongWith(schlucker.stop(), arm.stow()));
     }
 
     @Override
