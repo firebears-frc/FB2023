@@ -47,18 +47,26 @@ public class AutoCubeGetOutCommand extends SequentialCommandGroup {
         (new WaitCommand(1)),
         (m_chassis.getDriveCommand(
          new Pose2d(-0.5, 0, new Rotation2d()),
-         List.of( ), new Pose2d(-4.953, 0.1, Rotation2d.fromDegrees(180))
+         List.of( ), new Pose2d(-2.953, 0.1, Rotation2d.fromDegrees(-90))
        )),
-       (new WaitCommand(5)),
+       (m_chassis.getDriveCommand(
+       new Pose2d(-0.5, 0, new Rotation2d(-90)),
+       List.of( ), new Pose2d(-2, 0.1, Rotation2d.fromDegrees(-180))
+     )),
+       (new WaitCommand(5)),       
         (new ArmShoulderSetpointCommand(127, m_arm)),
         (new ArmElbowSetpointCommand(224, m_arm)),
         (new WaitCommand(5)),
         (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
         (new WaitCommand(5)),
         (m_chassis.getDriveCommand(
-         new Pose2d(-4.953, 0.1, Rotation2d.fromDegrees(180)),
-          List.of( ), new Pose2d(0, 0, Rotation2d.fromDegrees(0))
+         new Pose2d(-4.953, 0.1, Rotation2d.fromDegrees(-180)),
+          List.of( ), new Pose2d(0, 0, Rotation2d.fromDegrees(-90))
         )),
+        (m_chassis.getDriveCommand(
+          new Pose2d(-4.953, 0.1, Rotation2d.fromDegrees(-90)),
+           List.of( ), new Pose2d(0, 0, Rotation2d.fromDegrees(0))
+         )),
         (new WaitCommand(5)),
         (new InstantCommand(m_schlucker::hold, m_schlucker)),
         (new WaitCommand(5)),
