@@ -1,7 +1,5 @@
 package frc.robot;
 
-import frc.robot.auto.OneElementWithMobility;
-import frc.robot.auto.OneElementWithMobilityAndEngaged;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
@@ -9,17 +7,9 @@ import frc.robot.subsystems.Schlucker;
 import frc.robot.subsystems.SchluckerBag;
 import frc.robot.subsystems.SchluckerNeo550;
 import frc.robot.subsystems.Vision;
-import frc.robot.util.GamePiece;
-
-import java.util.List;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -48,7 +38,7 @@ public class RobotContainer {
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
-    private final LoggedDashboardChooser<Command> autoSelector;
+    private final Autos autos;
 
     public RobotContainer() {
         chassis = new Chassis();
@@ -63,22 +53,7 @@ public class RobotContainer {
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        autoSelector = new LoggedDashboardChooser<>("Auto Routine");
-        autoSelector.addDefaultOption("1 Cone w/ Mobility & Engage",
-                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CONE));
-        autoSelector.addOption("1 Cube w/ Mobility & Engage",
-                new OneElementWithMobilityAndEngaged(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector.addOption("1 Cone w/ Mobility",
-                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
-        autoSelector.addOption("1 Cube w/ Mobility",
-                new OneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector.addOption("Test Auto Path", chassis.driveTrajectory(
-                new Pose2d(),
-                List.of(
-                        new Translation2d(1, 1),
-                        new Translation2d(2, -1)),
-                new Pose2d(3, 0, new Rotation2d()),
-                false));
+        autos = new Autos(chassis, arm, schlucker);
 
         configureButtonBindings();
     }
@@ -135,6 +110,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoSelector.get();
+        return autos.get();
     }
 }

@@ -245,14 +245,6 @@ public class Chassis extends SubsystemBase {
         return generateSwerveControllerCommand(trajectory);
     }
 
-    public Command driveDistance(double distance) {
-        Trajectory trajectory = generateTrajectory(
-                new Pose2d(0.0, 0.0, new Rotation2d()),
-                new Pose2d(distance, 0.0, new Rotation2d()),
-                distance < 0);
-        return generateSwerveControllerCommand(trajectory);
-    }
-
     /****************** CHARGE STATION ******************/
     public double getPitchDegrees() {
         if (navX == null)
