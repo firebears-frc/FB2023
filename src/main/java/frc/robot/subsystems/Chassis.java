@@ -33,9 +33,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class Chassis extends SubsystemBase {
+    public static final double ROBOT_WIDTH = Units.inchesToMeters(25);
+    public static final double ROBOT_LENGTH = Units.inchesToMeters(34);
+
     private static final class Constants {
-        public static final double ROBOT_WIDTH = Units.inchesToMeters(25);
-        public static final double ROBOT_LENGTH = Units.inchesToMeters(34);
         // Wheels are offset 1.75" into the modules
         public static final double TRACK_WIDTH = ROBOT_WIDTH - (Units.inchesToMeters(1.75) * 2);
         public static final double WHEEL_BASE = ROBOT_LENGTH - (Units.inchesToMeters(1.75) * 2);
@@ -284,7 +285,8 @@ public class Chassis extends SubsystemBase {
 
     public Command zeroHeading() {
         return runOnce(() -> {
-            setPose(new Pose2d());
+            Pose2d pose = getPose();
+            setPose(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(0.0)));
         });
     }
 

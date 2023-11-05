@@ -4,11 +4,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -21,22 +24,75 @@ import java.util.List;
 
 public class Autos {
     private static class Constants {
+        // Robot dimensions
+        private static final double BUMPER_SIZE = Units.inchesToMeters(3);
+        private static final double ROBOT_OFFSET = ((Chassis.ROBOT_LENGTH / 2) + BUMPER_SIZE);
+
+        // Field dimensions
+        private static final double GRID_DEPTH = Units.feetToMeters(4) + Units.inchesToMeters(8.25);
+        private static final double CHARGE_STATION_DEPTH = Units.feetToMeters(6) + Units.inchesToMeters(4.125);
+        private static final double WALL_TO_FAR_CHARGE_STATION = Units.feetToMeters(16) + Units.inchesToMeters(1.25);
+        private static final double WALL_TO_NEAR_CHARGE_STATION = WALL_TO_FAR_CHARGE_STATION - CHARGE_STATION_DEPTH;
+        private static final double GRID_TO_ELEMENTS = Units.feetToMeters(18) + Units.inchesToMeters(8);
+
+        // Useful coordinates
+        private static final double GRID_X = GRID_DEPTH + ROBOT_OFFSET;
+        private static final double CHARGE_STATION_FAR_X = WALL_TO_FAR_CHARGE_STATION + ROBOT_OFFSET;
+        private static final double CHARGE_STATION_NEAR_X = WALL_TO_NEAR_CHARGE_STATION - ROBOT_OFFSET;
+        private static final double ELEMENTS_X = GRID_X + GRID_TO_ELEMENTS - (ROBOT_OFFSET * 2);
+
+        // Speeds
         public static final double BALANCE_ON_CHARGE_STATION_SPEED = 0.375; // meters per second
-        public static final double DRIVE_ONTO_CHARGE_STATION_SPEED = 1.0; // meters per second
+        public static final double DRIVE_ONTO_CHARGE_STATION_SPEED = 1; // meters per second
 
-        public static final Pose2d MOBILITY_FINAL_POSE = new Pose2d(-3.0, 0, Rotation2d.fromDegrees(-180.0));
+        public static class Mobility {
+            private static final Transform2d MOVEMENT = new Transform2d(ELEMENTS_X - GRID_X, 0,
+                    Rotation2d.fromDegrees(-135));
 
-        public static final Pose2d BALANCE_MIDDLE_POSE = new Pose2d(-2.0, 0, new Rotation2d());
-        public static final Pose2d BALANCE_FINAL_POSE = new Pose2d(-1.0, 0, new Rotation2d());
+            public static final Pose2d START_POSE = new Pose2d(GRID_X, Units.feetToMeters(1.5),
+                    Rotation2d.fromDegrees(180));
+            public static final Pose2d END_POSE = START_POSE.plus(MOVEMENT);
+        }
 
-        public static final Pose2d OPEN_GAME_PIECE_POSE = new Pose2d(-5.0, 0.25, Rotation2d.fromDegrees(150));
-        public static final Translation2d OPEN_MIDDLE_TRANSLATION = new Translation2d(-3.0, 0);
+        public static class Balance {
+            private static final double REF_OFFSET = Units.feetToMeters(3);
+            private static final Transform2d FIRST_MOVEMENT = new Transform2d(
+                    CHARGE_STATION_FAR_X - GRID_X + REF_OFFSET, 0, Rotation2d.fromDegrees(0));
+            private static final Transform2d SECOND_MOVEMENT = new Transform2d(-REF_OFFSET, 0,
+                    Rotation2d.fromDegrees(0));
 
-        public static final Pose2d CABLE_FIRST_POSE = new Pose2d(-1.0, 0, Rotation2d.fromDegrees(30));
-        public static final Pose2d CABLE_SECOND_POSE = new Pose2d(-2.0, 0, Rotation2d.fromDegrees(60));
-        public static final Translation2d CABLE_MIDDLE_TRANSLATION = new Translation2d(-3.0, 0);
-        public static final Pose2d CABLE_GAME_PIECE_POSE = new Pose2d(-5.0, -0.25, Rotation2d.fromDegrees(150));
-        public static final Pose2d CABLE_END_POSE = new Pose2d(0, -0.5, new Rotation2d());
+            public static final Pose2d START_POSE = new Pose2d(GRID_X, Units.feetToMeters(11),
+                    Rotation2d.fromDegrees(180));
+            public static final Pose2d MIDDLE_POSE = START_POSE.plus(FIRST_MOVEMENT);
+            public static final Pose2d END_POSE = MIDDLE_POSE.plus(SECOND_MOVEMENT);
+        }
+
+        public static class Open {
+            private static final Transform2d END_OFFSET = new Transform2d(0, -0.5, Rotation2d.fromDegrees(0));
+
+            public static final Pose2d START_POSE = new Pose2d(GRID_X, Units.feetToMeters(16),
+                    Rotation2d.fromDegrees(180));
+            public static final Translation2d MIDDLE_TRANSLATION = new Translation2d(CHARGE_STATION_FAR_X - GRID_X, 0);
+            public static final Pose2d GAME_PIECE_POSE = new Pose2d(ELEMENTS_X, -0.25, Rotation2d.fromDegrees(-45));
+            public static final Pose2d END_POSE = START_POSE.plus(END_OFFSET);
+        }
+
+        public static class Cable {
+            private static final Transform2d FIRST_TRANSFORM = new Transform2d(CHARGE_STATION_NEAR_X - GRID_X, 0,
+                    Rotation2d.fromDegrees(-30));
+            private static final Transform2d SECOND_TRANSFORM = new Transform2d(
+                    CHARGE_STATION_FAR_X - CHARGE_STATION_NEAR_X, 0, Rotation2d.fromDegrees(-30));
+            private static final Transform2d GAME_PIECE_TRANSFORM = new Transform2d(ELEMENTS_X - CHARGE_STATION_FAR_X,
+                    0.25, Rotation2d.fromDegrees(-75));
+            private static final Transform2d END_OFFSET = new Transform2d(0, 0.5, Rotation2d.fromDegrees(0));
+
+            public static final Pose2d START_POSE = new Pose2d(GRID_X, Units.feetToMeters(1.5),
+                    Rotation2d.fromDegrees(180));
+            public static final Pose2d FIRST_POSE = START_POSE.plus(FIRST_TRANSFORM);
+            public static final Pose2d SECOND_POSE = FIRST_POSE.plus(SECOND_TRANSFORM);
+            public static final Pose2d GAME_PIECE_POSE = SECOND_POSE.plus(GAME_PIECE_TRANSFORM);
+            public static final Pose2d END_POSE = START_POSE.plus(END_OFFSET);
+        }
     }
 
     private final LoggedDashboardChooser<Command> autoSelector;
@@ -71,7 +127,7 @@ public class Autos {
                     if (chassis.getPitchDegrees() > 0) {
                         chassis.drive(new ChassisSpeeds(Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false);
                     } else {
-                        chassis.drive(new ChassisSpeeds(-1.0 * Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false);
+                        chassis.drive(new ChassisSpeeds(-1 * Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false);
                     }
                 },
                 null,
@@ -81,7 +137,7 @@ public class Autos {
 
     private Command driveOntoChargeStation(Chassis chassis) {
         return new FunctionalCommand(
-                () -> chassis.drive(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0.0, 0.0), false),
+                () -> chassis.drive(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0, 0), false),
                 null,
                 null,
                 chassis::isOnChargeStation,
@@ -118,12 +174,14 @@ public class Autos {
 
     private Command oneElementWithMobility(Chassis chassis, Arm arm, Schlucker schlucker, GamePiece gamePiece) {
         Command result = new SequentialCommandGroup(
+                new InstantCommand(() -> chassis.setPose(Constants.Mobility.START_POSE), chassis),
+
                 placeElement(arm, schlucker, gamePiece),
 
                 stopSchluckerAndStowWhile(
                         chassis.driveTrajectory(
-                                new Pose2d(),
-                                Constants.MOBILITY_FINAL_POSE,
+                                Constants.Mobility.START_POSE,
+                                Constants.Mobility.END_POSE,
                                 false),
                         arm, schlucker, 0.25));
         result.setName("OneElementWithMobility<" + gamePiece.name() + ">");
@@ -133,19 +191,22 @@ public class Autos {
     private Command oneElementWithMobilityAndBalance(Chassis chassis, Arm arm, Schlucker schlucker,
             GamePiece gamePiece) {
         Command result = new SequentialCommandGroup(
+                new InstantCommand(() -> chassis.setPose(Constants.Balance.START_POSE), chassis),
+
                 placeElement(arm, schlucker, gamePiece),
 
                 stopSchluckerAndStowWhile(
                         chassis.driveTrajectory(
-                                new Pose2d(),
-                                Constants.BALANCE_MIDDLE_POSE,
+                                Constants.Balance.START_POSE,
+                                Constants.Balance.MIDDLE_POSE,
                                 false),
                         arm, schlucker, 0.25),
 
                 chassis.driveTrajectory(
-                        Constants.BALANCE_MIDDLE_POSE,
-                        Constants.BALANCE_FINAL_POSE,
+                        Constants.Balance.MIDDLE_POSE,
+                        Constants.Balance.END_POSE,
                         false),
+
                 autoBalance(chassis));
         result.setName("OneElementWithMobilityAndBalance<" + gamePiece.name() + ">");
         return result;
@@ -153,20 +214,28 @@ public class Autos {
 
     private Command twoElementWithMobilityOpenSide(Chassis chassis, Arm arm, Schlucker schlucker) {
         Command result = new SequentialCommandGroup(
+                new InstantCommand(() -> chassis.setPose(Constants.Open.START_POSE), chassis),
+
                 placeElement(arm, schlucker, GamePiece.CONE),
 
                 stopSchluckerAndStowWhile(
-                        chassis.driveTrajectory(new Pose2d(), List.of(Constants.OPEN_MIDDLE_TRANSLATION),
-                                Constants.OPEN_GAME_PIECE_POSE, false),
+                        chassis.driveTrajectory(
+                                Constants.Open.START_POSE,
+                                List.of(Constants.Open.MIDDLE_TRANSLATION),
+                                Constants.Open.GAME_PIECE_POSE,
+                                false),
                         arm, schlucker, 0.25),
 
                 arm.groundCube(),
                 schlucker.intakeCube(),
 
                 stopSchluckerAndStowWhile(
-                        chassis.driveTrajectory(Constants.OPEN_GAME_PIECE_POSE,
-                                List.of(Constants.OPEN_MIDDLE_TRANSLATION), new Pose2d(), false),
-                        arm, schlucker, 2.0),
+                        chassis.driveTrajectory(
+                                Constants.Open.GAME_PIECE_POSE,
+                                List.of(Constants.Open.MIDDLE_TRANSLATION),
+                                Constants.Open.END_POSE,
+                                false),
+                        arm, schlucker, 2),
 
                 placeElement(arm, schlucker, GamePiece.CUBE));
 
@@ -179,21 +248,19 @@ public class Autos {
                 placeElement(arm, schlucker, GamePiece.CONE),
 
                 stopSchluckerAndStowWhile(
-                        chassis.driveTrajectory(new Pose2d(), Constants.CABLE_FIRST_POSE, false),
+                        chassis.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
                         arm, schlucker, 0.25),
-                chassis.driveTrajectory(Constants.CABLE_FIRST_POSE, Constants.CABLE_SECOND_POSE, false),
-                chassis.driveTrajectory(Constants.CABLE_SECOND_POSE, List.of(Constants.CABLE_MIDDLE_TRANSLATION),
-                        Constants.CABLE_GAME_PIECE_POSE, false),
+                chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
+                chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.GAME_PIECE_POSE, false),
 
                 arm.groundCube(),
                 schlucker.intakeCube(),
 
                 stopSchluckerAndStowWhile(
-                        chassis.driveTrajectory(Constants.CABLE_GAME_PIECE_POSE,
-                                List.of(Constants.CABLE_MIDDLE_TRANSLATION), Constants.CABLE_SECOND_POSE, false),
-                        arm, schlucker, 2.0),
-                chassis.driveTrajectory(Constants.CABLE_SECOND_POSE, Constants.CABLE_FIRST_POSE, false),
-                chassis.driveTrajectory(Constants.CABLE_FIRST_POSE, Constants.CABLE_END_POSE, false),
+                        chassis.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE, false),
+                        arm, schlucker, 2),
+                chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
+                chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.END_POSE, false),
 
                 placeElement(arm, schlucker, GamePiece.CUBE));
 
