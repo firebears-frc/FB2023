@@ -3,9 +3,9 @@ package frc.robot;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Schlucker;
-import frc.robot.subsystems.SchluckerBag;
-import frc.robot.subsystems.SchluckerNeo550;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeBag;
+import frc.robot.subsystems.IntakeNeo550;
 import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.math.MathUtil;
@@ -30,7 +30,7 @@ public class RobotContainer {
 
     private final Chassis chassis;
     private final Arm arm;
-    private final Schlucker schlucker;
+    private final Intake intake;
     private final Vision vision;
     private final Lights lights;
 
@@ -43,9 +43,9 @@ public class RobotContainer {
     public RobotContainer() {
         chassis = new Chassis();
         arm = new Arm();
-        schlucker = new SchluckerBag(); // new SchluckerNeo550();
+        intake = new IntakeBag(); // new IntakeNeo550();
         vision = new Vision(chassis::visionPose);
-        lights = new Lights(schlucker::getHeldItem, schlucker::getWantedItem, chassis::isLevel,
+        lights = new Lights(intake::getHeldItem, intake::getWantedItem, chassis::isLevel,
                 chassis::isOnChargeStation, chassis::isNotPitching);
         pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
@@ -53,7 +53,7 @@ public class RobotContainer {
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        autos = new Autos(chassis, arm, schlucker);
+        autos = new Autos(chassis, arm, intake);
 
         configureButtonBindings();
     }
@@ -70,12 +70,12 @@ public class RobotContainer {
         arm.setDefaultCommand(arm.defaultCommand(controller::getLeftY, controller::getRightY));
         controller.povUp().onTrue(arm.substation());
         controller.povRight()
-                .onTrue(arm.mid().andThen(schlucker.eject()))
-                .onFalse(schlucker.stop());
+                .onTrue(arm.mid().andThen(intake.eject()))
+                .onFalse(intake.stop());
         controller.povDown().onTrue(arm.groundCone());
         controller.povLeft()
-                .onTrue(arm.high().andThen(schlucker.eject()))
-                .onFalse(schlucker.stop());
+                .onTrue(arm.high().andThen(intake.eject()))
+                .onFalse(intake.stop());
         controller.leftBumper().onTrue(arm.groundCube());
         controller.b().onTrue(arm.stow());
 
@@ -94,19 +94,19 @@ public class RobotContainer {
         two.trigger().onTrue(chassis.zeroHeading());
 
         // Lights commands
-        one.button(3).onTrue(schlucker.wantCone());
-        one.button(4).onTrue(schlucker.wantCube());
+        one.button(3).onTrue(intake.wantCone());
+        one.button(4).onTrue(intake.wantCube());
 
-        // Schlucker commands
+        // intake commands
         controller.a()
-                .onTrue(schlucker.intakeCone())
-                .onFalse(schlucker.hold());
+                .onTrue(intake.intakeCone())
+                .onFalse(intake.hold());
         controller.x()
-                .onTrue(schlucker.intakeCube())
-                .onFalse(schlucker.hold());
+                .onTrue(intake.intakeCube())
+                .onFalse(intake.hold());
         controller.y()
-                .onTrue(schlucker.eject())
-                .onFalse(schlucker.stop());
+                .onTrue(intake.eject())
+                .onFalse(intake.stop());
     }
 
     public Command getAutonomousCommand() {

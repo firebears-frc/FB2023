@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Schlucker;
+import frc.robot.subsystems.Intake;
 import frc.robot.util.GamePiece;
 import java.util.List;
 
@@ -97,16 +97,16 @@ public class Autos {
 
     private final LoggedDashboardChooser<Command> autoSelector;
 
-    public Autos(Chassis chassis, Arm arm, Schlucker schlucker) {
+    public Autos(Chassis chassis, Arm arm, Intake intake) {
         autoSelector = new LoggedDashboardChooser<>("Auto Routine");
         autoSelector.addDefaultOption("1 Cone & Engage",
-                oneElementWithMobilityAndBalance(chassis, arm, schlucker, GamePiece.CONE));
+                oneElementWithMobilityAndBalance(chassis, arm, intake, GamePiece.CONE));
         autoSelector.addOption("1 Cube & Engage",
-                oneElementWithMobilityAndBalance(chassis, arm, schlucker, GamePiece.CUBE));
-        autoSelector.addOption("2 Open", twoElementWithMobilityOpenSide(chassis, arm, schlucker));
-        autoSelector.addOption("2 Cable", twoElementWithMobilityCableSide(chassis, arm, schlucker));
-        autoSelector.addOption("1 Cone", oneElementWithMobility(chassis, arm, schlucker, GamePiece.CONE));
-        autoSelector.addOption("1 Cube", oneElementWithMobility(chassis, arm, schlucker, GamePiece.CUBE));
+                oneElementWithMobilityAndBalance(chassis, arm, intake, GamePiece.CUBE));
+        autoSelector.addOption("2 Open", twoElementWithMobilityOpenSide(chassis, arm, intake));
+        autoSelector.addOption("2 Cable", twoElementWithMobilityCableSide(chassis, arm, intake));
+        autoSelector.addOption("1 Cone", oneElementWithMobility(chassis, arm, intake, GamePiece.CONE));
+        autoSelector.addOption("1 Cube", oneElementWithMobility(chassis, arm, intake, GamePiece.CUBE));
     }
 
     public Command get() {
@@ -151,56 +151,56 @@ public class Autos {
                 new WaitUntilCommand(DriverStation::isDisabled));
     }
 
-    private Command placeElement(Arm arm, Schlucker schlucker, GamePiece gamePiece) {
+    private Command placeElement(Arm arm, Intake intake, GamePiece gamePiece) {
         return new SequentialCommandGroup(
                 switch (gamePiece) {
-                    case CONE -> schlucker.intakeCone();
-                    case CUBE, NONE -> schlucker.intakeCube();
+                    case CONE -> intake.intakeCone();
+                    case CUBE, NONE -> intake.intakeCube();
                 },
-                schlucker.hold(),
+                intake.hold(),
                 arm.ready(),
                 arm.high(),
-                schlucker.eject());
+                intake.eject());
     }
 
-    private Command stopSchluckerAndStowWhile(Command command, Arm arm, Schlucker schlucker, double delay) {
+    private Command stopintakeAndStowWhile(Command command, Arm arm, Intake intake, double delay) {
         return new ParallelCommandGroup(
                 command,
                 new SequentialCommandGroup(
                         new WaitCommand(delay),
-                        schlucker.stop(),
+                        intake.stop(),
                         arm.stow()));
     }
 
-    private Command oneElementWithMobility(Chassis chassis, Arm arm, Schlucker schlucker, GamePiece gamePiece) {
+    protected Command oneElementWithMobility(Chassis chassis, Arm arm, Intake intake, GamePiece gamePiece) {
         Command result = new SequentialCommandGroup(
                 new InstantCommand(() -> chassis.setPose(Constants.Mobility.START_POSE), chassis),
 
-                placeElement(arm, schlucker, gamePiece),
+                placeElement(arm, intake, gamePiece),
 
-                stopSchluckerAndStowWhile(
+                stopintakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Mobility.START_POSE,
                                 Constants.Mobility.END_POSE,
                                 false),
-                        arm, schlucker, 0.25));
+                        arm, intake, 0.25));
         result.setName("OneElementWithMobility<" + gamePiece.name() + ">");
         return result;
     }
 
-    private Command oneElementWithMobilityAndBalance(Chassis chassis, Arm arm, Schlucker schlucker,
+    protected Command oneElementWithMobilityAndBalance(Chassis chassis, Arm arm, Intake intake,
             GamePiece gamePiece) {
         Command result = new SequentialCommandGroup(
                 new InstantCommand(() -> chassis.setPose(Constants.Balance.START_POSE), chassis),
 
-                placeElement(arm, schlucker, gamePiece),
+                placeElement(arm, intake, gamePiece),
 
-                stopSchluckerAndStowWhile(
+                stopintakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Balance.START_POSE,
                                 Constants.Balance.MIDDLE_POSE,
                                 false),
-                        arm, schlucker, 0.25),
+                        arm, intake, 0.25),
 
                 chassis.driveTrajectory(
                         Constants.Balance.MIDDLE_POSE,
@@ -212,57 +212,57 @@ public class Autos {
         return result;
     }
 
-    private Command twoElementWithMobilityOpenSide(Chassis chassis, Arm arm, Schlucker schlucker) {
+    protected Command twoElementWithMobilityOpenSide(Chassis chassis, Arm arm, Intake intake) {
         Command result = new SequentialCommandGroup(
                 new InstantCommand(() -> chassis.setPose(Constants.Open.START_POSE), chassis),
 
-                placeElement(arm, schlucker, GamePiece.CONE),
+                placeElement(arm, intake, GamePiece.CONE),
 
-                stopSchluckerAndStowWhile(
+                stopintakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Open.START_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
                                 Constants.Open.GAME_PIECE_POSE,
                                 false),
-                        arm, schlucker, 0.25),
+                        arm, intake, 0.25),
 
                 arm.groundCube(),
-                schlucker.intakeCube(),
+                intake.intakeCube(),
 
-                stopSchluckerAndStowWhile(
+                stopintakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Open.GAME_PIECE_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
                                 Constants.Open.END_POSE,
                                 false),
-                        arm, schlucker, 2),
+                        arm, intake, 2),
 
-                placeElement(arm, schlucker, GamePiece.CUBE));
+                placeElement(arm, intake, GamePiece.CUBE));
 
         result.setName("TwoElementWithMobilityOpen");
         return result;
     }
 
-    private Command twoElementWithMobilityCableSide(Chassis chassis, Arm arm, Schlucker schlucker) {
+    protected Command twoElementWithMobilityCableSide(Chassis chassis, Arm arm, Intake intake) {
         Command result = new SequentialCommandGroup(
-                placeElement(arm, schlucker, GamePiece.CONE),
+                placeElement(arm, intake, GamePiece.CONE),
 
-                stopSchluckerAndStowWhile(
+                stopintakeAndStowWhile(
                         chassis.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
-                        arm, schlucker, 0.25),
+                        arm, intake, 0.25),
                 chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
                 chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.GAME_PIECE_POSE, false),
 
                 arm.groundCube(),
-                schlucker.intakeCube(),
+                intake.intakeCube(),
 
-                stopSchluckerAndStowWhile(
+                stopintakeAndStowWhile(
                         chassis.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE, false),
-                        arm, schlucker, 2),
+                        arm, intake, 2),
                 chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
                 chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.END_POSE, false),
 
-                placeElement(arm, schlucker, GamePiece.CUBE));
+                placeElement(arm, intake, GamePiece.CUBE));
 
         result.setName("TwoElementWithMobilityCable");
         return result;

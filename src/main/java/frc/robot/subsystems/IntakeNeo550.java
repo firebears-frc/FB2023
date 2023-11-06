@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-public class SchluckerNeo550 extends Schlucker {
+public class IntakeNeo550 extends Intake {
     public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 20;
         public static final int FREE_CURRENT_LIMIT = 20;
@@ -26,10 +26,10 @@ public class SchluckerNeo550 extends Schlucker {
     private final RelativeEncoder encoder;
     private final SparkMaxPIDController pid;
 
-    public SchluckerNeo550() {
-        Logger.recordMetadata("Schlucker/Type", "Neo550");
+    public IntakeNeo550() {
+        Logger.recordMetadata("Intake/Type", "Neo550");
 
-        motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushless);
+        motor = new CANSparkMax(Intake.Constants.MOTOR_CAN_ID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
@@ -72,7 +72,7 @@ public class SchluckerNeo550 extends Schlucker {
         position += speed;
         pid.setReference(position, ControlType.kPosition);
 
-        Logger.recordOutput("Schlucker/Speed", speed);
-        Logger.recordOutput("Schlucker/Position", position);
+        Logger.recordOutput("Intake/Speed", speed);
+        Logger.recordOutput("Intake/Position", position);
     }
 }

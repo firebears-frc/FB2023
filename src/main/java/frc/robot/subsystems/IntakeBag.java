@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-public class SchluckerBag extends Schlucker {
+public class IntakeBag extends Intake {
     public static class Constants {
         public static final int STALL_CURRENT_LIMIT = 10;
         public static final int FREE_CURRENT_LIMIT = 10;
@@ -18,9 +18,9 @@ public class SchluckerBag extends Schlucker {
 
     private final CANSparkMax motor;
 
-    public SchluckerBag() {
-        Logger.recordMetadata("Schlucker/Type", "Bag");
-        motor = new CANSparkMax(Schlucker.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
+    public IntakeBag() {
+        Logger.recordMetadata("Intake/Type", "Bag");
+        motor = new CANSparkMax(Intake.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
@@ -60,6 +60,6 @@ public class SchluckerBag extends Schlucker {
 
         motor.set(speed);
 
-        Logger.recordOutput("Schlucker/Speed", speed);
+        Logger.recordOutput("Intake/Speed", speed);
     }
 }

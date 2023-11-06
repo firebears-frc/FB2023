@@ -6,30 +6,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.GamePiece;
 
-public class Schlucker extends SubsystemBase {
+public class Intake extends SubsystemBase {
     public static class Constants {
         public static final int MOTOR_CAN_ID = 6;
     }
 
-    protected enum SchluckerState {
+    protected enum IntakeState {
         INTAKE,
         EJECT,
         HOLD,
         STOP
     }
 
-    protected SchluckerState state = SchluckerState.STOP;
+    protected IntakeState state = IntakeState.STOP;
     protected GamePiece itemHeld = GamePiece.NONE;
     protected GamePiece lastItemHeld = GamePiece.NONE;
     protected GamePiece itemWanted = GamePiece.NONE;
 
-    public Schlucker() {
-        Logger.recordMetadata("Schlucker/Type", "Schlucker");
+    public Intake() {
+        Logger.recordMetadata("Intake/Type", "Intake");
     }
 
     public Command intakeCone() {
         return runOnce(() -> {
-            state = SchluckerState.INTAKE;
+            state = IntakeState.INTAKE;
             itemHeld = GamePiece.CONE;
             lastItemHeld = GamePiece.CONE;
             itemWanted = GamePiece.NONE;
@@ -38,7 +38,7 @@ public class Schlucker extends SubsystemBase {
 
     public Command intakeCube() {
         return runOnce(() -> {
-            state = SchluckerState.INTAKE;
+            state = IntakeState.INTAKE;
             itemHeld = GamePiece.CUBE;
             lastItemHeld = GamePiece.CUBE;
             itemWanted = GamePiece.NONE;
@@ -47,20 +47,20 @@ public class Schlucker extends SubsystemBase {
 
     public Command hold() {
         return runOnce(() -> {
-            state = SchluckerState.HOLD;
+            state = IntakeState.HOLD;
         });
     }
 
     public Command eject() {
         return runOnce(() -> {
-            state = SchluckerState.EJECT;
+            state = IntakeState.EJECT;
             itemHeld = GamePiece.NONE;
         });
     }
 
     public Command stop() {
         return runOnce(() -> {
-            state = SchluckerState.STOP;
+            state = IntakeState.STOP;
         });
     }
 
@@ -86,9 +86,9 @@ public class Schlucker extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("Schlucker/State", state.name());
-        Logger.recordOutput("Schlucker/ItemHeld", itemHeld.name());
-        Logger.recordOutput("Schlucker/LastItemHeld", lastItemHeld.name());
-        Logger.recordOutput("Schlucker/ItemWanted", itemWanted.name());
+        Logger.recordOutput("Intake/State", state.name());
+        Logger.recordOutput("Intake/ItemHeld", itemHeld.name());
+        Logger.recordOutput("Intake/LastItemHeld", lastItemHeld.name());
+        Logger.recordOutput("Intake/ItemWanted", itemWanted.name());
     }
 }
