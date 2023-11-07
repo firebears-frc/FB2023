@@ -24,8 +24,6 @@ public class ArmElbow extends ArmLigament {
         public static final double I = 0.0;
         public static final double D = 0.005;
 
-        public static final double OFFSET = 240.0; // degrees
-
         public static final double MAX_VELOCITY = 90.0; // degrees per second
         public static final double MAX_ACCELERATION = 90.0; // degrees per second squared
     }
@@ -42,8 +40,7 @@ public class ArmElbow extends ArmLigament {
         motor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
         motor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-        encoder.setPositionConversionFactor(360); // degrees
-        encoder.setZeroOffset(Constants.OFFSET);
+        encoder.setPositionConversionFactor(360); // degrees\
         encoder.setInverted(true);
         pid = motor.getPIDController();
         pid.setFeedbackDevice(encoder);

@@ -25,8 +25,6 @@ public class ArmShoulder extends ArmLigament {
         public static final double I = 0.0;
         public static final double D = 0.005;
 
-        public static final double OFFSET = 196.0; // degrees
-
         public static final double MAX_VELOCITY = 90.0; // degrees per second
         public static final double MAX_ACCELERATION = 90.0; // degrees per second squared
     }
@@ -45,7 +43,6 @@ public class ArmShoulder extends ArmLigament {
         motorRight.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
         encoder = motorRight.getAbsoluteEncoder(Type.kDutyCycle);
         encoder.setPositionConversionFactor(360); // degrees
-        encoder.setZeroOffset(Constants.OFFSET);
         encoder.setInverted(true);
         pid = motorRight.getPIDController();
         pid.setFeedbackDevice(encoder);
