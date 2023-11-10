@@ -14,34 +14,33 @@ public class AutoCubeAndBalanceCommand extends SequentialCommandGroup {
     Schlucker m_schlucker;
     Arm m_arm;
 
-  public AutoCubeAndBalanceCommand(DriveSubsystem chassis, Schlucker schlucker, Arm arm) {
-    m_chassis = chassis;
-    m_schlucker = schlucker;
-    m_arm = arm;
-    addCommands(
-        (new InstantCommand(() -> m_chassis.resetOdometry(new Pose2d(0,0,Rotation2d.fromDegrees(180))), m_chassis)),
-        (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
-        (new InstantCommand(m_schlucker::hold, m_schlucker)),
-        (new WaitCommand(0.25)),
-        (new ArmShoulderSetpointCommand(112, m_arm)),
-        (new ArmElbowSetpointCommand(355, m_arm)),
-        (new WaitCommand(1)),
-        (new ArmElbowSetpointCommand(329, m_arm)),
-        (new WaitCommand(0.5)),
-        (new InstantCommand(m_schlucker::eject, m_schlucker)),
-        (new ArmElbowSetpointCommand(350, m_arm)),
-        (new WaitCommand(0.5)),
-        (new InstantCommand(m_schlucker::stop, m_schlucker)),
-        (new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis)),
-        (new ArmShoulderSetpointCommand(20, m_arm)),
-        (new ArmElbowSetpointCommand(220, m_arm)),
-        (new WaitCommand(0.5)),
-        (new ChassisDriveToDistanceCommand(-3.5, 0.3, m_chassis)),
-        (new AutoBalanceRoutine(m_chassis)))
-      
-        
+    public AutoCubeAndBalanceCommand(DriveSubsystem chassis, Schlucker schlucker, Arm arm) {
+        m_chassis = chassis;
+        m_schlucker = schlucker;
+        m_arm = arm;
+        addCommands(
+                (new InstantCommand(() -> m_chassis.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(180))),
+                        m_chassis)),
+                (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
+                (new InstantCommand(m_schlucker::hold, m_schlucker)),
+                (new WaitCommand(0.25)),
+                (new ArmShoulderSetpointCommand(112, m_arm)),
+                (new ArmElbowSetpointCommand(355, m_arm)),
+                (new WaitCommand(1)),
+                (new ArmElbowSetpointCommand(329, m_arm)),
+                (new WaitCommand(0.5)),
+                (new InstantCommand(m_schlucker::eject, m_schlucker)),
+                (new ArmElbowSetpointCommand(350, m_arm)),
+                (new WaitCommand(0.5)),
+                (new InstantCommand(m_schlucker::stop, m_schlucker)),
+                (new ChassisDriveToDistanceCommand(-0.5, 0.4, m_chassis)),
+                (new ArmShoulderSetpointCommand(20, m_arm)),
+                (new ArmElbowSetpointCommand(220, m_arm)),
+                (new WaitCommand(0.5)),
+                (new ChassisDriveToDistanceCommand(-3.5, 0.3, m_chassis)),
+                (new AutoBalanceRoutine(m_chassis)))
 
-    ;
+        ;
 
     }
 }
