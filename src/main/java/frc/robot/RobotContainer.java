@@ -119,7 +119,7 @@ public class RobotContainer {
     xboxBButton.onTrue(
         (new ArmShoulderSetpointCommand(20, m_arm))
         .andThen(new ArmElbowSetpointCommand(220, m_arm)
-        .andThen(new WaitCommand(1))
+        .andThen(new WaitCommand(0.5))
         .andThen(new ArmShoulderSetpointCommand(0, m_arm))
         .andThen(new ArmElbowSetpointCommand(209, m_arm))));
 
