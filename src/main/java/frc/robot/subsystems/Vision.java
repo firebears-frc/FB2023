@@ -59,30 +59,23 @@ public class Vision extends SubsystemBase {
         poseEstimator.setLastPose(p2d);
     }
 
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-        if (!Camera.isConnected())
-            return;
-
-        // SmartDashboard.putBoolean("PhotonVision Works", Camera.isConnected());
-
-        PhotonPipelineResult result = Camera.getLatestResult();
-        if (result.hasTargets()) {
-            hasTarget = true;
-            // VM.onVisionTargetSeen(result.getBestTarget());
-            Optional<EstimatedRobotPose> pose = poseEstimator.update();
-            if (pose.isPresent()) {
-                // Pose is valid
-                Pose3d p3d = pose.get().estimatedPose;
-                // SmartDashboard.putString("VisionEayes",("" + p3d.toPose2d().getX() + ',' +
-                // p3d.toPose2d().getY()));
-                // Field.setRobotPose(p3d.toPose2d());
-                poseEstimator.setLastPose(p3d.toPose2d());
-                m_chassis.resetOdometry(p3d.toPose2d());
-            }
-        } else {
-            hasTarget = false;
-        }
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    if(!Camera.isConnected()) return;
+    
+    PhotonPipelineResult result = Camera.getLatestResult();
+    if(result.hasTargets()){
+      hasTarget = true;
+      Optional<EstimatedRobotPose> pose = poseEstimator.update();
+      if(pose.isPresent()){
+        //Pose is valid
+        Pose3d p3d = pose.get().estimatedPose;
+        poseEstimator.setLastPose(p3d.toPose2d());
+        m_chassis.resetOdometry(p3d.toPose2d());
+      }
+    } else {
+      hasTarget = false;
     }
+  }
 }

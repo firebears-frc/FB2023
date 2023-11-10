@@ -19,13 +19,12 @@ public class ArmManualCommand extends CommandBase {
         addRequirements(m_arm);
     }
 
-    @Override
-    public void initialize() {
-        // XboxController xboxController=RobotContainer.getInstance().getxbox();
-        shoulderSetPoint = m_arm.getShoulderAngle();
-        elbowSetPoint = m_arm.getElbowAngle();
-        // SmartDashboard.putBoolean("Running Arm", true);
-    }
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    shoulderSetPoint = m_arm.getShoulderAngle();
+    elbowSetPoint = m_arm.getElbowAngle();
+  }
 
     @Override
     public void execute() {
@@ -41,12 +40,6 @@ public class ArmManualCommand extends CommandBase {
         }
         m_arm.setElbowSetpoint(elbowSetPoint);
 
-    }
-
-    // Called once the command ends or is interrupted.
-    @Override
-    public void end(boolean interrupted) {
-        // SmartDashboard.putBoolean("Running Arm", false);
     }
 
     @Override

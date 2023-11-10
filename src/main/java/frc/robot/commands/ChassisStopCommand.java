@@ -31,14 +31,11 @@ public class ChassisStopCommand extends CommandBase {
         timer.start();
     }
 
-    @Override
-    public void execute() {
-        m_chassis.arcadeDrive(0, 0);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-    }
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    m_chassis.arcadeDrive(0, 0);
+  }
 
     @Override
     public boolean isFinished() {

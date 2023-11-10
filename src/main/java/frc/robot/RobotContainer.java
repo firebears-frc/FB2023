@@ -98,8 +98,6 @@ public class RobotContainer {
 
     two.trigger().onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
 
-    one.button(5).onTrue(new AutonomousBalanceCommand(m_robotDrive)); // DO NOT DELETE
-
     /* Lights Controls */
     one.button(5).onTrue(new InstantCommand(m_lights::showTeam, m_lights));
     one.button(6).onTrue(new InstantCommand(m_lights::showCone, m_lights));

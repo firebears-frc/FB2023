@@ -44,9 +44,9 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
         m_chassis.arcadeDrive(0, 0);
     }
 
-    @Override
-    public boolean isFinished() {
-        // return Math.abs(distance - m_chassis.getEncoderDistance()) < 0.1;
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
 
         if (distance > 0 && m_chassis.getPose().getX() > distance) {
             return true;
