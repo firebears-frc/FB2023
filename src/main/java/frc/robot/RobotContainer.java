@@ -93,11 +93,10 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    one.trigger().toggleOnTrue(new StartEndCommand(m_robotDrive::setX, () -> {}, m_robotDrive));
+    one.trigger().toggleOnTrue(new StartEndCommand(m_robotDrive::setX, () -> {
+    }, m_robotDrive));
 
     two.trigger().onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
-
-    one.button(5).onTrue(new AutonomousBalanceCommand(m_robotDrive)); // DO NOT DELETE
 
     /* Lights Controls */
     one.button(5).onTrue(new InstantCommand(m_lights::showTeam, m_lights));
@@ -118,10 +117,10 @@ public class RobotContainer {
     JoystickButton xboxBButton = new JoystickButton(xboxController, XboxController.Button.kB.value);
     xboxBButton.onTrue(
         (new ArmShoulderSetpointCommand(20, m_arm))
-        .andThen(new ArmElbowSetpointCommand(220, m_arm)
-        .andThen(new WaitCommand(1))
-        .andThen(new ArmShoulderSetpointCommand(0, m_arm))
-        .andThen(new ArmElbowSetpointCommand(209, m_arm))));
+            .andThen(new ArmElbowSetpointCommand(220, m_arm)
+                .andThen(new WaitCommand(0.4))
+                .andThen(new ArmShoulderSetpointCommand(0, m_arm))
+                .andThen(new ArmElbowSetpointCommand(209, m_arm))));
 
     // X button = picks up cube and drops cone
     JoystickButton xboxXButton = new JoystickButton(xboxController, XboxController.Button.kX.value);
@@ -138,7 +137,7 @@ public class RobotContainer {
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
-          .andThen(new ArmElbowSetpointCommand(264, m_arm)));
+        .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);

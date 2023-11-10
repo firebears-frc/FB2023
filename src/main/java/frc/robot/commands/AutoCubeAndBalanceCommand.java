@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,9 +10,9 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Schlucker;
 
 public class AutoCubeAndBalanceCommand extends SequentialCommandGroup {
-  DriveSubsystem m_chassis;
-  Schlucker m_schlucker;
-  Arm m_arm;
+    DriveSubsystem m_chassis;
+    Schlucker m_schlucker;
+    Arm m_arm;
 
   public AutoCubeAndBalanceCommand(DriveSubsystem chassis, Schlucker schlucker, Arm arm) {
     m_chassis = chassis;
@@ -47,5 +43,5 @@ public class AutoCubeAndBalanceCommand extends SequentialCommandGroup {
 
     ;
 
-  }
+    }
 }
