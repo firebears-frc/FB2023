@@ -9,7 +9,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-
 import static frc.robot.Constants.*;
 
 public class Schlucker extends SubsystemBase {
@@ -19,12 +18,12 @@ public class Schlucker extends SubsystemBase {
     public enum ItemHeld {
         CONE,
         CUBE,
-        NONE  
+        NONE
     }
 
     private ItemHeld item_held = ItemHeld.NONE;
     private ItemHeld saved_item_held = ItemHeld.NONE;
-    
+
     public Schlucker() {
         shluckerMotor = new CANSparkMax(6, MotorType.kBrushed);
         shluckerMotor.setSmartCurrentLimit(10, 10);
@@ -33,7 +32,7 @@ public class Schlucker extends SubsystemBase {
         shluckerMotor.setInverted(false);
         shluckerMotor.setIdleMode(IdleMode.kBrake);
         pid = shluckerMotor.getPIDController();
-        
+
         // set p value of pid to 1
         pid.setP(1.0);
         pid.setI(0);
@@ -41,43 +40,42 @@ public class Schlucker extends SubsystemBase {
         shluckerMotor.burnFlash();
     }
 
-
-    public void intakeCone(){
+    public void intakeCone() {
         pid.setReference(-0.7, ControlType.kDutyCycle);
         item_held = ItemHeld.CONE;
         saved_item_held = item_held;
     }
 
-    public void intakeCube(){
+    public void intakeCube() {
         pid.setReference(0.7, ControlType.kDutyCycle);
         item_held = ItemHeld.CUBE;
         saved_item_held = item_held;
     }
 
-    public void eject(){
-        switch(saved_item_held) {
-        case CONE:
-            pid.setReference(0.7, ControlType.kDutyCycle);
-            break;
-        case CUBE:
-            pid.setReference(-0.7, ControlType.kDutyCycle);
-            break;
-        default:
-            break;
+    public void eject() {
+        switch (saved_item_held) {
+            case CONE:
+                pid.setReference(0.7, ControlType.kDutyCycle);
+                break;
+            case CUBE:
+                pid.setReference(-0.7, ControlType.kDutyCycle);
+                break;
+            default:
+                break;
         }
         item_held = ItemHeld.NONE;
     }
 
     public void hold() {
-        switch(item_held) {
-        case CONE:
-            pid.setReference(-SCHLUCKER_HOLD_PERCENT, ControlType.kDutyCycle);
-            break;
-        case CUBE:
-            pid.setReference(SCHLUCKER_HOLD_PERCENT, ControlType.kDutyCycle);
-            break;
-        default:
-            break;
+        switch (item_held) {
+            case CONE:
+                pid.setReference(-SCHLUCKER_HOLD_PERCENT, ControlType.kDutyCycle);
+                break;
+            case CUBE:
+                pid.setReference(SCHLUCKER_HOLD_PERCENT, ControlType.kDutyCycle);
+                break;
+            default:
+                break;
         }
     }
 
