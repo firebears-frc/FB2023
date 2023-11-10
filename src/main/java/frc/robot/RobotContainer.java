@@ -93,11 +93,10 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    one.trigger().toggleOnTrue(new StartEndCommand(m_robotDrive::setX, () -> {}, m_robotDrive));
+    one.trigger().toggleOnTrue(new StartEndCommand(m_robotDrive::setX, () -> {
+    }, m_robotDrive));
 
     two.trigger().onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
-
-    one.button(5).onTrue(new AutonomousBalanceCommand(m_robotDrive)); // DO NOT DELETE
 
     /* Lights Controls */
     one.button(5).onTrue(new InstantCommand(m_lights::showTeam, m_lights));
@@ -138,7 +137,7 @@ public class RobotContainer {
     // Substation pickup
     POVButton xboxDpadUpButton = new POVButton(xboxController, 0);
     xboxDpadUpButton.onTrue((new ArmShoulderSetpointCommand(65, m_arm))
-          .andThen(new ArmElbowSetpointCommand(264, m_arm)));
+        .andThen(new ArmElbowSetpointCommand(264, m_arm)));
 
     // Mid level node
     POVButton xboxDpadRightButton = new POVButton(xboxController, 90);
