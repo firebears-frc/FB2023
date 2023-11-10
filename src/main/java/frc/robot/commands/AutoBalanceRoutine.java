@@ -14,8 +14,6 @@ public class AutoBalanceRoutine extends SequentialCommandGroup {
     public AutoBalanceRoutine(DriveSubsystem c) {
         m_chassis = c;
 
-        // Add your commands in the addCommands() call, e.g.
-        // addCommands(new FooCommand(), new BarCommand());
         addCommands(
                 new InstantCommand(() -> m_chassis.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(180))),
                         m_chassis),
