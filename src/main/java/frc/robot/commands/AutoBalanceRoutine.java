@@ -1,5 +1,8 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
@@ -12,6 +15,8 @@ public class AutoBalanceRoutine extends SequentialCommandGroup {
         m_chassis = c;
 
         addCommands(
+                new InstantCommand(() -> m_chassis.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(180))),
+                        m_chassis),
                 new ChassisSetBrakeMode(true, m_chassis),
                 // new ChassisDriveToPitch(10, 0.2, m_chassis),
                 new ChassisDriveToPitch(10, 0.2, m_chassis), new PrintCommand("PITCH"),

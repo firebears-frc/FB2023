@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +26,8 @@ public class AutoCubeGetOutCommand extends SequentialCommandGroup {
     m_schlucker = schlucker;
     m_arm = arm;
     addCommands(
+                (new InstantCommand(() -> m_chassis.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(180))),
+                        m_chassis)),
         (new InstantCommand(m_schlucker::intakeCube, m_schlucker)),
        (new InstantCommand(m_schlucker::hold, m_schlucker)),
         (new WaitCommand(1)),

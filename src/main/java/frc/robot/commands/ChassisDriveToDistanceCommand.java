@@ -9,6 +9,7 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
     private double distance;
     private DriveSubsystem m_chassis;
     private double speed = 0.6;
+  private double start_x;
 
     public ChassisDriveToDistanceCommand(double d, DriveSubsystem c) {
         distance = d;
@@ -27,7 +28,7 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        m_chassis.resetOdometry(new Pose2d());
+        start_x = m_chassis.getPose().getX();
     }
 
     @Override
@@ -48,9 +49,9 @@ public class ChassisDriveToDistanceCommand extends CommandBase {
   @Override
   public boolean isFinished() {
 
-        if (distance > 0 && m_chassis.getPose().getX() > distance) {
+        if (distance > 0 && (start_x - m_chassis.getPose().getX()) > distance) {
             return true;
-        } else if (distance < 0 && m_chassis.getPose().getX() < distance) {
+        } else if (distance < 0 && (start_x - m_chassis.getPose().getX()) < distance) {
             return true;
         }
         return false;
