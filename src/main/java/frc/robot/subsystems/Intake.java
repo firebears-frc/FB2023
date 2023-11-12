@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,9 +19,13 @@ public class Intake extends SubsystemBase {
         STOP
     }
 
+    @AutoLogOutput
     protected IntakeState state = IntakeState.STOP;
+    @AutoLogOutput
     protected GamePiece itemHeld = GamePiece.NONE;
+    @AutoLogOutput
     protected GamePiece lastItemHeld = GamePiece.NONE;
+    @AutoLogOutput
     protected GamePiece itemWanted = GamePiece.NONE;
 
     public Intake() {
@@ -82,13 +87,5 @@ public class Intake extends SubsystemBase {
 
     public GamePiece getWantedItem() {
         return itemWanted;
-    }
-
-    @Override
-    public void periodic() {
-        Logger.recordOutput("Intake/State", state.name());
-        Logger.recordOutput("Intake/ItemHeld", itemHeld.name());
-        Logger.recordOutput("Intake/LastItemHeld", lastItemHeld.name());
-        Logger.recordOutput("Intake/ItemWanted", itemWanted.name());
     }
 }

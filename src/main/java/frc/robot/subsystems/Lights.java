@@ -177,16 +177,15 @@ public class Lights extends SubsystemBase {
         Status status = getStatus();
         communication.set(status.ordinal());
 
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Lights/Status", status.name());
-        logger.recordOutput("Lights/Tx", status.ordinal());
-        logger.recordOutput("Lights/ChargeStation/Status", chargeStationStatus.name());
+        Logger.recordOutput("Lights/Status", status.name());
+        Logger.recordOutput("Lights/Tx", status.ordinal());
+        Logger.recordOutput("Lights/ChargeStation/Status", chargeStationStatus.name());
         if (levelSupplier != null)
-            logger.recordOutput("Lights/ChargeStation/Level", levelSupplier.get());
+            Logger.recordOutput("Lights/ChargeStation/Level", levelSupplier.get());
         if (onChargeStationSupplier != null)
-            logger.recordOutput("Lights/ChargeStation/OnChargeStation", onChargeStationSupplier.get());
+            Logger.recordOutput("Lights/ChargeStation/OnChargeStation", onChargeStationSupplier.get());
         if (isNotPitchingSupplier != null)
-            logger.recordOutput("Lights/ChargeStation/IsNotPitching", isNotPitchingSupplier.get());
+            Logger.recordOutput("Lights/ChargeStation/IsNotPitching", isNotPitchingSupplier.get());
     }
 
     private static class ParallelBus {

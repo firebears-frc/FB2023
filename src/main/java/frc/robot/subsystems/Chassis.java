@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -92,7 +93,9 @@ public class Chassis extends SubsystemBase {
     private final TrajectoryConfig config;
 
     // Charge Station
+    @AutoLogOutput
     private double lastPitch = 0;
+    @AutoLogOutput
     private double pitchVelocity = 0;
 
     public Chassis() {
@@ -136,6 +139,7 @@ public class Chassis extends SubsystemBase {
         return result;
     }
 
+    @AutoLogOutput
     private SwerveModuleState[] getModuleStates() {
         // Build up state array
         SwerveModuleState result[] = new SwerveModuleState[modules.length];
@@ -163,11 +167,6 @@ public class Chassis extends SubsystemBase {
         for (int i = 0; i < modules.length; i++) {
             modules[i].periodic();
         }
-
-        Logger.recordOutput("Chassis/Pose", getPose());
-        Logger.recordOutput("Chassis/Pitch", currentPitch);
-        Logger.recordOutput("Chassis/PitchVelocity", pitchVelocity);
-        Logger.recordOutput("Chassis/Actual", getModuleStates());
     }
 
     /****************** DRIVING ******************/
@@ -204,6 +203,7 @@ public class Chassis extends SubsystemBase {
         poseEstimator.addVisionMeasurement(pose, timestampSeconds);
     }
 
+    @AutoLogOutput
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
@@ -350,7 +350,9 @@ public class Chassis extends SubsystemBase {
     private static class RateLimiter {
         private SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
         private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
+        @AutoLogOutput
         private double currentDirection = 0.0;
+        @AutoLogOutput
         private double currentMagnitude = 0.0;
         private double previousTime = WPIUtilJNI.now() * 1e-6;
 
@@ -432,9 +434,6 @@ public class Chassis extends SubsystemBase {
             command.vxMetersPerSecond = currentMagnitude * Math.cos(currentDirection);
             command.vyMetersPerSecond = currentMagnitude * Math.sin(currentDirection);
             command.omegaRadiansPerSecond = rotationLimiter.calculate(command.omegaRadiansPerSecond);
-
-            Logger.recordOutput("Chassis/RateLimiter/Magnitude", currentMagnitude);
-            Logger.recordOutput("Chassis/RateLimiter/Direction", currentDirection);
 
             return command;
         }

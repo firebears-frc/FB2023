@@ -2,8 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
-
+import org.littletonrobotics.junction.AutoLogOutput;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -41,6 +40,7 @@ public class Arm extends SubsystemBase {
 
     private final ArmElbow elbow;
     private final ArmShoulder shoulder;
+    @AutoLogOutput
     private final Mechanism2d arm;
     private final MechanismRoot2d armPivot;
     private final MechanismLigament2d upperArm, foreArm;
@@ -74,7 +74,6 @@ public class Arm extends SubsystemBase {
 
         upperArm.setAngle(shoulder.getAngle());
         foreArm.setAngle(elbow.getAngle());
-        Logger.recordOutput("Arm/Mechanism", arm);
     }
 
     private Command positionCommand(Rotation2d elbowSetpoint, Rotation2d shoulderSetpoint) {
