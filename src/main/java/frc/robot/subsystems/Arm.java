@@ -13,24 +13,30 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
-    private static class Constants {
-        public static final Rotation2d ELBOW_MANUAL_SPEED = Rotation2d.fromDegrees(1.0); // per loop
-        public static final Rotation2d SHOULDER_MANUAL_SPEED = Rotation2d.fromDegrees(1.0); // per loop
+    private static class ArmPosition {
+        private final Rotation2d elbow;
+        private final Rotation2d shoulder;
 
-        public static final Rotation2d SHOULDER_SUBSTATION = Rotation2d.fromDegrees(65.0);
-        public static final Rotation2d ELBOW_SUBSTATION = Rotation2d.fromDegrees(275.0);
-        public static final Rotation2d SHOULDER_STOW = Rotation2d.fromDegrees(20.0);
-        public static final Rotation2d ELBOW_STOW = Rotation2d.fromDegrees(220.0);
-        public static final Rotation2d SHOULDER_GROUND_CONE = Rotation2d.fromDegrees(110.0);
-        public static final Rotation2d ELBOW_GROUND_CONE = Rotation2d.fromDegrees(230.0);
-        public static final Rotation2d SHOULDER_GROUND_CUBE = Rotation2d.fromDegrees(127.0);
-        public static final Rotation2d ELBOW_GROUND_CUBE = Rotation2d.fromDegrees(224.0);
-        public static final Rotation2d SHOULDER_READY = Rotation2d.fromDegrees(122.0);
-        public static final Rotation2d ELBOW_READY = Rotation2d.fromDegrees(355.0);
-        public static final Rotation2d SHOULDER_HIGH = Rotation2d.fromDegrees(106.0);
-        public static final Rotation2d ELBOW_HIGH = Rotation2d.fromDegrees(319.0);
-        public static final Rotation2d SHOULDER_MID = Rotation2d.fromDegrees(76.0);
-        public static final Rotation2d ELBOW_MID = Rotation2d.fromDegrees(267.0);
+        public static ArmPosition fromDegrees(double elbow, double shoulder) {
+            return new ArmPosition(Rotation2d.fromDegrees(elbow), Rotation2d.fromDegrees(shoulder));
+        }
+
+        public ArmPosition(Rotation2d elbow, Rotation2d shoulder) {
+            this.elbow = elbow;
+            this.shoulder = shoulder;
+        }
+    }
+
+    private static class Constants {
+        public static final ArmPosition MANUAL_SPEED = ArmPosition.fromDegrees(1.0, 1.0); // per loop
+
+        public static final ArmPosition SUBSTATION = ArmPosition.fromDegrees(65.0, 275.0);
+        public static final ArmPosition STOW = ArmPosition.fromDegrees(20.0, 220.0);
+        public static final ArmPosition GROUND_CONE = ArmPosition.fromDegrees(110.0, 230.0);
+        public static final ArmPosition GROUND_CUBE = ArmPosition.fromDegrees(127.0, 224.0);
+        public static final ArmPosition READY = ArmPosition.fromDegrees(122.0, 355.0);
+        public static final ArmPosition HIGH = ArmPosition.fromDegrees(106.0, 319.0);
+        public static final ArmPosition MID = ArmPosition.fromDegrees(76.0, 267.0);
 
         public static final double ANGLE_TOLERANCE = 2.5; // degrees
 
@@ -40,7 +46,7 @@ public class Arm extends SubsystemBase {
 
     private final ArmElbow elbow;
     private final ArmShoulder shoulder;
-    @AutoLogOutput
+    @AutoLogOutput(key = "Arm/Mechanism")
     private final Mechanism2d arm;
     private final MechanismRoot2d armPivot;
     private final MechanismLigament2d upperArm, foreArm;
@@ -62,9 +68,9 @@ public class Arm extends SubsystemBase {
                 && Math.abs(elbow.getError().getDegrees()) < Constants.ANGLE_TOLERANCE;
     }
 
-    private void setAngles(Rotation2d elbowAngle, Rotation2d shoulderAngle) {
-        elbow.setAngle(elbowAngle);
-        shoulder.setAngle(shoulderAngle);
+    private void setPosition(ArmPosition position) {
+        elbow.setAngle(position.elbow);
+        shoulder.setAngle(position.shoulder);
     }
 
     @Override
@@ -76,62 +82,47 @@ public class Arm extends SubsystemBase {
         foreArm.setAngle(elbow.getAngle());
     }
 
-    private Command positionCommand(Rotation2d elbowSetpoint, Rotation2d shoulderSetpoint) {
-        return new FunctionalCommand(null, () -> setAngles(elbowSetpoint, shoulderSetpoint), null, this::onTarget,
-                this);
+    private Command positionCommand(ArmPosition position) {
+        return new FunctionalCommand(null, () -> setPosition(position), null, this::onTarget, this);
     }
 
     public Command groundCone() {
-        return positionCommand(
-                Constants.ELBOW_GROUND_CONE,
-                Constants.SHOULDER_GROUND_CONE);
+        return positionCommand(Constants.GROUND_CONE);
     }
 
     public Command groundCube() {
-        return positionCommand(
-                Constants.ELBOW_GROUND_CUBE,
-                Constants.SHOULDER_GROUND_CUBE);
+        return positionCommand(Constants.GROUND_CUBE);
     }
 
     public Command high() {
-        return positionCommand(
-                Constants.ELBOW_HIGH,
-                Constants.SHOULDER_HIGH);
+        return positionCommand(Constants.HIGH);
     }
 
     public Command mid() {
-        return positionCommand(
-                Constants.ELBOW_MID,
-                Constants.SHOULDER_MID);
+        return positionCommand(Constants.MID);
     }
 
     public Command ready() {
-        return positionCommand(
-                Constants.ELBOW_READY,
-                Constants.SHOULDER_READY);
+        return positionCommand(Constants.READY);
     }
 
     public Command stow() {
-        return positionCommand(
-                Constants.ELBOW_STOW,
-                Constants.SHOULDER_STOW);
+        return positionCommand(Constants.STOW);
     }
 
     public Command substation() {
-        return positionCommand(
-                Constants.ELBOW_SUBSTATION,
-                Constants.SHOULDER_SUBSTATION);
+        return positionCommand(Constants.SUBSTATION);
     }
 
     public Command defaultCommand(Supplier<Double> elbowChange, Supplier<Double> shoulderChange) {
         return run(() -> {
             Rotation2d elbowAngle = elbow.getTargetAngle();
-            elbowAngle = elbowAngle.plus(Constants.ELBOW_MANUAL_SPEED.times(elbowChange.get()));
+            elbowAngle = elbowAngle.plus(Constants.MANUAL_SPEED.elbow.times(elbowChange.get()));
 
             Rotation2d shoulderAngle = shoulder.getTargetAngle();
-            shoulderAngle = shoulderAngle.plus(Constants.SHOULDER_MANUAL_SPEED.times(shoulderChange.get()));
+            shoulderAngle = shoulderAngle.plus(Constants.MANUAL_SPEED.shoulder.times(shoulderChange.get()));
 
-            setAngles(elbowAngle, shoulderAngle);
+            setPosition(new ArmPosition(elbowAngle, shoulderAngle));
         });
     }
 }
