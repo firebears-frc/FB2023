@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -95,6 +95,7 @@ public class SwerveModule {
     private final double angleOffset;
     private final String name;
 
+    @AutoLogOutput(key="Chassis/{name}/Target")
     private SwerveModuleState desiredState;
 
     public SwerveModule(SwerveModuleConfiguration configuration) {
@@ -159,14 +160,10 @@ public class SwerveModule {
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
     }
 
+    @AutoLogOutput(key="Chassis/{name}/Actual")
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 drivingEncoder.getVelocity(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
-    }
-
-    public void periodic() {
-        Logger.recordOutput("Chassis/" + name + "/Target", desiredState);
-        Logger.recordOutput("Chassis/" + name + "/Actual", getState());
     }
 }

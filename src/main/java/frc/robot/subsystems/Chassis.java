@@ -163,10 +163,6 @@ public class Chassis extends SubsystemBase {
         double currentPitch = getPitchDegrees();
         pitchVelocity = currentPitch - lastPitch;
         lastPitch = currentPitch;
-
-        for (int i = 0; i < modules.length; i++) {
-            modules[i].periodic();
-        }
     }
 
     /****************** DRIVING ******************/
@@ -184,7 +180,6 @@ public class Chassis extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.MAX_TELE_VELOCITY);
 
-        Logger.recordOutput("Chassis/Target", states);
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i].setDesiredState(states[i]);
         }
@@ -321,10 +316,6 @@ public class Chassis extends SubsystemBase {
         public void execute() {
             ChassisSpeeds command = commandSupplier.get();
 
-            Logger.recordOutput("Chassis/Input/X", command.vxMetersPerSecond);
-            Logger.recordOutput("Chassis/Input/Y", command.vyMetersPerSecond);
-            Logger.recordOutput("Chassis/Input/R", command.omegaRadiansPerSecond);
-
             if (rateLimit) {
                 command = rateLimiter.calculate(command);
             }
@@ -338,10 +329,6 @@ public class Chassis extends SubsystemBase {
                 command.vyMetersPerSecond *= Constants.MAX_TELE_VELOCITY;
                 command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
             }
-
-            Logger.recordOutput("Chassis/Actual/X", command.vxMetersPerSecond);
-            Logger.recordOutput("Chassis/Actual/Y", command.vyMetersPerSecond);
-            Logger.recordOutput("Chassis/Actual/R", command.omegaRadiansPerSecond);
 
             chassis.drive(command, fieldRelative);
         }
