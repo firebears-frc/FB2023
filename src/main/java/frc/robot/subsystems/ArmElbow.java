@@ -23,9 +23,6 @@ public class ArmElbow extends ArmLigament {
         public static final double P = 0.01;
         public static final double I = 0.0;
         public static final double D = 0.005;
-
-        public static final double MAX_VELOCITY = 90.0; // degrees per second
-        public static final double MAX_ACCELERATION = 90.0; // degrees per second squared
     }
 
     private final CANSparkMax motor;

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -28,7 +26,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -86,7 +83,6 @@ public class Chassis extends SubsystemBase {
     // Localization
     private AHRS navX;
     private final SwerveDrivePoseEstimator poseEstimator;
-    private final Field2d field;
 
     // Trajectories
     private final TrapezoidProfile.Constraints rotationConstraints;
@@ -121,8 +117,6 @@ public class Chassis extends SubsystemBase {
                 navX.getRotation2d(),
                 getModulePositions(),
                 new Pose2d());
-        field = new Field2d();
-        addChild("Field", field);
 
         rotationConstraints = new TrapezoidProfile.Constraints(Constants.MAX_AUTO_ANGULAR_VELOCITY,
                 Constants.MAX_AUTO_ANGULAR_ACCELERATION);
@@ -156,7 +150,6 @@ public class Chassis extends SubsystemBase {
             poseEstimator.update(
                     navX.getRotation2d(),
                     getModulePositions());
-            field.setRobotPose(getPose());
         }
 
         // Update pitch velocity

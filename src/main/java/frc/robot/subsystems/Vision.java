@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -74,7 +73,7 @@ public class Vision extends SubsystemBase {
 
     private Status updatePose() {
         boolean connected = visionSystem.isConnected();
-        if (connected)
+        if (!connected)
             return Status.NOT_CONNECTED;
 
         PhotonPipelineResult result = visionSystem.getLatestResult();
