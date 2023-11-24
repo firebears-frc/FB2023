@@ -8,6 +8,7 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -60,6 +61,22 @@ public class ArmShoulder extends ArmLigament {
 
         motorRight.burnFlash();
         motorLeft.burnFlash();
+
+        // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 1);
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
+        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
     }
 
     public void periodic() {
