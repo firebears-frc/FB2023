@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -26,21 +26,32 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Vision extends SubsystemBase {
     private static class Constants {
         public static final String NAME = "MainC";
+        public static final Transform3d CAMERA_TRANSFORM = new Transform3d(new Translation3d(
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(0)),
+                new Rotation3d());
     }
 
-    UsbCamera driverCamera;
-    PhotonCamera visionSystem;
-    PhotonPoseEstimator poseEstimator;
-    EstimatedRobotPose lastResult;
-    BiConsumer<Pose2d, Double> consumer;
+    private final UsbCamera driverCamera;
+    private final PhotonCamera visionSystem;
+    private final PhotonPoseEstimator poseEstimator;
+    private final BiConsumer<Pose2d, Double> consumer;
+
+    @AutoLogOutput(key = "Vision/Status")
+    private Status status;
+    @AutoLogOutput(key = "Vision/Result")
+    private EstimatedRobotPose lastResult;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) {
         driverCamera = CameraServer.startAutomaticCapture();
         driverCamera.setResolution(320, 240);
-        this.consumer = consumer;
-        lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of(), PoseStrategy.LOWEST_AMBIGUITY);
 
         visionSystem = new PhotonCamera(Constants.NAME);
+        this.consumer = consumer;
+
+        status = Status.NOT_CONNECTED;
+        lastResult = new EstimatedRobotPose(new Pose3d(), 0, List.of(), PoseStrategy.LOWEST_AMBIGUITY);
 
         AprilTagFieldLayout fieldLayout = null;
         try {
@@ -48,6 +59,7 @@ public class Vision extends SubsystemBase {
         } catch (IOException e) {
             System.out.println("Failed to load AprilTag layout!");
             e.printStackTrace();
+            poseEstimator = null;
             return;
         }
 
@@ -55,62 +67,51 @@ public class Vision extends SubsystemBase {
                 fieldLayout,
                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 visionSystem,
-                new Transform3d(new Translation3d(
-                        Units.inchesToMeters(0),
-                        Units.inchesToMeters(0),
-                        Units.inchesToMeters(0)),
-                        new Rotation3d()));
+                Constants.CAMERA_TRANSFORM);
         poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     }
 
     private enum Status {
         NOT_CONNECTED,
         NO_TARGETS,
+        NO_POSE_ESTIMATOR,
         NO_POSE_RESULT,
         NO_CONSUMER,
         POSE_FOUND
     }
 
-    private Status updatePose() {
-        boolean connected = visionSystem.isConnected();
-        if (!connected)
-            return Status.NOT_CONNECTED;
-
-        PhotonPipelineResult result = visionSystem.getLatestResult();
-        if (!result.hasTargets())
-            return Status.NOT_CONNECTED;
-
-        Optional<EstimatedRobotPose> poseResult = poseEstimator.update();
-        if (!poseResult.isPresent())
-            return Status.NO_POSE_RESULT;
-
-        lastResult = poseResult.get();
-        if (consumer == null)
-            return Status.NO_CONSUMER;
-
-        consumer.accept(lastResult.estimatedPose.toPose2d(), lastResult.timestampSeconds);
-        return Status.POSE_FOUND;
-    }
-
     @Override
     public void periodic() {
-        Status status = updatePose();
+        boolean connected = visionSystem.isConnected();
+        if (!connected) {
+            status = Status.NOT_CONNECTED;
+            return;
+        }
 
-        Logger.recordOutput("Vision/Status", status.name());
-        Logger.recordOutput("Vision/Pose", lastResult.estimatedPose);
-        Logger.recordOutput("Vision/Timestamp", lastResult.timestampSeconds);
-        Logger.recordOutput("Vision/TargetsFound", lastResult.targetsUsed.size());
+        PhotonPipelineResult result = visionSystem.getLatestResult();
+        if (!result.hasTargets()) {
+            status = Status.NO_TARGETS;
+            return;
+        }
 
-        // Map the target objects to their integer ID, sort them, then store in a list
-        List<Integer> visibleTags = lastResult.targetsUsed.stream().map(target -> target.getFiducialId()).sorted()
-                .toList();
-        // Map the IDs to a string, then join with commas
-        Logger.recordOutput("Vision/VisibleIDs",
-                String.join(", ", visibleTags.stream().map(id -> id.toString()).toList()));
+        if (poseEstimator == null) {
+            status = Status.NO_POSE_ESTIMATOR;
+            return;
+        }
 
-        // Set only the IDs for the visible tags
-        boolean[] tags = new boolean[poseEstimator.getFieldTags().getTags().size()];
-        visibleTags.stream().forEach(id -> tags[id] = true);
-        Logger.recordOutput("Vision/VisibleTargets", tags);
+        Optional<EstimatedRobotPose> poseResult = poseEstimator.update();
+        if (!poseResult.isPresent()) {
+            status = Status.NO_POSE_RESULT;
+            return;
+        }
+
+        lastResult = poseResult.get();
+        if (consumer == null) {
+            status = Status.NO_CONSUMER;
+            return;
+        }
+
+        consumer.accept(lastResult.estimatedPose.toPose2d(), lastResult.timestampSeconds);
+        status = Status.POSE_FOUND;
     }
 }

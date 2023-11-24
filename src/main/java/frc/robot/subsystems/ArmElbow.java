@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -59,13 +57,12 @@ public class ArmElbow extends ArmLigament {
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
+
+        name = "Elbow";
     }
 
     public void periodic() {
         position = Rotation2d.fromDegrees(encoder.getPosition());
         pid.setReference(setpoint.getDegrees(), ControlType.kPosition);
-
-        Logger.recordOutput("Arm/Elbow/Setpoint", setpoint.getDegrees());
-        Logger.recordOutput("Arm/Elbow/Position", position.getDegrees());
     }
 }

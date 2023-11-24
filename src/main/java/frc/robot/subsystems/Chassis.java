@@ -89,9 +89,9 @@ public class Chassis extends SubsystemBase {
     private final TrajectoryConfig config;
 
     // Charge Station
-    @AutoLogOutput
+    @AutoLogOutput(key = "Chassis/ChargeStation/LastPitch")
     private double lastPitch = 0;
-    @AutoLogOutput
+    @AutoLogOutput(key = "Chassis/ChargeStation/PitchVelocity")
     private double pitchVelocity = 0;
 
     public Chassis() {
@@ -133,7 +133,7 @@ public class Chassis extends SubsystemBase {
         return result;
     }
 
-    @AutoLogOutput
+    @AutoLogOutput(key = "Chassis/ModuleStates")
     private SwerveModuleState[] getModuleStates() {
         // Build up state array
         SwerveModuleState result[] = new SwerveModuleState[modules.length];
@@ -191,7 +191,7 @@ public class Chassis extends SubsystemBase {
         poseEstimator.addVisionMeasurement(pose, timestampSeconds);
     }
 
-    @AutoLogOutput
+    @AutoLogOutput(key = "Chassis/Pose")
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
@@ -330,9 +330,9 @@ public class Chassis extends SubsystemBase {
     private static class RateLimiter {
         private SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
         private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
-        @AutoLogOutput
+        @AutoLogOutput(key = "Chassis/RateLimiter/CurrentDirection")
         private double currentDirection = 0.0;
-        @AutoLogOutput
+        @AutoLogOutput(key = "Chassis/RateLimiter/CurrentMagnitude")
         private double currentMagnitude = 0.0;
         private double previousTime = WPIUtilJNI.now() * 1e-6;
 

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
@@ -63,6 +62,7 @@ public class Arm extends SubsystemBase {
                 .append(new MechanismLigament2d("Fore Arm", Constants.FORE_ARM_LENGTH, elbow.getAngle().getDegrees()));
     }
 
+    @AutoLogOutput(key = "Arm/OnTarget")
     private boolean onTarget() {
         return Math.abs(shoulder.getError().getDegrees()) < Constants.ANGLE_TOLERANCE
                 && Math.abs(elbow.getError().getDegrees()) < Constants.ANGLE_TOLERANCE;
@@ -83,7 +83,7 @@ public class Arm extends SubsystemBase {
     }
 
     private Command positionCommand(ArmPosition position) {
-        return new FunctionalCommand(null, () -> setPosition(position), null, this::onTarget, this);
+        return run(() -> setPosition(position)).until(this::onTarget);
     }
 
     public Command groundCone() {

@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -17,6 +17,10 @@ public class Lights extends SubsystemBase {
     private final Supplier<Boolean> onChargeStationSupplier;
     private final Supplier<Boolean> isNotPitchingSupplier;
     private final ParallelBus communication;
+
+    @AutoLogOutput(key = "Lights/Status")
+    private Status status;
+    @AutoLogOutput(key = "Lights/ChargeStationStatus")
     private ChargeStationStatus chargeStationStatus;
 
     public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier,
@@ -28,6 +32,8 @@ public class Lights extends SubsystemBase {
         this.onChargeStationSupplier = onChargeStationSupplier;
         this.isNotPitchingSupplier = isPitchingSupplier;
         communication = new ParallelBus();
+
+        status = Status.DISABLED;
         chargeStationStatus = ChargeStationStatus.NONE;
     }
 
@@ -174,23 +180,14 @@ public class Lights extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Status status = getStatus();
+        status = getStatus();
         communication.set(status.ordinal());
-
-        Logger.recordOutput("Lights/Status", status.name());
-        Logger.recordOutput("Lights/Tx", status.ordinal());
-        Logger.recordOutput("Lights/ChargeStation/Status", chargeStationStatus.name());
-        if (levelSupplier != null)
-            Logger.recordOutput("Lights/ChargeStation/Level", levelSupplier.get());
-        if (onChargeStationSupplier != null)
-            Logger.recordOutput("Lights/ChargeStation/OnChargeStation", onChargeStationSupplier.get());
-        if (isNotPitchingSupplier != null)
-            Logger.recordOutput("Lights/ChargeStation/IsNotPitching", isNotPitchingSupplier.get());
     }
 
     private static class ParallelBus {
         public static final int OUTPUT_COUNT = 5;
         public static final int BASE_CHANNEL = 10;
+
         private final DigitalOutput[] outputs;
 
         public ParallelBus() {

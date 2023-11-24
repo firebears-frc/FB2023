@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -27,9 +27,14 @@ public class IntakeNeo550 extends Intake {
     private final RelativeEncoder encoder;
     private final SparkMaxPIDController pid;
 
-    public IntakeNeo550() {
-        Logger.recordMetadata("Intake/Type", "Neo550");
+    @AutoLogOutput(key = "Intake/Speed")
+    private double speed;
+    @AutoLogOutput(key = "Intake/Actual")
+    private double actual;
+    @AutoLogOutput(key = "Intake/Target")
+    private double target;
 
+    public IntakeNeo550() {
         motor = new CANSparkMax(Intake.Constants.MOTOR_CAN_ID, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
@@ -56,8 +61,6 @@ public class IntakeNeo550 extends Intake {
 
     @Override
     public void periodic() {
-        super.periodic();
-
         // Figure out what speed we should be running
         double speed = switch (state) {
             case INTAKE -> switch (itemHeld) {
@@ -78,11 +81,8 @@ public class IntakeNeo550 extends Intake {
         };
 
         // Update the position controller
-        double position = encoder.getPosition();
-        position += speed;
-        pid.setReference(position, ControlType.kPosition);
-
-        Logger.recordOutput("Intake/Speed", speed);
-        Logger.recordOutput("Intake/Position", position);
+        actual = encoder.getPosition();
+        target = speed + actual;
+        pid.setReference(target, ControlType.kPosition);
     }
 }

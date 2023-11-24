@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -19,8 +19,10 @@ public class IntakeBag extends Intake {
 
     private final CANSparkMax motor;
 
+    @AutoLogOutput(key = "Intake/Speed")
+    private double speed;
+
     public IntakeBag() {
-        Logger.recordMetadata("Intake/Type", "Bag");
         motor = new CANSparkMax(Intake.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
         motor.restoreFactoryDefaults();
         motor.setInverted(false);
@@ -38,12 +40,12 @@ public class IntakeBag extends Intake {
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
+
+        speed = 0;
     }
 
     @Override
     public void periodic() {
-        super.periodic();
-
         // Figure out what speed we should be running
         double speed = switch (state) {
             case INTAKE -> switch (itemHeld) {
@@ -69,7 +71,5 @@ public class IntakeBag extends Intake {
         };
 
         motor.set(speed);
-
-        Logger.recordOutput("Intake/Speed", speed);
     }
 }
