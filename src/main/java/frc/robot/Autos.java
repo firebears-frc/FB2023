@@ -10,12 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Intake;
@@ -114,45 +109,50 @@ public class Autos {
     }
 
     private Command balanceOnChargeStation(Chassis chassis) {
-        return new FunctionalCommand(
-                () -> chassis.drive(new ChassisSpeeds(Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false),
-                () -> {
-                    if (!chassis.isNotPitching()) {
-                        // Charge station is moving, stop!
-                        chassis.setX();
-                        return;
-                    }
+        return Commands.sequence(
+                Commands.runOnce(
+                        () -> chassis.drive(new ChassisSpeeds(Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false),
+                        chassis),
+                Commands.run(
+                        () -> {
+                            if (!chassis.isNotPitching()) {
+                                // Charge station is moving, stop!
+                                chassis.setX();
+                                return;
+                            }
 
-                    // Depending on what way the charge station is tipped, go to middle
-                    if (chassis.getPitchDegrees() > 0) {
-                        chassis.drive(new ChassisSpeeds(Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false);
-                    } else {
-                        chassis.drive(new ChassisSpeeds(-1 * Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false);
-                    }
-                },
-                null,
-                () -> chassis.isNotPitching() && chassis.isLevel(),
-                chassis);
+                            // Depending on what way the charge station is tipped, go to middle
+                            if (chassis.getPitchDegrees() > 0) {
+                                chassis.drive(new ChassisSpeeds(
+                                        Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0),
+                                        false);
+                            } else {
+                                chassis.drive(new ChassisSpeeds(
+                                        -1 * Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0),
+                                        false);
+                            }
+                        },
+                        chassis).until(() -> chassis.isNotPitching() && chassis.isLevel()),
+                Commands.runOnce(() -> chassis.drive(new ChassisSpeeds(), false), chassis));
     }
 
     private Command driveOntoChargeStation(Chassis chassis) {
-        return new FunctionalCommand(
-                () -> chassis.drive(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0, 0), false),
-                null,
-                null,
-                chassis::isOnChargeStation,
-                chassis);
+        return Commands.startEnd(
+                () -> chassis.drive(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0, 0),
+                        false),
+                () -> chassis.drive(new ChassisSpeeds(), false),
+                chassis).until(chassis::isOnChargeStation);
     }
 
     private Command autoBalance(Chassis chassis) {
-        return new SequentialCommandGroup(
+        return Commands.sequence(
                 driveOntoChargeStation(chassis),
                 balanceOnChargeStation(chassis),
-                new WaitUntilCommand(DriverStation::isDisabled));
+                Commands.waitUntil(DriverStation::isDisabled));
     }
 
     private Command placeElement(Arm arm, Intake intake, GamePiece gamePiece) {
-        return new SequentialCommandGroup(
+        return Commands.sequence(
                 switch (gamePiece) {
                     case CONE -> intake.intakeCone();
                     case CUBE, NONE -> intake.intakeCube();
@@ -163,22 +163,22 @@ public class Autos {
                 intake.eject());
     }
 
-    private Command stopintakeAndStowWhile(Command command, Arm arm, Intake intake, double delay) {
-        return new ParallelCommandGroup(
+    private Command stopIntakeAndStowWhile(Command command, Arm arm, Intake intake, double delay) {
+        return Commands.parallel(
                 command,
-                new SequentialCommandGroup(
-                        new WaitCommand(delay),
+                Commands.sequence(
+                        Commands.waitSeconds(delay),
                         intake.stop(),
                         arm.stow()));
     }
 
     protected Command oneElementWithMobility(Chassis chassis, Arm arm, Intake intake, GamePiece gamePiece) {
-        Command result = new SequentialCommandGroup(
-                new InstantCommand(() -> chassis.setPose(Constants.Mobility.START_POSE), chassis),
+        Command result = Commands.sequence(
+                Commands.runOnce(() -> chassis.setPose(Constants.Mobility.START_POSE), chassis),
 
                 placeElement(arm, intake, gamePiece),
 
-                stopintakeAndStowWhile(
+                stopIntakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Mobility.START_POSE,
                                 Constants.Mobility.END_POSE,
@@ -190,12 +190,12 @@ public class Autos {
 
     protected Command oneElementWithMobilityAndBalance(Chassis chassis, Arm arm, Intake intake,
             GamePiece gamePiece) {
-        Command result = new SequentialCommandGroup(
-                new InstantCommand(() -> chassis.setPose(Constants.Balance.START_POSE), chassis),
+        Command result = Commands.sequence(
+                Commands.runOnce(() -> chassis.setPose(Constants.Balance.START_POSE), chassis),
 
                 placeElement(arm, intake, gamePiece),
 
-                stopintakeAndStowWhile(
+                stopIntakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Balance.START_POSE,
                                 Constants.Balance.MIDDLE_POSE,
@@ -213,12 +213,12 @@ public class Autos {
     }
 
     protected Command twoElementWithMobilityOpenSide(Chassis chassis, Arm arm, Intake intake) {
-        Command result = new SequentialCommandGroup(
-                new InstantCommand(() -> chassis.setPose(Constants.Open.START_POSE), chassis),
+        Command result = Commands.sequence(
+                Commands.runOnce(() -> chassis.setPose(Constants.Open.START_POSE), chassis),
 
                 placeElement(arm, intake, GamePiece.CONE),
 
-                stopintakeAndStowWhile(
+                stopIntakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Open.START_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
@@ -229,7 +229,7 @@ public class Autos {
                 arm.groundCube(),
                 intake.intakeCube(),
 
-                stopintakeAndStowWhile(
+                stopIntakeAndStowWhile(
                         chassis.driveTrajectory(
                                 Constants.Open.GAME_PIECE_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
@@ -244,10 +244,10 @@ public class Autos {
     }
 
     protected Command twoElementWithMobilityCableSide(Chassis chassis, Arm arm, Intake intake) {
-        Command result = new SequentialCommandGroup(
+        Command result = Commands.sequence(
                 placeElement(arm, intake, GamePiece.CONE),
 
-                stopintakeAndStowWhile(
+                stopIntakeAndStowWhile(
                         chassis.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
                         arm, intake, 0.25),
                 chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
@@ -256,7 +256,7 @@ public class Autos {
                 arm.groundCube(),
                 intake.intakeCube(),
 
-                stopintakeAndStowWhile(
+                stopIntakeAndStowWhile(
                         chassis.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE, false),
                         arm, intake, 2),
                 chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
