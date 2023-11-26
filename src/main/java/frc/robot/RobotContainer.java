@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Localization;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeBag;
 import frc.robot.subsystems.IntakeNeo550;
@@ -29,6 +30,7 @@ public class RobotContainer {
     }
 
     private final Chassis chassis;
+    private final Localization localization;
     private final Arm arm;
     private final Intake intake;
     private final Vision vision;
@@ -38,22 +40,23 @@ public class RobotContainer {
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
-    private final Autos autos;
+    //private final Autos autos;
 
     public RobotContainer() {
         chassis = new Chassis();
+        localization = chassis.getLocalization();
         arm = new Arm();
         intake = new IntakeBag(); // new IntakeNeo550();
-        vision = new Vision(chassis::visionPose);
-        lights = new Lights(intake::getHeldItem, intake::getWantedItem, chassis::isLevel,
-                chassis::isOnChargeStation, chassis::isNotPitching);
+        vision = new Vision(localization::visionPose);
+        lights = new Lights(intake::getHeldItem, intake::getWantedItem, localization::isLevel,
+                localization::isOnChargeStation, localization::isNotPitching);
         pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
         one = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        autos = new Autos(chassis, arm, intake);
+        //autos = new Autos(chassis, arm, intake);
 
         configureButtonBindings();
     }
@@ -91,7 +94,7 @@ public class RobotContainer {
                 true,
                 true));
         one.trigger().toggleOnTrue(chassis.turtle());
-        two.trigger().onTrue(chassis.zeroHeading());
+        two.trigger().onTrue(localization.zeroHeading());
 
         // Lights commands
         one.button(3).onTrue(intake.wantCone());
@@ -110,6 +113,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autos.get();
+        return null;//autos.get();
     }
 }

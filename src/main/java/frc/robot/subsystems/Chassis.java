@@ -1,34 +1,21 @@
 package frc.robot.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
-import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class Chassis extends SubsystemBase {
     public static final double ROBOT_WIDTH = Units.inchesToMeters(25);
@@ -65,34 +52,20 @@ public class Chassis extends SubsystemBase {
         public static final double Y_CONTROLLER_P = 1.0;
         public static final double R_CONTROLLER_P = 1.0;
 
-        // Charge Station
-        public static final double LEVEL_TOLERANCE = 2.0; // degrees
-        public static final double ON_TOLERANCE = 10.0; // degrees
-        public static final double PITCH_VELOCITY_MAX = 0.2; // degrees per cycle
-
         // Slew Rate Limiting
         public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
         public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
         public static final double ROTATION_SLEW_RATE = 2.0; // percent per second (1 = 100%)
     }
 
-    // Driving
     private final SwerveModule[] modules;
     private final SwerveDriveKinematics kinematics;
 
-    // Localization
-    private AHRS navX;
-    private final SwerveDrivePoseEstimator poseEstimator;
+    private final Localization localization;
 
     // Trajectories
     private final TrapezoidProfile.Constraints rotationConstraints;
     private final TrajectoryConfig config;
-
-    // Charge Station
-    @AutoLogOutput(key = "Chassis/ChargeStation/LastPitch")
-    private double lastPitch = 0;
-    @AutoLogOutput(key = "Chassis/ChargeStation/PitchVelocity")
-    private double pitchVelocity = 0;
 
     public Chassis() {
         // Build up modules array
@@ -107,16 +80,7 @@ public class Chassis extends SubsystemBase {
         }
         kinematics = new SwerveDriveKinematics(positionOffsets);
 
-        try {
-            navX = new AHRS(SPI.Port.kMXP);
-        } catch (RuntimeException ex) {
-            DriverStation.reportError(ex.getMessage(), true);
-        }
-        poseEstimator = new SwerveDrivePoseEstimator(
-                kinematics,
-                navX.getRotation2d(),
-                getModulePositions(),
-                new Pose2d());
+        localization = new Localization(kinematics, this::getModulePositions);
 
         rotationConstraints = new TrapezoidProfile.Constraints(Constants.MAX_AUTO_ANGULAR_VELOCITY,
                 Constants.MAX_AUTO_ANGULAR_ACCELERATION);
@@ -124,6 +88,11 @@ public class Chassis extends SubsystemBase {
         config.setKinematics(kinematics);
     }
 
+    public Localization getLocalization() {
+        return localization;
+    }
+
+    @AutoLogOutput(key = "Chassis/ModulePositions")
     private SwerveModulePosition[] getModulePositions() {
         // Build up position array
         SwerveModulePosition result[] = new SwerveModulePosition[modules.length];
@@ -143,30 +112,14 @@ public class Chassis extends SubsystemBase {
         return result;
     }
 
-    @Override
-    public void periodic() {
-        // Update pose estimate
-        if (navX != null) {
-            poseEstimator.update(
-                    navX.getRotation2d(),
-                    getModulePositions());
-        }
-
-        // Update pitch velocity
-        double currentPitch = getPitchDegrees();
-        pitchVelocity = currentPitch - lastPitch;
-        lastPitch = currentPitch;
-    }
-
-    /****************** DRIVING ******************/
-    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
-        if (fieldRelative && navX != null)
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, navX.getRotation2d());
+    private void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
+        if (fieldRelative && localization.isActive())
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, localization.getRawYaw());
 
         swerveDrive(kinematics.toSwerveModuleStates(chassisSpeeds));
     }
 
-    public void swerveDrive(SwerveModuleState states[]) {
+    private void swerveDrive(SwerveModuleState states[]) {
         if (states.length != Constants.MODULES.length)
             throw new IllegalStateException(
                     "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);
@@ -178,7 +131,7 @@ public class Chassis extends SubsystemBase {
         }
     }
 
-    public void setX() {
+    private void setX() {
         SwerveModuleState[] states = new SwerveModuleState[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             states[i] = new SwerveModuleState(0, Constants.MODULES[i].positionOffset.getAngle());
@@ -186,22 +139,7 @@ public class Chassis extends SubsystemBase {
         swerveDrive(states);
     }
 
-    /****************** LOCALIZATION ******************/
-    public void visionPose(Pose2d pose, double timestampSeconds) {
-        poseEstimator.addVisionMeasurement(pose, timestampSeconds);
-    }
-
-    @AutoLogOutput(key = "Chassis/Pose")
-    public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
-    }
-
-    public void setPose(Pose2d pose) {
-        poseEstimator.resetPosition(navX.getRotation2d(), getModulePositions(), pose);
-    }
-
-    /****************** TRAJECTORIES ******************/
-    private Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
+    /*private Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
         return generateTrajectory(start, new ArrayList<>(), end, reversed);
     }
 
@@ -232,50 +170,10 @@ public class Chassis extends SubsystemBase {
     public Command driveTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
         Trajectory trajectory = generateTrajectory(start, interior, end, reversed);
         return generateSwerveControllerCommand(trajectory);
-    }
+    }*/
 
-    /****************** CHARGE STATION ******************/
-    public double getPitchDegrees() {
-        if (navX == null)
-            return 0;
-
-        return navX.getPitch();
-    }
-
-    public boolean isLevel() {
-        return Math.abs(getPitchDegrees()) < Constants.LEVEL_TOLERANCE;
-    }
-
-    public boolean isOnChargeStation() {
-        return Math.abs(getPitchDegrees()) > Constants.ON_TOLERANCE;
-    }
-
-    private double getPitchVelocityDegrees() {
-        return pitchVelocity;
-    }
-
-    public boolean isNotPitching() {
-        return Math.abs(getPitchVelocityDegrees()) < Constants.PITCH_VELOCITY_MAX;
-    }
-
-    /****************** ROTATION ******************/
-    public double getYawDegrees() {
-        if (navX == null)
-            return 0;
-
-        return navX.getYaw();
-    }
-
-    /****************** COMMANDS ******************/
     public Command turtle() {
         return startEnd(this::setX, null);
-    }
-
-    public Command zeroHeading() {
-        return runOnce(() -> {
-            Pose2d pose = getPose();
-            setPose(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(0.0)));
-        });
     }
 
     public Command defaultCommand(Supplier<ChassisSpeeds> commandSupplier, boolean slowMode, boolean fieldRelative,
