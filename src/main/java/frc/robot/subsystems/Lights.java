@@ -13,28 +13,19 @@ import frc.robot.util.GamePiece;
 public class Lights extends SubsystemBase {
     private final Supplier<GamePiece> itemHeldSupplier;
     private final Supplier<GamePiece> itemWantedSupplier;
-    private final Supplier<Boolean> levelSupplier;
-    private final Supplier<Boolean> onChargeStationSupplier;
-    private final Supplier<Boolean> isNotPitchingSupplier;
+    private final Supplier<ChargeStationStatus> chargeStationStatusSupplier;
     private final ParallelBus communication;
 
     @AutoLogOutput(key = "Lights/Status")
     private Status status;
-    @AutoLogOutput(key = "Lights/ChargeStationStatus")
-    private ChargeStationStatus chargeStationStatus;
 
-    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier,
-            Supplier<Boolean> levelSupplier, Supplier<Boolean> onChargeStationSupplier,
-            Supplier<Boolean> isPitchingSupplier) {
+    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier, Supplier<ChargeStationStatus> chargeStationStatusSupplier) {
         this.itemHeldSupplier = itemHeldSupplier;
         this.itemWantedSupplier = itemWantedSupplier;
-        this.levelSupplier = levelSupplier;
-        this.onChargeStationSupplier = onChargeStationSupplier;
-        this.isNotPitchingSupplier = isPitchingSupplier;
+        this.chargeStationStatusSupplier = chargeStationStatusSupplier;
         communication = new ParallelBus();
 
         status = Status.DISABLED;
-        chargeStationStatus = ChargeStationStatus.NONE;
     }
 
     private enum Status {
@@ -76,40 +67,16 @@ public class Lights extends SubsystemBase {
         };
     }
 
-    private void updateChargeStationStatus() {
-        if (levelSupplier == null || onChargeStationSupplier == null || isNotPitchingSupplier == null) {
-            chargeStationStatus = ChargeStationStatus.NONE;
-            return;
-        }
-
-        switch (chargeStationStatus) {
-            case ENGAGED:
-                if (!levelSupplier.get()) {
-                    chargeStationStatus = ChargeStationStatus.DOCKED;
-                }
-                break;
-            case DOCKED:
-                if (levelSupplier.get() && isNotPitchingSupplier.get()) {
-                    chargeStationStatus = ChargeStationStatus.ENGAGED;
-                }
-                break;
-            case NONE:
-            default:
-                if (onChargeStationSupplier.get()) {
-                    chargeStationStatus = ChargeStationStatus.DOCKED;
-                }
-                break;
-        }
-    }
-
     private Status getStatus() {
         // Disabled
         if (!DriverStation.isEnabled()) {
-            chargeStationStatus = ChargeStationStatus.NONE;
             return getAlliance(Status.DISABLED_RED, Status.DISABLED_BLUE, Status.DISABLED);
         }
 
-        updateChargeStationStatus();
+        ChargeStationStatus chargeStationStatus = ChargeStationStatus.NONE;
+        if (chargeStationStatusSupplier != null) {
+            chargeStationStatus = chargeStationStatusSupplier.get();
+        }
 
         // Auto
         if (DriverStation.isAutonomousEnabled()) {

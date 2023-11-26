@@ -30,7 +30,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Arm arm;
     private final Intake intake;
-    // private final Lights lights;
+    private final Lights lights;
 
     private final PowerDistribution pdh;
     private final CommandJoystick one;
@@ -42,10 +42,7 @@ public class RobotContainer {
         drive = new Drive();
         arm = new Arm();
         intake = new IntakeBag(); // new IntakeNeo550();
-        // vision = new Vision(localization::visionPose);
-        // lights = new Lights(intake::getHeldItem, intake::getWantedItem,
-        // localization::isLevel,
-        // localization::isOnChargeStation, localization::isNotPitching);
+        lights = new Lights(intake::getHeldItem, intake::getWantedItem, drive::chargeStationStatus);
         pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
         one = new CommandJoystick(Constants.JOYSTICK_1_PORT);

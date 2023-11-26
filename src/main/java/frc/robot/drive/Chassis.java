@@ -54,7 +54,7 @@ public class Chassis {
         return kinematics;
     }
 
-    @AutoLogOutput(key = "Chassis/ModulePositions")
+    @AutoLogOutput(key = "Drive/Chassis/ModulePositions")
     public SwerveModulePosition[] getModulePositions() {
         // Build up position array
         SwerveModulePosition result[] = new SwerveModulePosition[modules.length];
@@ -64,7 +64,7 @@ public class Chassis {
         return result;
     }
 
-    @AutoLogOutput(key = "Chassis/ModuleStates")
+    @AutoLogOutput(key = "Drive/Chassis/ModuleStates")
     public SwerveModuleState[] getModuleStates() {
         // Build up state array
         SwerveModuleState result[] = new SwerveModuleState[modules.length];
