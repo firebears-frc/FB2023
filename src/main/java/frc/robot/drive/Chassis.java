@@ -20,15 +20,15 @@ public class Chassis {
         public static final double TRACK_WIDTH = ROBOT_WIDTH - (Units.inchesToMeters(1.75) * 2);
         public static final double WHEEL_BASE = ROBOT_LENGTH - (Units.inchesToMeters(1.75) * 2);
 
-        public static final SwerveModule.SwerveModuleConfiguration MODULES[] = {
-                new SwerveModule.SwerveModuleConfiguration(26, 27, -Math.PI / 2,
-                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), "Front Left"),
-                new SwerveModule.SwerveModuleConfiguration(21, 20, 0,
-                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Front Right"),
-                new SwerveModule.SwerveModuleConfiguration(24, 25, Math.PI,
-                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), "Rear Left"),
-                new SwerveModule.SwerveModuleConfiguration(23, 22, Math.PI / 2,
-                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Rear Right")
+        public static final SwerveModuleConfiguration MODULES[] = {
+                new SwerveModuleConfiguration(26, 27, -Math.PI / 2, new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                        "Front Left"),
+                new SwerveModuleConfiguration(21, 20, 0, new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+                        "Front Right"),
+                new SwerveModuleConfiguration(24, 25, Math.PI, new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
+                        "Rear Left"),
+                new SwerveModuleConfiguration(23, 22, Math.PI / 2, new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
+                        "Rear Right")
         };
     }
 

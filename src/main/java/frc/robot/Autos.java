@@ -18,7 +18,7 @@ import frc.robot.util.GamePiece;
 import java.util.List;
 
 public class Autos {
-    private static class Constants {
+    private static final class Constants {
         // Robot dimensions
         private static final double BUMPER_SIZE = Units.inchesToMeters(3);
         private static final double ROBOT_OFFSET = ((Chassis.ROBOT_LENGTH / 2) + BUMPER_SIZE);

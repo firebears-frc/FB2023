@@ -8,7 +8,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 public class IntakeBag extends Intake {
-    public static class Constants {
+    public static final class Constants {
         public static final int STALL_CURRENT_LIMIT = 10;
         public static final int FREE_CURRENT_LIMIT = 10;
         public static final double SECONDARY_CURRENT_LIMIT = 20.0;

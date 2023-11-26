@@ -12,7 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Shoulder extends Ligament {
-    private static class Constants {
+    private static final class Constants {
         public static final int RIGHT_CAN_ID = 12;
         public static final int LEFT_CAN_ID = 13;
 

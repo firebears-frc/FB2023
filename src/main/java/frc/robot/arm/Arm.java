@@ -26,7 +26,7 @@ public class Arm extends SubsystemBase {
         }
     }
 
-    private static class Constants {
+    private final static class Constants {
         public static final ArmPosition MANUAL_SPEED = ArmPosition.fromDegrees(1.0, 1.0); // per loop
 
         public static final ArmPosition SUBSTATION = ArmPosition.fromDegrees(65.0, 275.0);

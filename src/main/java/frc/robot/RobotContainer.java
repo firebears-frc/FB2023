@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-    public class Constants {
+    private static final  class Constants {
         public static final int JOYSTICK_1_PORT = 0;
         public static final int JOYSTICK_2_PORT = 1;
         public static final int CONTROLLER_PORT = 2;

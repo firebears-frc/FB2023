@@ -12,7 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Elbow extends Ligament {
-    private static class Constants {
+    private static final class Constants {
         public static final int PORT = 7;
 
         public static final int STALL_CURRENT_LIMIT = 40;

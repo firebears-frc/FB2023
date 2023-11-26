@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.GamePiece;
 
 public class Intake extends SubsystemBase {
-    public static class Constants {
+    public static final class Constants {
         public static final int MOTOR_CAN_ID = 6;
     }
 

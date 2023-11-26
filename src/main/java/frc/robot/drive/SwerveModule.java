@@ -12,29 +12,11 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveModule {
-    public static class SwerveModuleConfiguration {
-        protected final int drivingID;
-        protected final int turningID;
-        protected final double angleOffset;
-        protected final Translation2d positionOffset;
-        protected final String name;
-
-        public SwerveModuleConfiguration(int drivingID, int turningID, double angleOffset,
-                Translation2d positionOffset, String name) {
-            this.drivingID = drivingID;
-            this.turningID = turningID;
-            this.angleOffset = angleOffset;
-            this.positionOffset = positionOffset;
-            this.name = name;
-        }
-    }
-
-    private static class Constants {
+    private static final class Constants {
         public static final double NEO_FREE_SPEED = 5676.0 / 60; // rotations per second
 
         private static class Driving {

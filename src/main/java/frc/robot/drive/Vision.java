@@ -23,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public class Vision {
-    private static class Constants {
+    private static final class Constants {
         public static final String NAME = "MainC";
         public static final Transform3d CAMERA_TRANSFORM = new Transform3d(new Translation3d(
                 Units.inchesToMeters(0),
