@@ -16,9 +16,9 @@ public class RateLimiter {
 
     private SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(Constants.MAGNITUDE_SLEW_RATE);
     private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Constants.ROTATION_SLEW_RATE);
-    @AutoLogOutput(key = "Chassis/RateLimiter/CurrentDirection")
+    @AutoLogOutput(key = "Drive/RateLimiter/CurrentDirection")
     private double currentDirection = 0.0;
-    @AutoLogOutput(key = "Chassis/RateLimiter/CurrentMagnitude")
+    @AutoLogOutput(key = "Drive/RateLimiter/CurrentMagnitude")
     private double currentMagnitude = 0.0;
     private double previousTime = WPIUtilJNI.now() * 1e-6;
 
