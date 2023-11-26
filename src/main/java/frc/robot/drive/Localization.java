@@ -1,7 +1,5 @@
 package frc.robot.drive;
 
-import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -13,8 +11,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Localization {
     private static final class Constants {
@@ -24,19 +20,16 @@ public class Localization {
     }
 
     private final SwerveDrivePoseEstimator poseEstimator;
-    private final Supplier<SwerveModulePosition[]> positionSupplier;
 
     private AHRS navX;
 
     // Charge Station
-    @AutoLogOutput(key = "Localization/ChargeStation/LastPitch")
-    private Rotation2d lastPitch;
+    @AutoLogOutput(key = "Localization/ChargeStation/Pitch")
+    private Rotation2d pitch;
     @AutoLogOutput(key = "Localization/ChargeStation/PitchVelocity")
     private Rotation2d pitchVelocity;
 
-    public Localization(SwerveDriveKinematics kinematics, Supplier<SwerveModulePosition[]> positionSupplier) {
-        this.positionSupplier = positionSupplier;
-
+    public Localization(SwerveDriveKinematics kinematics, SwerveModulePosition[] initiaModulePositions) {
         try {
             navX = new AHRS(SPI.Port.kMXP);
         } catch (RuntimeException ex) {
@@ -49,15 +42,16 @@ public class Localization {
         poseEstimator = new SwerveDrivePoseEstimator(
                 kinematics,
                 getRawYaw(),
-                positionSupplier.get(),
+                initiaModulePositions,
                 new Pose2d());
 
-        lastPitch = Rotation2d.fromDegrees(0.0);
+        pitch = Rotation2d.fromDegrees(0.0);
         pitchVelocity = Rotation2d.fromDegrees(0.0);
     }
 
+    @AutoLogOutput(key = "Localization/Active")
     public boolean isActive() {
-        return navX != null;
+        return navX != null && poseEstimator != null;
     }
 
     @AutoLogOutput(key = "Localization/RawYaw")
@@ -68,16 +62,12 @@ public class Localization {
         return navX.getRotation2d();
     }
 
-    public Rotation2d getPitch() {
-        return lastPitch;
-    }
-
     public void visionPose(Pose2d pose, double timestampSeconds) {
         poseEstimator.addVisionMeasurement(pose, timestampSeconds);
     }
 
-    public void setPose(Pose2d pose) {
-        poseEstimator.resetPosition(getRawYaw(), positionSupplier.get(), pose);
+    public void setPose(Pose2d pose, SwerveModulePosition[] modulePositions) {
+        poseEstimator.resetPosition(getRawYaw(), modulePositions, pose);
     }
 
     @AutoLogOutput(key = "Localization/Pose")
@@ -88,27 +78,31 @@ public class Localization {
         return poseEstimator.getEstimatedPosition();
     }
 
+    public void periodic(SwerveModulePosition[] modulePositions) {
+        if (!isActive())
+            return;
+
+        poseEstimator.update(getRawYaw(), modulePositions);
+
+        // Update pitch velocity
+        Rotation2d currentPitch = Rotation2d.fromDegrees(navX.getPitch());
+        pitchVelocity = currentPitch.minus(pitch);
+        pitch = currentPitch;
+    }
+
+    public Rotation2d getPitch() {
+        return pitch;
+    }
+
     public boolean isLevel() {
-        return Math.abs(lastPitch.getRadians()) < Constants.LEVEL_TOLERANCE.getRadians();
+        return Math.abs(pitch.getRadians()) < Constants.LEVEL_TOLERANCE.getRadians();
     }
 
     public boolean isOnChargeStation() {
-        return Math.abs(lastPitch.getRadians()) > Constants.ON_TOLERANCE.getRadians();
+        return Math.abs(pitch.getRadians()) > Constants.ON_TOLERANCE.getRadians();
     }
 
     public boolean isNotPitching() {
         return Math.abs(pitchVelocity.getRadians()) < Constants.PITCH_VELOCITY_MAX.getRadians();
-    }
-
-    public void periodic() {
-        if (!isActive())
-            return;
-
-        poseEstimator.update(getRawYaw(), positionSupplier.get());
-
-        // Update pitch velocity
-        Rotation2d currentPitch = Rotation2d.fromDegrees(navX.getPitch());
-        pitchVelocity = currentPitch.minus(lastPitch);
-        lastPitch = currentPitch;
     }
 }

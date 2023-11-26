@@ -96,7 +96,7 @@ public class SwerveModule {
     private final double angleOffset;
     private final String name;
 
-    @AutoLogOutput(key = "Chassis/{name}/Target")
+    @AutoLogOutput(key = "Drive/{name}Module/Target")
     private SwerveModuleState desiredState;
 
     public SwerveModule(SwerveModuleConfiguration configuration) {
@@ -177,7 +177,7 @@ public class SwerveModule {
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
     }
 
-    @AutoLogOutput(key = "Chassis/{name}/Actual")
+    @AutoLogOutput(key = "Drive/{name}Module/Actual")
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 drivingEncoder.getVelocity(),

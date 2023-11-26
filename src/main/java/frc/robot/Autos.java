@@ -13,8 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.arm.Arm;
 import frc.robot.drive.Chassis;
-import frc.robot.drive.Localization;
-import frc.robot.drive.Trajectories;
+import frc.robot.drive.Drive;
 import frc.robot.subsystems.Intake;
 import frc.robot.util.GamePiece;
 import java.util.List;
@@ -94,20 +93,14 @@ public class Autos {
 
     private final LoggedDashboardChooser<Command> autoSelector;
 
-    public Autos(Chassis chassis, Localization localization, Trajectories trajectories, Arm arm, Intake intake) {
+    public Autos(Drive drive, Arm arm, Intake intake) {
         autoSelector = new LoggedDashboardChooser<>("Auto Routine");
-        autoSelector.addDefaultOption("1 Cone & Engage",
-                oneElementWithMobilityAndBalance(chassis, localization, trajectories, arm, intake, GamePiece.CONE));
-        autoSelector.addOption("1 Cube & Engage",
-                oneElementWithMobilityAndBalance(chassis, localization, trajectories, arm, intake, GamePiece.CUBE));
-        autoSelector.addOption("2 Open",
-                twoElementWithMobilityOpenSide(chassis, localization, trajectories, arm, intake));
-        autoSelector.addOption("2 Cable",
-                twoElementWithMobilityCableSide(chassis, localization, trajectories, arm, intake));
-        autoSelector.addOption("1 Cone",
-                oneElementWithMobility(chassis, localization, trajectories, arm, intake, GamePiece.CONE));
-        autoSelector.addOption("1 Cube",
-                oneElementWithMobility(chassis, localization, trajectories, arm, intake, GamePiece.CUBE));
+        autoSelector.addDefaultOption("1 Cone & Engage", oneElementWithMobilityAndBalance(drive, arm, intake, GamePiece.CONE));
+        autoSelector.addOption("1 Cube & Engage", oneElementWithMobilityAndBalance(drive, arm, intake, GamePiece.CUBE));
+        autoSelector.addOption("2 Open", twoElementWithMobilityOpenSide(drive, arm, intake));
+        autoSelector.addOption("2 Cable", twoElementWithMobilityCableSide(drive, arm, intake));
+        autoSelector.addOption("1 Cone", oneElementWithMobility(drive, arm, intake, GamePiece.CONE));
+        autoSelector.addOption("1 Cube", oneElementWithMobility(drive, arm, intake, GamePiece.CUBE));
     }
 
     public Command get() {
@@ -178,15 +171,14 @@ public class Autos {
                         arm.stow()));
     }
 
-    protected Command oneElementWithMobility(Chassis chassis, Localization localization, Trajectories trajectories,
-            Arm arm, Intake intake, GamePiece gamePiece) {
+    protected Command oneElementWithMobility(Drive drive, Arm arm, Intake intake, GamePiece gamePiece) {
         Command result = Commands.sequence(
-                Commands.runOnce(() -> localization.setPose(Constants.Mobility.START_POSE), localization),
+                drive.setPose(Constants.Mobility.START_POSE),
 
                 placeElement(arm, intake, gamePiece),
 
                 stopIntakeAndStowWhile(
-                        trajectories.driveTrajectory(
+                        drive.driveTrajectory(
                                 Constants.Mobility.START_POSE,
                                 Constants.Mobility.END_POSE,
                                 false),
@@ -195,21 +187,20 @@ public class Autos {
         return result;
     }
 
-    protected Command oneElementWithMobilityAndBalance(Chassis chassis, Localization localization,
-            Trajectories trajectories, Arm arm, Intake intake, GamePiece gamePiece) {
+    protected Command oneElementWithMobilityAndBalance(Drive drive, Arm arm, Intake intake, GamePiece gamePiece) {
         Command result = Commands.sequence(
-                Commands.runOnce(() -> localization.setPose(Constants.Balance.START_POSE), localization),
+                drive.setPose(Constants.Balance.START_POSE),
 
                 placeElement(arm, intake, gamePiece),
 
                 stopIntakeAndStowWhile(
-                        trajectories.driveTrajectory(
+                        drive.driveTrajectory(
                                 Constants.Balance.START_POSE,
                                 Constants.Balance.MIDDLE_POSE,
                                 false),
                         arm, intake, 0.25),
 
-                trajectories.driveTrajectory(
+                drive.driveTrajectory(
                         Constants.Balance.MIDDLE_POSE,
                         Constants.Balance.END_POSE,
                         false),
@@ -219,15 +210,14 @@ public class Autos {
         return result;
     }
 
-    protected Command twoElementWithMobilityOpenSide(Chassis chassis, Localization localization,
-            Trajectories trajectories, Arm arm, Intake intake) {
+    protected Command twoElementWithMobilityOpenSide(Drive drive, Arm arm, Intake intake) {
         Command result = Commands.sequence(
-                Commands.runOnce(() -> localization.setPose(Constants.Open.START_POSE), chassis),
+                drive.setPose(Constants.Open.START_POSE),
 
                 placeElement(arm, intake, GamePiece.CONE),
 
                 stopIntakeAndStowWhile(
-                        trajectories.driveTrajectory(
+                        drive.driveTrajectory(
                                 Constants.Open.START_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
                                 Constants.Open.GAME_PIECE_POSE,
@@ -238,7 +228,7 @@ public class Autos {
                 intake.intakeCube(),
 
                 stopIntakeAndStowWhile(
-                        trajectories.driveTrajectory(
+                        drive.driveTrajectory(
                                 Constants.Open.GAME_PIECE_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
                                 Constants.Open.END_POSE,
@@ -251,28 +241,27 @@ public class Autos {
         return result;
     }
 
-    protected Command twoElementWithMobilityCableSide(Chassis chassis, Localization localization,
-            Trajectories trajectories, Arm arm, Intake intake) {
+    protected Command twoElementWithMobilityCableSide(Drive drive, Arm arm, Intake intake) {
         Command result = Commands.sequence(
-                Commands.runOnce(() -> localization.setPose(Constants.Open.START_POSE), chassis),
+                drive.setPose(Constants.Open.START_POSE),
 
                 placeElement(arm, intake, GamePiece.CONE),
 
                 stopIntakeAndStowWhile(
-                        trajectories.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
+                        drive.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
                         arm, intake, 0.25),
-                trajectories.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
-                trajectories.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.GAME_PIECE_POSE, false),
+                drive.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
+                drive.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.GAME_PIECE_POSE, false),
 
                 arm.groundCube(),
                 intake.intakeCube(),
 
                 stopIntakeAndStowWhile(
-                        trajectories.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE,
+                        drive.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE,
                                 false),
                         arm, intake, 2),
-                trajectories.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
-                trajectories.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.END_POSE, false),
+                drive.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
+                drive.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.END_POSE, false),
 
                 placeElement(arm, intake, GamePiece.CUBE));
 
