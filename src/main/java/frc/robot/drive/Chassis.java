@@ -1,20 +1,16 @@
 package frc.robot.drive;
 
-import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.drive.SwerveModule.SwerveModuleConfiguration;
 
-public class Chassis extends SubsystemBase {
+public class Chassis {
     public static final double ROBOT_WIDTH = Units.inchesToMeters(25);
     public static final double ROBOT_LENGTH = Units.inchesToMeters(34);
     public static final double MAX_VELOCITY = 4.8; // meters per second
@@ -39,36 +35,27 @@ public class Chassis extends SubsystemBase {
     private final SwerveModule[] modules;
     private final SwerveDriveKinematics kinematics;
 
-    private final Localization localization;
-    private final Trajectories trajectories;
-
     public Chassis() {
         // Build up modules array
         modules = new SwerveModule[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             modules[i] = new SwerveModule(Constants.MODULES[i]);
         }
+
         // Build up position offset array for kinematics
         Translation2d positionOffsets[] = new Translation2d[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             positionOffsets[i] = Constants.MODULES[i].positionOffset;
         }
         kinematics = new SwerveDriveKinematics(positionOffsets);
-
-        localization = new Localization(kinematics, this::getModulePositions);
-        trajectories = new Trajectories(kinematics, localization::getPose, this::swerveDrive, this);
     }
 
-    public Localization getLocalization() {
-        return localization;
-    }
-
-    public Trajectories getTrajectories() {
-        return trajectories;
+    public SwerveDriveKinematics getKinematics() {
+        return kinematics;
     }
 
     @AutoLogOutput(key = "Chassis/ModulePositions")
-    private SwerveModulePosition[] getModulePositions() {
+    public SwerveModulePosition[] getModulePositions() {
         // Build up position array
         SwerveModulePosition result[] = new SwerveModulePosition[modules.length];
         for (int i = 0; i < modules.length; i++) {
@@ -78,7 +65,7 @@ public class Chassis extends SubsystemBase {
     }
 
     @AutoLogOutput(key = "Chassis/ModuleStates")
-    private SwerveModuleState[] getModuleStates() {
+    public SwerveModuleState[] getModuleStates() {
         // Build up state array
         SwerveModuleState result[] = new SwerveModuleState[modules.length];
         for (int i = 0; i < modules.length; i++) {
@@ -87,14 +74,15 @@ public class Chassis extends SubsystemBase {
         return result;
     }
 
-    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
-        if (fieldRelative && localization.isActive())
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, localization.getRawYaw());
+    public void driveFieldRelative(ChassisSpeeds chassisSpeeds, Rotation2d yaw) {
+        drive(ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, yaw));
+    }
 
+    public void drive(ChassisSpeeds chassisSpeeds) {
         swerveDrive(kinematics.toSwerveModuleStates(chassisSpeeds));
     }
 
-    private void swerveDrive(SwerveModuleState states[]) {
+    public void swerveDrive(SwerveModuleState states[]) {
         if (states.length != Constants.MODULES.length)
             throw new IllegalStateException(
                     "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);
@@ -112,14 +100,5 @@ public class Chassis extends SubsystemBase {
             states[i] = new SwerveModuleState(0, Constants.MODULES[i].positionOffset.getAngle());
         }
         swerveDrive(states);
-    }
-
-    public Command turtle() {
-        return startEnd(this::setX, null);
-    }
-
-    public Command defaultCommand(Supplier<ChassisSpeeds> commandSupplier, boolean slowMode, boolean fieldRelative,
-            boolean rateLimit) {
-        return new DefaultCommand(this, commandSupplier, slowMode, fieldRelative, rateLimit);
     }
 }

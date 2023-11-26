@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Localization extends SubsystemBase {
+public class Localization {
     private static final class Constants {
         public static final Rotation2d LEVEL_TOLERANCE = Rotation2d.fromDegrees(2.0);
         public static final Rotation2d ON_TOLERANCE = Rotation2d.fromDegrees(10.0);
@@ -100,7 +100,6 @@ public class Localization extends SubsystemBase {
         return Math.abs(pitchVelocity.getRadians()) < Constants.PITCH_VELOCITY_MAX.getRadians();
     }
 
-    @Override
     public void periodic() {
         if (!isActive())
             return;
@@ -111,12 +110,5 @@ public class Localization extends SubsystemBase {
         Rotation2d currentPitch = Rotation2d.fromDegrees(navX.getPitch());
         pitchVelocity = currentPitch.minus(lastPitch);
         lastPitch = currentPitch;
-    }
-
-    public Command zeroHeading() {
-        return runOnce(() -> {
-            Pose2d pose = getPose();
-            setPose(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(0.0)));
-        });
     }
 }

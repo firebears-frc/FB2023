@@ -1,9 +1,11 @@
 package frc.robot.drive;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class DefaultCommand extends Command {
     private static final class Constants {
@@ -12,34 +14,24 @@ public class DefaultCommand extends Command {
         public static final double SLOW_TELE_ANGULAR_VELOCITY = Math.PI / 2; // radians per second
     }
 
-    private final Chassis chassis;
     private final Supplier<ChassisSpeeds> commandSupplier;
+    private final Consumer<ChassisSpeeds> commandConsumer;
     private final boolean slowMode;
-    private final boolean fieldRelative;
-    private final boolean rateLimit;
+    private final RateLimiter rateLimiter = new RateLimiter();
 
-    private final RateLimiter rateLimiter;
-
-    public DefaultCommand(Chassis chassis, Supplier<ChassisSpeeds> commandSupplier,
-            boolean slowMode, boolean fieldRelative, boolean rateLimit) {
-        this.chassis = chassis;
+    public DefaultCommand(Supplier<ChassisSpeeds> commandSupplier, Consumer<ChassisSpeeds> commandConsumer,
+            boolean slowMode, Subsystem requirement) {
         this.commandSupplier = commandSupplier;
+        this.commandConsumer = commandConsumer;
         this.slowMode = slowMode;
-        this.fieldRelative = fieldRelative;
-        this.rateLimit = rateLimit;
 
-        rateLimiter = new RateLimiter();
-
-        addRequirements(chassis);
+        addRequirements(requirement);
     }
 
     @Override
     public void execute() {
         ChassisSpeeds command = commandSupplier.get();
-
-        if (rateLimit) {
-            command = rateLimiter.calculate(command);
-        }
+        command = rateLimiter.calculate(command);
 
         if (slowMode) {
             command.vxMetersPerSecond *= Constants.SLOW_TELE_VELOCITY;
@@ -51,6 +43,6 @@ public class DefaultCommand extends Command {
             command.omegaRadiansPerSecond *= Constants.MAX_TELE_ANGULAR_VELOCITY;
         }
 
-        chassis.drive(command, fieldRelative);
+        commandConsumer.accept(command);
     }
 }
