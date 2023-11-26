@@ -10,8 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -43,15 +41,6 @@ public class Chassis extends SubsystemBase {
         public static final double MAX_TELE_ANGULAR_VELOCITY = 1.5 * Math.PI; // radians per second
         public static final double SLOW_TELE_ANGULAR_VELOCITY = Math.PI / 2; // radians per second
 
-        // Trajectories
-        public static final double MAX_AUTO_VELOCITY = 4.5; // meters per second
-        public static final double MAX_AUTO_ACCELERATION = 3.0; // meters per second squared
-        public static final double MAX_AUTO_ANGULAR_VELOCITY = Math.PI; // radians per second
-        public static final double MAX_AUTO_ANGULAR_ACCELERATION = Math.PI; // radians per second squared
-        public static final double X_CONTROLLER_P = 1.0;
-        public static final double Y_CONTROLLER_P = 1.0;
-        public static final double R_CONTROLLER_P = 1.0;
-
         // Slew Rate Limiting
         public static final double DIRECTION_SLEW_RATE = 1.2; // radians per second
         public static final double MAGNITUDE_SLEW_RATE = 1.8; // percent per second (1 = 100%)
@@ -62,10 +51,7 @@ public class Chassis extends SubsystemBase {
     private final SwerveDriveKinematics kinematics;
 
     private final Localization localization;
-
-    // Trajectories
-    private final TrapezoidProfile.Constraints rotationConstraints;
-    private final TrajectoryConfig config;
+    private final Trajectories trajectories;
 
     public Chassis() {
         // Build up modules array
@@ -81,15 +67,15 @@ public class Chassis extends SubsystemBase {
         kinematics = new SwerveDriveKinematics(positionOffsets);
 
         localization = new Localization(kinematics, this::getModulePositions);
-
-        rotationConstraints = new TrapezoidProfile.Constraints(Constants.MAX_AUTO_ANGULAR_VELOCITY,
-                Constants.MAX_AUTO_ANGULAR_ACCELERATION);
-        config = new TrajectoryConfig(Constants.MAX_AUTO_VELOCITY, Constants.MAX_AUTO_ACCELERATION);
-        config.setKinematics(kinematics);
+        trajectories = new Trajectories(kinematics, localization::getPose, this::swerveDrive, this);
     }
 
     public Localization getLocalization() {
         return localization;
+    }
+
+    public Trajectories getTrajectories() {
+        return trajectories;
     }
 
     @AutoLogOutput(key = "Chassis/ModulePositions")
@@ -138,39 +124,6 @@ public class Chassis extends SubsystemBase {
         }
         swerveDrive(states);
     }
-
-    /*private Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean reversed) {
-        return generateTrajectory(start, new ArrayList<>(), end, reversed);
-    }
-
-    private Trajectory generateTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
-        config.setReversed(reversed);
-        return TrajectoryGenerator.generateTrajectory(start, interior, end, config);
-    }
-
-    private SwerveControllerCommand generateSwerveControllerCommand(Trajectory trajectory) {
-        ProfiledPIDController rotationController = new ProfiledPIDController(Constants.R_CONTROLLER_P, 0.0, 0.0,
-                rotationConstraints);
-        return new SwerveControllerCommand(
-                trajectory,
-                this::getPose,
-                kinematics,
-                new PIDController(Constants.X_CONTROLLER_P, 0.0, 0.0),
-                new PIDController(Constants.Y_CONTROLLER_P, 0.0, 0.0),
-                rotationController,
-                this::swerveDrive,
-                this);
-    }
-
-    public Command driveTrajectory(Pose2d start, Pose2d end, boolean reversed) {
-        Trajectory trajectory = generateTrajectory(start, end, reversed);
-        return generateSwerveControllerCommand(trajectory);
-    }
-
-    public Command driveTrajectory(Pose2d start, List<Translation2d> interior, Pose2d end, boolean reversed) {
-        Trajectory trajectory = generateTrajectory(start, interior, end, reversed);
-        return generateSwerveControllerCommand(trajectory);
-    }*/
 
     public Command turtle() {
         return startEnd(this::setX, null);

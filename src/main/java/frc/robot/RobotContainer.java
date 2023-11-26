@@ -4,6 +4,7 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Chassis;
 import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Localization;
+import frc.robot.subsystems.Trajectories;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeBag;
 import frc.robot.subsystems.IntakeNeo550;
@@ -31,6 +32,7 @@ public class RobotContainer {
 
     private final Chassis chassis;
     private final Localization localization;
+    private final Trajectories trajectories;
     private final Arm arm;
     private final Intake intake;
     private final Vision vision;
@@ -45,6 +47,7 @@ public class RobotContainer {
     public RobotContainer() {
         chassis = new Chassis();
         localization = chassis.getLocalization();
+        trajectories = chassis.getTrajectories();
         arm = new Arm();
         intake = new IntakeBag(); // new IntakeNeo550();
         vision = new Vision(localization::visionPose);
