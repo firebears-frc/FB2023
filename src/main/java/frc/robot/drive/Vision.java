@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.drive;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,9 +21,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Vision extends SubsystemBase {
+public class Vision {
     private static class Constants {
         public static final String NAME = "MainC";
         public static final Transform3d CAMERA_TRANSFORM = new Transform3d(new Translation3d(
@@ -80,7 +79,6 @@ public class Vision extends SubsystemBase {
         POSE_FOUND
     }
 
-    @Override
     public void periodic() {
         boolean connected = visionSystem.isConnected();
         if (!connected) {

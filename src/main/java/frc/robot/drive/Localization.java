@@ -20,6 +20,7 @@ public class Localization {
     }
 
     private final SwerveDrivePoseEstimator poseEstimator;
+    private final Vision vision;
 
     private AHRS navX;
 
@@ -33,6 +34,7 @@ public class Localization {
             DriverStation.reportError(ex.getMessage(), true);
             navX = null;
             poseEstimator = null;
+            vision = new Vision(null); // initialize driver vision
             return;
         }
 
@@ -41,6 +43,7 @@ public class Localization {
                 getRawYaw(),
                 initiaModulePositions,
                 new Pose2d());
+        vision = new Vision(this::visionPose);
 
         pitch = Rotation2d.fromDegrees(0.0);
         pitchVelocity = Rotation2d.fromDegrees(0.0);
@@ -85,6 +88,8 @@ public class Localization {
         Rotation2d currentPitch = Rotation2d.fromDegrees(navX.getPitch());
         pitchVelocity = currentPitch.minus(pitch);
         pitch = currentPitch;
+
+        vision.periodic();
     }
 
     @AutoLogOutput(key = "Localization/ChargeStation/Pitch")

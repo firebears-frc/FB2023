@@ -6,7 +6,6 @@ import frc.robot.intake.Intake;
 import frc.robot.intake.IntakeBag;
 import frc.robot.intake.IntakeNeo550;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -31,29 +30,29 @@ public class RobotContainer {
     private final Drive drive;
     private final Arm arm;
     private final Intake intake;
-    //private final Vision vision;
-    //private final Lights lights;
+    // private final Lights lights;
 
     private final PowerDistribution pdh;
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
-    //private final Autos autos;
+    private final Autos autos;
 
     public RobotContainer() {
         drive = new Drive();
         arm = new Arm();
         intake = new IntakeBag(); // new IntakeNeo550();
-        //vision = new Vision(localization::visionPose);
-        //lights = new Lights(intake::getHeldItem, intake::getWantedItem, localization::isLevel,
-        //        localization::isOnChargeStation, localization::isNotPitching);
+        // vision = new Vision(localization::visionPose);
+        // lights = new Lights(intake::getHeldItem, intake::getWantedItem,
+        // localization::isLevel,
+        // localization::isOnChargeStation, localization::isNotPitching);
         pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
         one = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        //autos = new Autos(drive, arm, intake);
+        autos = new Autos(drive, arm, intake);
 
         configureButtonBindings();
     }
@@ -106,6 +105,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;//autos.get();
+        return autos.get();
     }
 }
