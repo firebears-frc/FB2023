@@ -1,14 +1,11 @@
 package frc.robot;
 
 import frc.robot.arm.Arm;
-import frc.robot.drive.Chassis;
 import frc.robot.drive.Drive;
-import frc.robot.drive.Localization;
-import frc.robot.drive.Trajectories;
+import frc.robot.intake.Intake;
+import frc.robot.intake.IntakeBag;
+import frc.robot.intake.IntakeNeo550;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.IntakeBag;
-import frc.robot.subsystems.IntakeNeo550;
 import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.math.MathUtil;

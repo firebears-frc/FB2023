@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
@@ -24,9 +25,13 @@ public class Drive extends SubsystemBase {
         public static final double MAX_AUTO_ACCELERATION = 3.0; // meters per second squared
         public static final double MAX_AUTO_ANGULAR_VELOCITY = Math.PI; // radians per second
         public static final double MAX_AUTO_ANGULAR_ACCELERATION = Math.PI; // radians per second squared
+
         public static final double X_CONTROLLER_P = 1.0;
         public static final double Y_CONTROLLER_P = 1.0;
         public static final double R_CONTROLLER_P = 1.0;
+
+        public static final double BALANCE_ON_CHARGE_STATION_SPEED = 0.375; // meters per second
+        public static final double DRIVE_ONTO_CHARGE_STATION_SPEED = 1; // meters per second
     }
 
     private final Chassis chassis;
@@ -84,5 +89,29 @@ public class Drive extends SubsystemBase {
                                 Constants.MAX_AUTO_ANGULAR_ACCELERATION)),
                 chassis::swerveDrive,
                 this);
+    }
+
+    public Command autoBalance() {
+        return Commands.sequence(
+                // Drive until we are at a high enough angle
+                startEnd(
+                        () -> chassis.drive(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0.0, 0.0)),
+                        () -> {
+                        }).until(localization::isOnChargeStation),
+
+                // Rock back and forth until it stops and is level
+                run(() -> {
+                    if (!localization.isNotPitching()) {
+                        // Charge station is moving, stop!
+                        chassis.setX();
+                        return;
+                    }
+
+                    // Depending on what way the charge station is tipped, go to middle
+                    ChassisSpeeds speeds = new ChassisSpeeds(Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0.0, 0.0);
+                    if (localization.getPitch().getRadians() < 0)
+                        speeds.vxMetersPerSecond *= -1.0;
+                    chassis.drive(speeds);
+                }).until(() -> localization.isNotPitching() && localization.isLevel()));
     }
 }

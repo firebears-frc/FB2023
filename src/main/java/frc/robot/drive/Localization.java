@@ -24,10 +24,7 @@ public class Localization {
     private AHRS navX;
 
     // Charge Station
-    @AutoLogOutput(key = "Localization/ChargeStation/Pitch")
-    private Rotation2d pitch;
-    @AutoLogOutput(key = "Localization/ChargeStation/PitchVelocity")
-    private Rotation2d pitchVelocity;
+    private Rotation2d pitch, pitchVelocity;
 
     public Localization(SwerveDriveKinematics kinematics, SwerveModulePosition[] initiaModulePositions) {
         try {
@@ -90,18 +87,27 @@ public class Localization {
         pitch = currentPitch;
     }
 
+    @AutoLogOutput(key = "Localization/ChargeStation/Pitch")
     public Rotation2d getPitch() {
         return pitch;
     }
 
+    @AutoLogOutput(key = "Localization/ChargeStation/PitchVelocity")
+    private Rotation2d getPitchVelocity() {
+        return pitchVelocity;
+    }
+
+    @AutoLogOutput(key = "Localization/ChargeStation/IsLevel")
     public boolean isLevel() {
         return Math.abs(pitch.getRadians()) < Constants.LEVEL_TOLERANCE.getRadians();
     }
 
+    @AutoLogOutput(key = "Localization/ChargeStation/IsOnChargeStation")
     public boolean isOnChargeStation() {
         return Math.abs(pitch.getRadians()) > Constants.ON_TOLERANCE.getRadians();
     }
 
+    @AutoLogOutput(key = "Localization/ChargeStation/IsNotPitching")
     public boolean isNotPitching() {
         return Math.abs(pitchVelocity.getRadians()) < Constants.PITCH_VELOCITY_MAX.getRadians();
     }
