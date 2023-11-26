@@ -68,6 +68,10 @@ public class Localization extends SubsystemBase {
         return navX.getRotation2d();
     }
 
+    public Rotation2d getPitch() {
+        return lastPitch;
+    }
+
     public void visionPose(Pose2d pose, double timestampSeconds) {
         poseEstimator.addVisionMeasurement(pose, timestampSeconds);
     }

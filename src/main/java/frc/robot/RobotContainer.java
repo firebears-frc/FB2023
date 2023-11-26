@@ -42,7 +42,7 @@ public class RobotContainer {
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
-    //private final Autos autos;
+    private final Autos autos;
 
     public RobotContainer() {
         chassis = new Chassis();
@@ -59,7 +59,7 @@ public class RobotContainer {
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        //autos = new Autos(chassis, arm, intake);
+        autos = new Autos(chassis, localization, trajectories, arm, intake);
 
         configureButtonBindings();
     }
@@ -116,6 +116,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;//autos.get();
+        return autos.get();
     }
 }

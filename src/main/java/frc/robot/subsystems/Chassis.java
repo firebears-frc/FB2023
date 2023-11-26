@@ -98,7 +98,7 @@ public class Chassis extends SubsystemBase {
         return result;
     }
 
-    private void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
+    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
         if (fieldRelative && localization.isActive())
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, localization.getRawYaw());
 
@@ -117,7 +117,7 @@ public class Chassis extends SubsystemBase {
         }
     }
 
-    private void setX() {
+    public void setX() {
         SwerveModuleState[] states = new SwerveModuleState[Constants.MODULES.length];
         for (int i = 0; i < Constants.MODULES.length; i++) {
             states[i] = new SwerveModuleState(0, Constants.MODULES[i].positionOffset.getAngle());
