@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.arm;
 
 import java.util.function.Supplier;
 
@@ -43,16 +43,16 @@ public class Arm extends SubsystemBase {
         public static final double FORE_ARM_LENGTH = Units.inchesToMeters(30);
     }
 
-    private final ArmElbow elbow;
-    private final ArmShoulder shoulder;
+    private final Elbow elbow;
+    private final Shoulder shoulder;
     @AutoLogOutput(key = "Arm/Mechanism")
     private final Mechanism2d arm;
     private final MechanismRoot2d armPivot;
     private final MechanismLigament2d upperArm, foreArm;
 
     public Arm() {
-        elbow = new ArmElbow();
-        shoulder = new ArmShoulder();
+        elbow = new Elbow();
+        shoulder = new Shoulder();
 
         arm = new Mechanism2d(0, 0);
         armPivot = arm.getRoot("Arm Pivot", 0, 0);

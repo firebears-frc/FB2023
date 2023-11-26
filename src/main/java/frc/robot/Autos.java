@@ -6,14 +6,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chassis;
-import frc.robot.subsystems.Intake;
+import frc.robot.arm.Arm;
+import frc.robot.drive.Chassis;
+import frc.robot.drive.Drive;
+import frc.robot.intake.Intake;
 import frc.robot.util.GamePiece;
 import java.util.List;
 
@@ -35,10 +35,6 @@ public class Autos {
         private static final double CHARGE_STATION_FAR_X = WALL_TO_FAR_CHARGE_STATION + ROBOT_OFFSET;
         private static final double CHARGE_STATION_NEAR_X = WALL_TO_NEAR_CHARGE_STATION - ROBOT_OFFSET;
         private static final double ELEMENTS_X = GRID_X + GRID_TO_ELEMENTS - (ROBOT_OFFSET * 2);
-
-        // Speeds
-        public static final double BALANCE_ON_CHARGE_STATION_SPEED = 0.375; // meters per second
-        public static final double DRIVE_ONTO_CHARGE_STATION_SPEED = 1; // meters per second
 
         public static class Mobility {
             private static final Transform2d MOVEMENT = new Transform2d(ELEMENTS_X - GRID_X, 0,
@@ -92,177 +88,165 @@ public class Autos {
 
     private final LoggedDashboardChooser<Command> autoSelector;
 
-    public Autos(Chassis chassis, Arm arm, Intake intake) {
+    public Autos(Drive drive, Arm arm, Intake intake) {
         autoSelector = new LoggedDashboardChooser<>("Auto Routine");
         autoSelector.addDefaultOption("1 Cone & Engage",
-                oneElementWithMobilityAndBalance(chassis, arm, intake, GamePiece.CONE));
-        autoSelector.addOption("1 Cube & Engage",
-                oneElementWithMobilityAndBalance(chassis, arm, intake, GamePiece.CUBE));
-        autoSelector.addOption("2 Open", twoElementWithMobilityOpenSide(chassis, arm, intake));
-        autoSelector.addOption("2 Cable", twoElementWithMobilityCableSide(chassis, arm, intake));
-        autoSelector.addOption("1 Cone", oneElementWithMobility(chassis, arm, intake, GamePiece.CONE));
-        autoSelector.addOption("1 Cube", oneElementWithMobility(chassis, arm, intake, GamePiece.CUBE));
+                oneElementWithMobilityAndBalance(drive, arm, intake, GamePiece.CONE));
+        autoSelector.addOption("1 Cube & Engage", oneElementWithMobilityAndBalance(drive, arm, intake, GamePiece.CUBE));
+        autoSelector.addOption("2 Open", twoElementWithMobilityOpenSide(drive, arm, intake));
+        autoSelector.addOption("2 Cable", twoElementWithMobilityCableSide(drive, arm, intake));
+        autoSelector.addOption("1 Cone", oneElementWithMobility(drive, arm, intake, GamePiece.CONE));
+        autoSelector.addOption("1 Cube", oneElementWithMobility(drive, arm, intake, GamePiece.CUBE));
     }
 
     public Command get() {
         return autoSelector.get();
     }
 
-    private Command balanceOnChargeStation(Chassis chassis) {
-        return Commands.sequence(
-                Commands.runOnce(
-                        () -> chassis.drive(new ChassisSpeeds(Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0), false),
-                        chassis),
-                Commands.run(
-                        () -> {
-                            if (!chassis.isNotPitching()) {
-                                // Charge station is moving, stop!
-                                chassis.setX();
-                                return;
-                            }
-
-                            // Depending on what way the charge station is tipped, go to middle
-                            if (chassis.getPitchDegrees() > 0) {
-                                chassis.drive(new ChassisSpeeds(
-                                        Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0),
-                                        false);
-                            } else {
-                                chassis.drive(new ChassisSpeeds(
-                                        -1 * Constants.BALANCE_ON_CHARGE_STATION_SPEED, 0, 0),
-                                        false);
-                            }
-                        },
-                        chassis).until(() -> chassis.isNotPitching() && chassis.isLevel()),
-                Commands.runOnce(() -> chassis.drive(new ChassisSpeeds(), false), chassis));
-    }
-
-    private Command driveOntoChargeStation(Chassis chassis) {
-        return Commands.startEnd(
-                () -> chassis.drive(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0, 0),
-                        false),
-                () -> chassis.drive(new ChassisSpeeds(), false),
-                chassis).until(chassis::isOnChargeStation);
-    }
-
-    private Command autoBalance(Chassis chassis) {
-        return Commands.sequence(
-                driveOntoChargeStation(chassis),
-                balanceOnChargeStation(chassis),
-                Commands.waitUntil(DriverStation::isDisabled));
-    }
-
-    private Command placeElement(Arm arm, Intake intake, GamePiece gamePiece) {
-        return Commands.sequence(
+    protected Command oneElementWithMobility(Drive drive, Arm arm, Intake intake, GamePiece gamePiece) {
+        Command result = Commands.sequence(
+                drive.setPose(Constants.Mobility.START_POSE),
                 switch (gamePiece) {
                     case CONE -> intake.intakeCone();
                     case CUBE, NONE -> intake.intakeCube();
                 },
                 intake.hold(),
+
                 arm.ready(),
                 arm.high(),
-                intake.eject());
-    }
+                intake.eject(),
+                Commands.waitSeconds(0.1),
 
-    private Command stopIntakeAndStowWhile(Command command, Arm arm, Intake intake, double delay) {
-        return Commands.parallel(
-                command,
-                Commands.sequence(
-                        Commands.waitSeconds(delay),
-                        intake.stop(),
-                        arm.stow()));
-    }
-
-    protected Command oneElementWithMobility(Chassis chassis, Arm arm, Intake intake, GamePiece gamePiece) {
-        Command result = Commands.sequence(
-                Commands.runOnce(() -> chassis.setPose(Constants.Mobility.START_POSE), chassis),
-
-                placeElement(arm, intake, gamePiece),
-
-                stopIntakeAndStowWhile(
-                        chassis.driveTrajectory(
+                Commands.parallel(
+                        Commands.sequence(
+                                intake.stop(),
+                                Commands.waitSeconds(0.25),
+                                arm.stow()),
+                        drive.driveTrajectory(
                                 Constants.Mobility.START_POSE,
                                 Constants.Mobility.END_POSE,
-                                false),
-                        arm, intake, 0.25));
+                                false)));
         result.setName("OneElementWithMobility<" + gamePiece.name() + ">");
         return result;
     }
 
-    protected Command oneElementWithMobilityAndBalance(Chassis chassis, Arm arm, Intake intake,
-            GamePiece gamePiece) {
+    protected Command oneElementWithMobilityAndBalance(Drive drive, Arm arm, Intake intake, GamePiece gamePiece) {
         Command result = Commands.sequence(
-                Commands.runOnce(() -> chassis.setPose(Constants.Balance.START_POSE), chassis),
+                drive.setPose(Constants.Balance.START_POSE),
+                switch (gamePiece) {
+                    case CONE -> intake.intakeCone();
+                    case CUBE, NONE -> intake.intakeCube();
+                },
+                intake.hold(),
 
-                placeElement(arm, intake, gamePiece),
+                arm.ready(),
+                arm.high(),
+                intake.eject(),
+                Commands.waitSeconds(0.1),
 
-                stopIntakeAndStowWhile(
-                        chassis.driveTrajectory(
-                                Constants.Balance.START_POSE,
-                                Constants.Balance.MIDDLE_POSE,
-                                false),
-                        arm, intake, 0.25),
+                Commands.parallel(
+                        Commands.sequence(
+                                intake.stop(),
+                                Commands.waitSeconds(0.25),
+                                arm.stow()),
+                        Commands.sequence(
+                                drive.driveTrajectory(
+                                        Constants.Balance.START_POSE,
+                                        Constants.Balance.MIDDLE_POSE,
+                                        false),
+                                drive.driveTrajectory(
+                                        Constants.Balance.MIDDLE_POSE,
+                                        Constants.Balance.END_POSE,
+                                        false))),
 
-                chassis.driveTrajectory(
-                        Constants.Balance.MIDDLE_POSE,
-                        Constants.Balance.END_POSE,
-                        false),
-
-                autoBalance(chassis));
+                drive.autoBalance(),
+                Commands.idle(drive).until(DriverStation::isDisabled));
         result.setName("OneElementWithMobilityAndBalance<" + gamePiece.name() + ">");
         return result;
     }
 
-    protected Command twoElementWithMobilityOpenSide(Chassis chassis, Arm arm, Intake intake) {
+    protected Command twoElementWithMobilityOpenSide(Drive drive, Arm arm, Intake intake) {
         Command result = Commands.sequence(
-                Commands.runOnce(() -> chassis.setPose(Constants.Open.START_POSE), chassis),
+                drive.setPose(Constants.Open.START_POSE),
+                intake.intakeCone(),
+                intake.hold(),
 
-                placeElement(arm, intake, GamePiece.CONE),
+                arm.ready(),
+                arm.high(),
+                intake.eject(),
+                Commands.waitSeconds(0.1),
 
-                stopIntakeAndStowWhile(
-                        chassis.driveTrajectory(
+                Commands.parallel(
+                        Commands.sequence(
+                                intake.stop(),
+                                Commands.waitSeconds(0.25),
+                                arm.stow()),
+                        drive.driveTrajectory(
                                 Constants.Open.START_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
                                 Constants.Open.GAME_PIECE_POSE,
-                                false),
-                        arm, intake, 0.25),
+                                false)),
 
-                arm.groundCube(),
                 intake.intakeCube(),
+                arm.groundCube(),
 
-                stopIntakeAndStowWhile(
-                        chassis.driveTrajectory(
+                Commands.parallel(
+                        Commands.sequence(
+                                Commands.waitSeconds(2.5),
+                                intake.stop(),
+                                arm.stow()),
+                        drive.driveTrajectory(
                                 Constants.Open.GAME_PIECE_POSE,
                                 List.of(Constants.Open.MIDDLE_TRANSLATION),
                                 Constants.Open.END_POSE,
-                                false),
-                        arm, intake, 2),
+                                false)),
 
-                placeElement(arm, intake, GamePiece.CUBE));
-
+                arm.ready(),
+                arm.high(),
+                intake.eject());
         result.setName("TwoElementWithMobilityOpen");
         return result;
     }
 
-    protected Command twoElementWithMobilityCableSide(Chassis chassis, Arm arm, Intake intake) {
+    protected Command twoElementWithMobilityCableSide(Drive drive, Arm arm, Intake intake) {
         Command result = Commands.sequence(
-                placeElement(arm, intake, GamePiece.CONE),
+                drive.setPose(Constants.Open.START_POSE),
+                intake.intakeCone(),
+                intake.hold(),
 
-                stopIntakeAndStowWhile(
-                        chassis.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
-                        arm, intake, 0.25),
-                chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
-                chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.GAME_PIECE_POSE, false),
+                arm.ready(),
+                arm.high(),
+                intake.eject(),
+                Commands.waitSeconds(0.1),
 
-                arm.groundCube(),
+                Commands.parallel(
+                        Commands.sequence(
+                                intake.stop(),
+                                Commands.waitSeconds(0.25),
+                                arm.stow()),
+                        Commands.sequence(
+                                drive.driveTrajectory(Constants.Cable.START_POSE, Constants.Cable.FIRST_POSE, false),
+                                drive.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.SECOND_POSE, false),
+                                drive.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.GAME_PIECE_POSE,
+                                        false))),
+
                 intake.intakeCube(),
+                arm.groundCube(),
 
-                stopIntakeAndStowWhile(
-                        chassis.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE, false),
-                        arm, intake, 2),
-                chassis.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
-                chassis.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.END_POSE, false),
+                Commands.parallel(
+                        Commands.sequence(
+                                Commands.waitSeconds(2.5),
+                                intake.stop(),
+                                arm.stow()),
+                        Commands.sequence(
+                                drive.driveTrajectory(Constants.Cable.GAME_PIECE_POSE, Constants.Cable.SECOND_POSE,
+                                        false),
+                                drive.driveTrajectory(Constants.Cable.SECOND_POSE, Constants.Cable.FIRST_POSE, false),
+                                drive.driveTrajectory(Constants.Cable.FIRST_POSE, Constants.Cable.END_POSE, false))),
 
-                placeElement(arm, intake, GamePiece.CUBE));
+                arm.ready(),
+                arm.high(),
+                intake.eject());
 
         result.setName("TwoElementWithMobilityCable");
         return result;

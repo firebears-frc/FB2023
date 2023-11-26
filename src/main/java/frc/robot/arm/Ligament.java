@@ -1,10 +1,10 @@
-package frc.robot.subsystems;
+package frc.robot.arm;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class ArmLigament {
+public class Ligament {
     protected String name;
     protected Rotation2d setpoint;
     protected Rotation2d position;
