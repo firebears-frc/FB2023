@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.arm;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
@@ -11,7 +11,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class ArmElbow extends ArmLigament {
+public class Elbow extends Ligament {
     private static class Constants {
         public static final int PORT = 7;
 
@@ -28,7 +28,7 @@ public class ArmElbow extends ArmLigament {
     private final SparkMaxAbsoluteEncoder encoder;
     private final SparkMaxPIDController pid;
 
-    public ArmElbow() {
+    public Elbow() {
         motor = new CANSparkMax(Constants.PORT, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
         motor.setInverted(true);

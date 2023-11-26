@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.drive;
 
 import java.util.function.Supplier;
 
@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.drive.SwerveModule.SwerveModuleConfiguration;
 
 public class Chassis extends SubsystemBase {
     public static final double ROBOT_WIDTH = Units.inchesToMeters(25);

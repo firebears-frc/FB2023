@@ -11,11 +11,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chassis;
+import frc.robot.arm.Arm;
+import frc.robot.drive.Chassis;
+import frc.robot.drive.Localization;
+import frc.robot.drive.Trajectories;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Localization;
-import frc.robot.subsystems.Trajectories;
 import frc.robot.util.GamePiece;
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package frc.robot;
 
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Chassis;
+import frc.robot.arm.Arm;
+import frc.robot.drive.Chassis;
+import frc.robot.drive.Localization;
+import frc.robot.drive.Trajectories;
 import frc.robot.subsystems.Lights;
-import frc.robot.subsystems.Localization;
-import frc.robot.subsystems.Trajectories;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeBag;
 import frc.robot.subsystems.IntakeNeo550;
