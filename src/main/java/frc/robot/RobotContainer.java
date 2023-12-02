@@ -7,9 +7,12 @@ import frc.robot.intake.IntakeBag;
 import frc.robot.intake.IntakeNeo550;
 import frc.robot.subsystems.Lights;
 
+import java.util.Map;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -17,6 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -53,9 +57,21 @@ public class RobotContainer {
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
+        configureAutoCommands();
         autoChooser = new LoggedDashboardChooser<>("AutoChooser", AutoBuilder.buildAutoChooser());
 
         configureButtonBindings();
+    }
+
+    private void configureAutoCommands() {
+        NamedCommands.registerCommands(Map.of(
+                "prepCone", Commands.sequence(intake.intakeCone(), intake.hold()),
+                "prepCube", Commands.sequence(intake.intakeCube(), intake.hold()),
+                "armHigh", arm.high(),
+                "place", Commands.sequence(intake.eject(), Commands.waitSeconds(0.1)),
+                "armStow", Commands.sequence(intake.stop(), Commands.waitSeconds(0.25), arm.stow()),
+                "groundIntake", Commands.sequence(intake.intakeCube(), arm.groundCube()),
+                "autoBalance", drive.autoBalance()));
     }
 
     private ChassisSpeeds getChassisSpeeds() {
