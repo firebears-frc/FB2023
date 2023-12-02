@@ -7,6 +7,10 @@ import frc.robot.intake.IntakeBag;
 import frc.robot.intake.IntakeNeo550;
 import frc.robot.subsystems.Lights;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -17,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-    private static final  class Constants {
+    private static final class Constants {
         public static final int JOYSTICK_1_PORT = 0;
         public static final int JOYSTICK_2_PORT = 1;
         public static final int CONTROLLER_PORT = 2;
@@ -36,7 +40,7 @@ public class RobotContainer {
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
-    private final Autos autos;
+    private final LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
         drive = new Drive();
@@ -49,7 +53,7 @@ public class RobotContainer {
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        autos = new Autos(drive, arm, intake);
+        autoChooser = new LoggedDashboardChooser<>("AutoChooser", AutoBuilder.buildAutoChooser());
 
         configureButtonBindings();
     }
@@ -102,6 +106,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autos.get();
+        return autoChooser.get();
     }
 }
