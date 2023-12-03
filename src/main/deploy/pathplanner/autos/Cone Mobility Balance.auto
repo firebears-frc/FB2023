@@ -30,22 +30,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "armStow"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "balance1"
-                }
-              }
-            ]
+            "pathName": "balance1"
           }
         },
         {
