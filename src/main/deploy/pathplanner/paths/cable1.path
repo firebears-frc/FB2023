@@ -59,27 +59,27 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.2,
-      "rotationDegrees": 0
+      "rotationDegrees": 0.0
     },
     {
       "waypointRelativePos": 1.05,
-      "rotationDegrees": 15.0
+      "rotationDegrees": 60.0
     },
     {
       "waypointRelativePos": 1.9,
-      "rotationDegrees": 15.0
+      "rotationDegrees": 120.0
     }
   ],
   "constraintZones": [
     {
       "name": "Bump",
-      "minWaypointRelativePos": 1.35,
-      "maxWaypointRelativePos": 1.4,
+      "minWaypointRelativePos": 1.4,
+      "maxWaypointRelativePos": 1.6500000000000001,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0
+        "maxAngularVelocity": 45.0,
+        "maxAngularAcceleration": 90.0
       }
     }
   ],
@@ -87,12 +87,12 @@
   "globalConstraints": {
     "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,

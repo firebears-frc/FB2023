@@ -107,12 +107,6 @@
         {
           "type": "named",
           "data": {
-            "name": "armHigh"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "place"
           }
         },
@@ -182,19 +176,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "armHigh"
+                        "name": "armMid"
                       }
                     }
                   ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "armHigh"
           }
         },
         {

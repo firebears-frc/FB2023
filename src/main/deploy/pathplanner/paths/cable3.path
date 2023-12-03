@@ -26,7 +26,7 @@
         "x": 2.5,
         "y": 0.75
       },
-      "isLocked": false
+      "isLocked": true
     },
     {
       "anchor": {
@@ -34,8 +34,8 @@
         "y": 1.0655022122391942
       },
       "prevControl": {
-        "x": 2.38,
-        "y": 1.0655022122391942
+        "x": 2.3629629131445338,
+        "y": 0.9360926896879337
       },
       "nextControl": null,
       "isLocked": true
@@ -50,13 +50,13 @@
   "constraintZones": [
     {
       "name": "Bump",
-      "minWaypointRelativePos": 0.55,
-      "maxWaypointRelativePos": 0.65,
+      "minWaypointRelativePos": 0.5,
+      "maxWaypointRelativePos": 0.7,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0
+        "maxAngularVelocity": 45.0,
+        "maxAngularAcceleration": 90.0
       }
     }
   ],
@@ -64,8 +64,8 @@
   "globalConstraints": {
     "maxVelocity": 4.5,
     "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0
   },
   "goalEndState": {
     "velocity": 3.0,
@@ -74,7 +74,7 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 15.0,
+    "rotation": 180.0,
     "velocity": 3.0
   }
 }

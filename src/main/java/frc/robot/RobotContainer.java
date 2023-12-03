@@ -68,6 +68,7 @@ public class RobotContainer {
                 "prepCone", Commands.sequence(intake.intakeCone(), intake.hold()),
                 "prepCube", Commands.sequence(intake.intakeCube(), intake.hold()),
                 "armHigh", arm.high(),
+                "armMid", arm.mid(),
                 "place", Commands.sequence(intake.eject(), Commands.waitSeconds(0.1), intake.stop()),
                 "armStow", Commands.sequence(Commands.waitSeconds(0.25), arm.stow()),
                 "groundCube", Commands.sequence(intake.intakeCube(), arm.groundCube()),
