@@ -1,0 +1,118 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.88,
+        "y": 1.07
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.38,
+        "y": 1.07
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 0.8
+      },
+      "prevControl": {
+        "x": 2.5,
+        "y": 0.8
+      },
+      "nextControl": {
+        "x": 3.5,
+        "y": 0.8
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 4.9,
+        "y": 0.8
+      },
+      "prevControl": {
+        "x": 4.4,
+        "y": 0.8
+      },
+      "nextControl": {
+        "x": 5.4,
+        "y": 0.8
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 6.5,
+        "y": 1.8
+      },
+      "prevControl": {
+        "x": 5.850480947161671,
+        "y": 1.4250000000000003
+      },
+      "nextControl": null,
+      "isLocked": false
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.05,
+      "rotationDegrees": -60.0
+    },
+    {
+      "waypointRelativePos": 1.9,
+      "rotationDegrees": -120.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Bump",
+      "minWaypointRelativePos": 1.35,
+      "maxWaypointRelativePos": 1.6,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 30.0,
+        "maxAngularAcceleration": 90.0
+      }
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "Stow",
+      "waypointRelativePos": 0.1,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "armStow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 360.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -150.0
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null
+}

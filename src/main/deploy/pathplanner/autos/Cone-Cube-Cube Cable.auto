@@ -1,0 +1,108 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.88,
+      "y": 0.5
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "prepCone"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "armHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "place"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "cable1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "groundCube"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "cable2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeHold"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "cable3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "place"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "cable4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "groundCube"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "cable5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeHold"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "cable6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "place"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null
+}
