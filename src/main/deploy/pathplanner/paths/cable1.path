@@ -1,0 +1,100 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.88,
+        "y": 0.5
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.38,
+        "y": 0.5
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 3.0,
+        "y": 0.75
+      },
+      "prevControl": {
+        "x": 2.5,
+        "y": 0.75
+      },
+      "nextControl": {
+        "x": 3.5,
+        "y": 0.75
+      },
+      "isLocked": true
+    },
+    {
+      "anchor": {
+        "x": 4.75,
+        "y": 0.75
+      },
+      "prevControl": {
+        "x": 4.25,
+        "y": 0.75
+      },
+      "nextControl": {
+        "x": 5.5,
+        "y": 0.75
+      },
+      "isLocked": false
+    },
+    {
+      "anchor": {
+        "x": 6.4,
+        "y": 0.92
+      },
+      "prevControl": {
+        "x": 5.65,
+        "y": 0.92
+      },
+      "nextControl": null,
+      "isLocked": true
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2,
+      "rotationDegrees": 0
+    },
+    {
+      "waypointRelativePos": 1.05,
+      "rotationDegrees": 15.0
+    },
+    {
+      "waypointRelativePos": 1.9,
+      "rotationDegrees": 15.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Bump",
+      "minWaypointRelativePos": 1.35,
+      "maxWaypointRelativePos": 1.4,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": null
+}

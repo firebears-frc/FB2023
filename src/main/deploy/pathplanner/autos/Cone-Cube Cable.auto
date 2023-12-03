@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "clean1"
+                  "pathName": "cable1"
                 }
               }
             ]
@@ -57,7 +57,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "clean2"
+            "pathName": "cable2"
           }
         },
         {
@@ -79,7 +79,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "clean3"
+                  "pathName": "cable3"
                 }
               }
             ]
