@@ -15,11 +15,14 @@ public class Chassis {
     public static final double ROBOT_LENGTH = Units.inchesToMeters(34);
     public static final double MAX_VELOCITY = 4.8; // meters per second
 
-    private static final class Constants {
-        // Wheels are offset 1.75" into the modules
-        public static final double TRACK_WIDTH = ROBOT_WIDTH - (Units.inchesToMeters(1.75) * 2);
-        public static final double WHEEL_BASE = ROBOT_LENGTH - (Units.inchesToMeters(1.75) * 2);
+    // Wheels are offset 1.75" into the modules
+    private static final double WHEEL_OFFSET = Units.inchesToMeters(1.75);
+    private static final double TRACK_WIDTH = ROBOT_WIDTH - (WHEEL_OFFSET * 2);
+    private static final double WHEEL_BASE = ROBOT_LENGTH - (WHEEL_OFFSET * 2);
 
+    public static final double WHEEL_RADIUS = Math.hypot(TRACK_WIDTH / 2, WHEEL_BASE / 2);
+
+    private static final class Constants {
         public static final SwerveModuleConfiguration MODULES[] = {
                 new SwerveModuleConfiguration(26, 27, -Math.PI / 2, new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
                         "Front Left"),
@@ -74,15 +77,20 @@ public class Chassis {
         return result;
     }
 
-    public void driveFieldRelative(ChassisSpeeds chassisSpeeds, Rotation2d yaw) {
-        drive(ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, yaw));
+    @AutoLogOutput(key = "Drive/Chassis/Speeds")
+    public ChassisSpeeds getSpeeds() {
+        return kinematics.toChassisSpeeds(getModuleStates());
     }
 
-    public void drive(ChassisSpeeds chassisSpeeds) {
+    public void driveFieldRelative(ChassisSpeeds chassisSpeeds, Rotation2d yaw) {
+        driveRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, yaw));
+    }
+
+    public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
         swerveDrive(kinematics.toSwerveModuleStates(chassisSpeeds));
     }
 
-    public void swerveDrive(SwerveModuleState states[]) {
+    private void swerveDrive(SwerveModuleState states[]) {
         if (states.length != Constants.MODULES.length)
             throw new IllegalStateException(
                     "Swerve module count error: " + states.length + ", " + Constants.MODULES.length);

@@ -7,17 +7,25 @@ import frc.robot.intake.IntakeBag;
 import frc.robot.intake.IntakeNeo550;
 import frc.robot.subsystems.Lights;
 
+import java.util.Map;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-    private static final  class Constants {
+    private static final class Constants {
         public static final int JOYSTICK_1_PORT = 0;
         public static final int JOYSTICK_2_PORT = 1;
         public static final int CONTROLLER_PORT = 2;
@@ -36,7 +44,7 @@ public class RobotContainer {
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
-    private final Autos autos;
+    private final LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
         drive = new Drive();
@@ -49,9 +57,22 @@ public class RobotContainer {
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);
         controller = new CommandXboxController(Constants.CONTROLLER_PORT);
 
-        autos = new Autos(drive, arm, intake);
+        configureAutoCommands();
+        autoChooser = new LoggedDashboardChooser<>("AutoChooser", AutoBuilder.buildAutoChooser());
 
         configureButtonBindings();
+    }
+
+    private void configureAutoCommands() {
+        NamedCommands.registerCommands(Map.of(
+                "prepCone", Commands.sequence(intake.intakeCone(), intake.hold()),
+                "prepCube", Commands.sequence(intake.intakeCube(), intake.hold()),
+                "armHigh", arm.high(),
+                "place", Commands.sequence(intake.eject(), Commands.waitSeconds(0.1), intake.stop()),
+                "armStow", Commands.sequence(Commands.waitSeconds(0.25), arm.stow()),
+                "groundCube", Commands.sequence(intake.intakeCube(), arm.groundCube()),
+                "intakeHold", intake.hold(),
+                "autoBalance", drive.autoBalance()));
     }
 
     private ChassisSpeeds getChassisSpeeds() {
@@ -102,6 +123,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autos.get();
+        return autoChooser.get();
     }
 }
