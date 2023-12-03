@@ -3,7 +3,7 @@
   "startingPose": {
     "position": {
       "x": 1.88,
-      "y": 3.3
+      "y": 4.518720621519229
     },
     "rotation": 0
   },
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "mobilityOver"
+                  "pathName": "balance1"
                 }
               }
             ]
@@ -51,7 +51,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "mobilityBalance"
+            "pathName": "balance2"
           }
         },
         {
