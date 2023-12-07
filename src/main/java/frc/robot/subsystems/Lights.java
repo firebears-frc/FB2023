@@ -16,7 +16,7 @@ public class Lights extends SubsystemBase {
     private final Supplier<ChargeStationStatus> chargeStationStatusSupplier;
     private final ParallelBus communication;
 
-    @AutoLogOutput(key = "Lights/Status")
+    //@AutoLogOutput(key = "Lights/Status")
     private Status status;
 
     public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier, Supplier<ChargeStationStatus> chargeStationStatusSupplier) {

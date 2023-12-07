@@ -20,7 +20,7 @@ public class Localization {
     }
 
     private final SwerveDrivePoseEstimator poseEstimator;
-    private final Vision vision;
+    //private final Vision vision;
 
     private AHRS navX;
 
@@ -34,7 +34,7 @@ public class Localization {
             DriverStation.reportError(ex.getMessage(), true);
             navX = null;
             poseEstimator = null;
-            vision = new Vision(null); // initialize driver vision
+            //vision = new Vision(null); // initialize driver vision
             return;
         }
 
@@ -43,7 +43,7 @@ public class Localization {
                 getRawYaw(),
                 initiaModulePositions,
                 new Pose2d());
-        vision = new Vision(this::visionPose);
+        //vision = new Vision(this::visionPose);
 
         pitch = Rotation2d.fromDegrees(0.0);
         pitchVelocity = Rotation2d.fromDegrees(0.0);
@@ -83,7 +83,7 @@ public class Localization {
             return;
 
         poseEstimator.update(getRawYaw(), modulePositions);
-        vision.periodic();
+        //vision.periodic();
 
         // Update pitch velocity and charge station status
         Rotation2d currentPitch = Rotation2d.fromDegrees(navX.getPitch());

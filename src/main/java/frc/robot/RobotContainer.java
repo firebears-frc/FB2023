@@ -38,9 +38,9 @@ public class RobotContainer {
     private final Drive drive;
     private final Arm arm;
     private final Intake intake;
-    private final Lights lights;
+    //private final Lights lights;
 
-    private final PowerDistribution pdh;
+    //private final PowerDistribution pdh;
     private final CommandJoystick one;
     private final CommandJoystick two;
     private final CommandXboxController controller;
@@ -50,8 +50,8 @@ public class RobotContainer {
         drive = new Drive();
         arm = new Arm();
         intake = new IntakeBag(); // new IntakeNeo550();
-        lights = new Lights(intake::getHeldItem, intake::getWantedItem, drive::chargeStationStatus);
-        pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
+        //lights = new Lights(intake::getHeldItem, intake::getWantedItem, drive::chargeStationStatus);
+        //pdh = new PowerDistribution(Constants.PDH_CAN_ID, ModuleType.kRev);
 
         one = new CommandJoystick(Constants.JOYSTICK_1_PORT);
         two = new CommandJoystick(Constants.JOYSTICK_2_PORT);

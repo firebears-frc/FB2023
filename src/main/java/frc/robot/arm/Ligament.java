@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Ligament {
     protected String name;
-    protected Rotation2d setpoint;
-    protected Rotation2d position;
+    protected Rotation2d setpoint = new Rotation2d();
+    protected Rotation2d position = new Rotation2d();
 
     public void setAngle(Rotation2d angle) {
         setpoint = angle;

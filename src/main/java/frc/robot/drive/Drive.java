@@ -72,7 +72,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Command turtle() {
-        return startEnd(chassis::setX, null);
+        return startEnd(chassis::setX, () -> {});
     }
 
     public Command defaultCommand(Supplier<ChassisSpeeds> commandSupplier, boolean slowMode) {
@@ -102,7 +102,7 @@ public class Drive extends SubsystemBase {
                 }).until(() -> localization.isNotPitching() && localization.isLevel()));
     }
 
-    @AutoLogOutput(key = "Drive/ChargeStationStatus")
+    //@AutoLogOutput(key = "Drive/ChargeStationStatus")
     public ChargeStationStatus chargeStationStatus() {
         return chargeStationStatus;
     }

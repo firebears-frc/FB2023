@@ -18,13 +18,13 @@ public class Intake extends SubsystemBase {
         STOP
     }
 
-    @AutoLogOutput(key = "Intake/State")
+    //@AutoLogOutput(key = "Intake/State")
     protected IntakeState state = IntakeState.STOP;
-    @AutoLogOutput(key = "Intake/ItemHeld")
+    //@AutoLogOutput(key = "Intake/ItemHeld")
     protected GamePiece itemHeld = GamePiece.NONE;
-    @AutoLogOutput(key = "Intake/LastItemHeld")
+    //@AutoLogOutput(key = "Intake/LastItemHeld")
     protected GamePiece lastItemHeld = GamePiece.NONE;
-    @AutoLogOutput(key = "Intake/ItemWanted")
+    //@AutoLogOutput(key = "Intake/ItemWanted")
     protected GamePiece itemWanted = GamePiece.NONE;
 
     public Command intakeCone() {
