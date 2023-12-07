@@ -55,7 +55,7 @@ public class Elbow extends Ligament {
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        //motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
 
         name = "Elbow";

@@ -55,7 +55,7 @@ public class IntakeNeo550 extends Intake {
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        //motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
+        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
         motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
     }
 

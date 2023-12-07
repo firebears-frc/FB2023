@@ -132,14 +132,14 @@ public class SwerveModule {
         drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
         drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
         drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        //drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
+        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
         drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
         turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
         turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
         turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
         turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
         turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        //turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
         turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
     }
 
