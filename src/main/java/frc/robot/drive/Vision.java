@@ -37,9 +37,9 @@ public class Vision {
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> consumer;
 
-    @AutoLogOutput(key = "Drive/Localization/Vision/Status")
+    //@AutoLogOutput(key = "Drive/Localization/Vision/Status")
     private Status status;
-    @AutoLogOutput(key = "Drive/Localization/Vision/Result")
+    //@AutoLogOutput(key = "Drive/Localization/Vision/Result")
     private EstimatedRobotPose lastResult;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) {
