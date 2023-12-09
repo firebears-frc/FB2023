@@ -153,6 +153,7 @@ public class SwerveModule {
         desiredState = state;
     }
 
+    //@AutoLogOutput(key = "Drive/Modules/{name}/Position")
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
