@@ -1,6 +1,7 @@
 package frc.robot.drive;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -78,7 +79,7 @@ public class SwerveModule {
     private final double angleOffset;
     private final String name;
 
-    //@AutoLogOutput(key = "Drive/Modules/{name}/Target")
+    // @AutoLogOutput(key = "Drive/Modules/{name}/Target") TODO wpilib
     private SwerveModuleState desiredState;
 
     public SwerveModule(SwerveModuleConfiguration configuration) {
@@ -153,17 +154,24 @@ public class SwerveModule {
         desiredState = state;
     }
 
-    //@AutoLogOutput(key = "Drive/Modules/{name}/Position")
+    // @AutoLogOutput(key = "Drive/Modules/{name}/Position") TODO wpilib
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
     }
 
-    //@AutoLogOutput(key = "Drive/Modules/{name}/Actual")
+    // @AutoLogOutput(key = "Drive/Modules/{name}/Actual") TODO wpilib
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 drivingEncoder.getVelocity(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
+    }
+
+    // TODO wpilib
+    void periodic() {
+        Logger.recordOutput("Drive/Modules/{name}/Position", getPosition());
+        Logger.recordOutput("Drive/Modules/{name}/Actual", getState());
+        Logger.recordOutput("Drive/Modules/{name}/Target", desiredState);
     }
 }

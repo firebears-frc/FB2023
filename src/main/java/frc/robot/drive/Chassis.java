@@ -1,6 +1,7 @@
 package frc.robot.drive;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -57,7 +58,7 @@ public class Chassis {
         return kinematics;
     }
 
-    //@AutoLogOutput(key = "Drive/Chassis/ModulePositions")
+    // @AutoLogOutput(key = "Drive/Chassis/ModulePositions") TODO wpilib
     public SwerveModulePosition[] getModulePositions() {
         // Build up position array
         SwerveModulePosition result[] = new SwerveModulePosition[modules.length];
@@ -67,7 +68,7 @@ public class Chassis {
         return result;
     }
 
-    //@AutoLogOutput(key = "Drive/Chassis/ModuleStates")
+    // @AutoLogOutput(key = "Drive/Chassis/ModuleStates") TODO wpilib
     public SwerveModuleState[] getModuleStates() {
         // Build up state array
         SwerveModuleState result[] = new SwerveModuleState[modules.length];
@@ -77,7 +78,7 @@ public class Chassis {
         return result;
     }
 
-    //@AutoLogOutput(key = "Drive/Chassis/Speeds")
+    // @AutoLogOutput(key = "Drive/Chassis/Speeds") TODO wpilib
     public ChassisSpeeds getSpeeds() {
         return kinematics.toChassisSpeeds(getModuleStates());
     }
@@ -108,5 +109,15 @@ public class Chassis {
             states[i] = new SwerveModuleState(0, Constants.MODULES[i].positionOffset.getAngle());
         }
         swerveDrive(states);
+    }
+
+    // TODO wpilib
+    public void periodic() {
+        Logger.recordOutput("Drive/Chassis/ModulePositions", getModulePositions());
+        Logger.recordOutput("Drive/Chassis/ModuleStates", getModuleStates());
+        Logger.recordOutput("Drive/Chassis/Speeds", getSpeeds());
+        for (SwerveModule module : modules) {
+            module.periodic();
+        }
     }
 }

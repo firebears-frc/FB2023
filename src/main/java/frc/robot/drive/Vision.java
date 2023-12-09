@@ -36,7 +36,7 @@ public class Vision {
     private final PhotonPoseEstimator poseEstimator;
     private final BiConsumer<Pose2d, Double> consumer;
 
-    // @AutoLogOutput(key = "Drive/Localization/Vision/Status")
+    // @AutoLogOutput(key = "Drive/Localization/Vision/Status") TODO enum
     private Status status;
 
     public Vision(BiConsumer<Pose2d, Double> consumer) {
@@ -109,6 +109,6 @@ public class Vision {
 
     public void periodic() {
         status = getPhotonUpdate();
-        Logger.recordMetadata("Drive/Localization/Vision/Status", status.name()); // TODO
+        Logger.recordOutput("Drive/Localization/Vision/Status", status.name()); // TODO enum
     }
 }

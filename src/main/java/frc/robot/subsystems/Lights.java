@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,10 +17,11 @@ public class Lights extends SubsystemBase {
     private final Supplier<ChargeStationStatus> chargeStationStatusSupplier;
     private final ParallelBus communication;
 
-    //@AutoLogOutput(key = "Lights/Status")
+    // @AutoLogOutput(key = "Lights/Status") TODO enum
     private Status status;
 
-    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier, Supplier<ChargeStationStatus> chargeStationStatusSupplier) {
+    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier,
+            Supplier<ChargeStationStatus> chargeStationStatusSupplier) {
         this.itemHeldSupplier = itemHeldSupplier;
         this.itemWantedSupplier = itemWantedSupplier;
         this.chargeStationStatusSupplier = chargeStationStatusSupplier;
@@ -148,6 +150,7 @@ public class Lights extends SubsystemBase {
     @Override
     public void periodic() {
         status = getStatus();
+        Logger.recordOutput("Lights/Status", status.name()); // TODO enum
         communication.set(status.ordinal());
     }
 

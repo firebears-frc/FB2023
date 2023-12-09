@@ -3,6 +3,7 @@ package frc.robot.drive;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -25,11 +26,11 @@ public class Drive extends SubsystemBase {
         public static final double R_CONTROLLER_P = 5.0;
 
         public static final HolonomicPathFollowerConfig CONFIG = new HolonomicPathFollowerConfig(
-            new PIDConstants(XY_CONTROLLER_P, 0.0, 0.0),
-            new PIDConstants(R_CONTROLLER_P, 0.0, 0.0),
-            MAX_AUTO_VELOCITY,
-            Chassis.WHEEL_RADIUS,
-            new ReplanningConfig());
+                new PIDConstants(XY_CONTROLLER_P, 0.0, 0.0),
+                new PIDConstants(R_CONTROLLER_P, 0.0, 0.0),
+                MAX_AUTO_VELOCITY,
+                Chassis.WHEEL_RADIUS,
+                new ReplanningConfig());
 
         public static final double BALANCE_ON_CHARGE_STATION_SPEED = 0.5; // meters per second
         public static final double DRIVE_ONTO_CHARGE_STATION_SPEED = 2.0; // meters per second
@@ -45,12 +46,12 @@ public class Drive extends SubsystemBase {
         localization = new Localization(chassis.getKinematics(), chassis.getModulePositions());
 
         AutoBuilder.configureHolonomic(
-            localization::getPose,
-            this::setPose,
-            chassis::getSpeeds,
-            chassis::driveRobotRelative,
-            Constants.CONFIG,
-            this);
+                localization::getPose,
+                this::setPose,
+                chassis::getSpeeds,
+                chassis::driveRobotRelative,
+                Constants.CONFIG,
+                this);
     }
 
     private void setPose(Pose2d pose) {
@@ -61,6 +62,8 @@ public class Drive extends SubsystemBase {
     public void periodic() {
         localization.periodic(chassis.getModulePositions());
         updateChargeStationStatus();
+        chassis.periodic(); // TODO wpilib
+        Logger.recordOutput("Drive/ChargeStationStatus", chargeStationStatus().name()); // TODO enum
     }
 
     public Command zeroHeading() {
@@ -72,7 +75,8 @@ public class Drive extends SubsystemBase {
     }
 
     public Command turtle() {
-        return startEnd(chassis::setX, () -> {});
+        return startEnd(chassis::setX, () -> {
+        });
     }
 
     public Command defaultCommand(Supplier<ChassisSpeeds> commandSupplier, boolean slowMode) {
@@ -83,7 +87,8 @@ public class Drive extends SubsystemBase {
     public Command autoBalance() {
         return Commands.sequence(
                 // Drive until we are at a high enough angle
-                runOnce(() -> chassis.driveRobotRelative(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0.0, 0.0))),
+                runOnce(() -> chassis
+                        .driveRobotRelative(new ChassisSpeeds(Constants.DRIVE_ONTO_CHARGE_STATION_SPEED, 0.0, 0.0))),
                 Commands.waitUntil(localization::isOnChargeStation),
 
                 // Rock back and forth until it stops and is level
@@ -102,7 +107,7 @@ public class Drive extends SubsystemBase {
                 }).until(() -> localization.isNotPitching() && localization.isLevel()));
     }
 
-    //@AutoLogOutput(key = "Drive/ChargeStationStatus")
+    // @AutoLogOutput(key = "Drive/ChargeStationStatus") TODO enum
     public ChargeStationStatus chargeStationStatus() {
         return chargeStationStatus;
     }
