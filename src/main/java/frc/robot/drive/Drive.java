@@ -62,8 +62,6 @@ public class Drive extends SubsystemBase {
     public void periodic() {
         localization.periodic(chassis.getModulePositions());
         updateChargeStationStatus();
-        chassis.periodic(); // TODO wpilib
-        Logger.recordOutput("Drive/ChargeStationStatus", chargeStationStatus().name()); // TODO enum
     }
 
     public Command zeroHeading() {
@@ -107,7 +105,7 @@ public class Drive extends SubsystemBase {
                 }).until(() -> localization.isNotPitching() && localization.isLevel()));
     }
 
-    // @AutoLogOutput(key = "Drive/ChargeStationStatus") TODO enum
+    @AutoLogOutput(key = "Drive/ChargeStationStatus")
     public ChargeStationStatus chargeStationStatus() {
         return chargeStationStatus;
     }

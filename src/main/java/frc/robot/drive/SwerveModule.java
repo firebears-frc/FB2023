@@ -79,7 +79,7 @@ public class SwerveModule {
     private final double angleOffset;
     private final String name;
 
-    // @AutoLogOutput(key = "Drive/Modules/{name}/Target") TODO wpilib
+    @AutoLogOutput(key = "Drive/Modules/{name}/Target")
     private SwerveModuleState desiredState;
 
     public SwerveModule(SwerveModuleConfiguration configuration) {
@@ -154,24 +154,17 @@ public class SwerveModule {
         desiredState = state;
     }
 
-    // @AutoLogOutput(key = "Drive/Modules/{name}/Position") TODO wpilib
+    @AutoLogOutput(key = "Drive/Modules/{name}/Position")
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
     }
 
-    // @AutoLogOutput(key = "Drive/Modules/{name}/Actual") TODO wpilib
+    @AutoLogOutput(key = "Drive/Modules/{name}/Actual")
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 drivingEncoder.getVelocity(),
                 new Rotation2d(turningEncoder.getPosition() - angleOffset));
-    }
-
-    // TODO wpilib
-    void periodic() {
-        Logger.recordOutput("Drive/Modules/{name}/Position", getPosition());
-        Logger.recordOutput("Drive/Modules/{name}/Actual", getState());
-        Logger.recordOutput("Drive/Modules/{name}/Target", desiredState);
     }
 }

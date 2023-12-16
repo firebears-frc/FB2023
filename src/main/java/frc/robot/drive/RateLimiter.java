@@ -64,7 +64,7 @@ public class RateLimiter {
 
     public ChassisSpeeds calculate(ChassisSpeeds command) {
         // Convert XY to polar for rate limiting
-        Logger.recordOutput("Drive/RateLimiter/Input", command); // TODO wpilib
+        Logger.recordOutput("Drive/RateLimiter/Input", command);
         double inputDirection = Math.atan2(command.vyMetersPerSecond, command.vxMetersPerSecond);
         double inputMagnitude = Math
                 .sqrt(Math.pow(command.vxMetersPerSecond, 2) + Math.pow(command.vyMetersPerSecond, 2));
@@ -103,7 +103,7 @@ public class RateLimiter {
         command.vyMetersPerSecond = currentMagnitude * Math.sin(currentDirection);
         command.omegaRadiansPerSecond = rotationLimiter.calculate(command.omegaRadiansPerSecond);
 
-        Logger.recordOutput("Drive/RateLimiter/Output", command); // TODO wpilib
+        Logger.recordOutput("Drive/RateLimiter/Output", command);
         return command;
     }
 }

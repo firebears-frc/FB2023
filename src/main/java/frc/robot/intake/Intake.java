@@ -1,7 +1,6 @@
 package frc.robot.intake;
 
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,23 +18,14 @@ public class Intake extends SubsystemBase {
         STOP
     }
 
-    // @AutoLogOutput(key = "Intake/State") TODO enum
+    @AutoLogOutput(key = "Intake/State")
     protected IntakeState state = IntakeState.STOP;
-    // @AutoLogOutput(key = "Intake/ItemHeld") TODO enum
+    @AutoLogOutput(key = "Intake/ItemHeld")
     protected GamePiece itemHeld = GamePiece.NONE;
-    // @AutoLogOutput(key = "Intake/LastItemHeld") TODO enum
+    @AutoLogOutput(key = "Intake/LastItemHeld")
     protected GamePiece lastItemHeld = GamePiece.NONE;
-    // @AutoLogOutput(key = "Intake/ItemWanted") TODO enum
+    @AutoLogOutput(key = "Intake/ItemWanted")
     protected GamePiece itemWanted = GamePiece.NONE;
-
-    // TODO enum
-    @Override
-    public void periodic() {
-        Logger.recordOutput("Intake/State", state);
-        Logger.recordOutput("Intake/ItemHeld", itemHeld);
-        Logger.recordOutput("Intake/LastItemHeld", lastItemHeld);
-        Logger.recordOutput("Intake/ItemWanted", itemWanted);
-    }
 
     public Command intakeCone() {
         return runOnce(() -> {
