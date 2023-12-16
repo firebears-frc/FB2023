@@ -19,7 +19,8 @@ public class Lights extends SubsystemBase {
     @AutoLogOutput(key = "Lights/Status")
     private Status status;
 
-    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier, Supplier<ChargeStationStatus> chargeStationStatusSupplier) {
+    public Lights(Supplier<GamePiece> itemHeldSupplier, Supplier<GamePiece> itemWantedSupplier,
+            Supplier<ChargeStationStatus> chargeStationStatusSupplier) {
         this.itemHeldSupplier = itemHeldSupplier;
         this.itemWantedSupplier = itemWantedSupplier;
         this.chargeStationStatusSupplier = chargeStationStatusSupplier;

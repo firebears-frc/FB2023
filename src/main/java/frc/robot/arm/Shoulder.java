@@ -13,8 +13,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Shoulder extends Ligament {
     private static final class Constants {
-        public static final int RIGHT_CAN_ID = 12;
-        public static final int LEFT_CAN_ID = 13;
+        public static final int RIGHT_CAN_ID = 8;
+        public static final int LEFT_CAN_ID = 9;
 
         public static final int STALL_CURRENT_LIMIT = 30;
         public static final int FREE_CURRENT_LIMIT = 20;
