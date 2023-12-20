@@ -26,4 +26,12 @@ public interface CurrentLimitConfiguration {
             }
         };
     }
+
+    public static CurrentLimitConfiguration neo() {
+        return complex(40, 20, 10, 60.0);
+    }
+
+    public static CurrentLimitConfiguration neo550() {
+        return complex(20, 10, 10, 30.0);
+    }
 }

@@ -19,7 +19,7 @@ public class IntakeNeo550 extends Intake {
         public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
-                CurrentLimitConfiguration.complex(20, 20, 10, 25.0),
+                CurrentLimitConfiguration.complex(20, 10, 10, 25.0),
                 StatusFrameConfiguration.normal(),
                 ClosedLoopConfiguration.simple(3.0, 0.0, 0.0, 0.0));
 

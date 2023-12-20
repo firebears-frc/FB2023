@@ -15,7 +15,7 @@ public class IntakeBag extends Intake {
         public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
-                CurrentLimitConfiguration.complex(10, 10, 10, 20.0),
+                CurrentLimitConfiguration.complex(10, 5, 10, 20.0),
                 StatusFrameConfiguration.normal());
 
         public static final double INTAKE_SPEED = 0.7;
