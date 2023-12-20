@@ -29,7 +29,20 @@ public class Util {
         DriverStation.reportWarning("Failed to set parameter '" + name + "'", true);
     }
 
-    static <T> void configure(Function<T, REVLibError> setter, Supplier<T> getter, T setting, String name) {
+    static <T> void configureAndVerify(Consumer<T> setter, Supplier<T> getter, T setting, String name) {
+        for (int i = 0; i < Constants.MAXIMUM_RETRIES; i++) {
+            // Apply setting
+            setter.accept(setting);
+            // Check if the setting stuck
+            if (getter.get() == setting)
+                return; // If it stuck, exit
+            // Otherwise, try again
+        }
+        // We've hit max retries
+        DriverStation.reportWarning("Failed to set parameter '" + name + "'", true);
+    }
+
+    static <T> void configureCheckAndVerify(Function<T, REVLibError> setter, Supplier<T> getter, T setting, String name) {
         for (int i = 0; i < Constants.MAXIMUM_RETRIES; i++) {
             // Apply setting and check if the library returned OK status
             if (setter.apply(setting) == REVLibError.kOk) {
@@ -38,19 +51,6 @@ public class Util {
                     return; // If it applied ok and stuck, exit
                 }
             }
-            // Otherwise, try again
-        }
-        // We've hit max retries
-        DriverStation.reportWarning("Failed to set parameter '" + name + "'", true);
-    }
-
-    static <T> void configure(Consumer<T> setter, Supplier<T> getter, T setting, String name) {
-        for (int i = 0; i < Constants.MAXIMUM_RETRIES; i++) {
-            // Apply setting
-            setter.accept(setting);
-            // Check if the setting stuck
-            if (getter.get() == setting)
-                return; // If it stuck, exit
             // Otherwise, try again
         }
         // We've hit max retries

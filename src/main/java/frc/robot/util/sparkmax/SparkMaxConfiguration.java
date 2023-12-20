@@ -8,7 +8,6 @@ public class SparkMaxConfiguration {
     private final IdleMode idleMode;
     private final CurrentLimitConfiguration currentLimits;
     private final StatusFrameConfiguration statusFrames;
-    // TODO: PID, encoder, etc
 
     public SparkMaxConfiguration(boolean inverted, IdleMode idleMode, CurrentLimitConfiguration currentLimits, StatusFrameConfiguration statusFrames) {
         this.inverted = inverted;
@@ -19,8 +18,8 @@ public class SparkMaxConfiguration {
 
     public void apply(CANSparkMax motor) {
         Util.configure(motor::restoreFactoryDefaults, false, "restoreFactoryDefaults");
-        Util.configure(motor::setInverted, motor::getInverted, inverted, "inverted");
-        Util.configure(motor::setIdleMode, motor::getIdleMode, idleMode, "idleMode");
+        Util.configureAndVerify(motor::setInverted, motor::getInverted, inverted, "inverted");
+        Util.configureCheckAndVerify(motor::setIdleMode, motor::getIdleMode, idleMode, "idleMode");
         currentLimits.apply(motor);
         statusFrames.apply(motor);
         Util.burnFlash(motor);
