@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 public interface StatusFrameConfiguration {
+    // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
     void apply(CANSparkMax motor);
 
     public static StatusFrameConfiguration normal() {
@@ -24,6 +25,17 @@ public interface StatusFrameConfiguration {
             @Override
             public void apply(CANSparkMax motor) {
                 StatusFrameConfiguration.apply(motor, ABSOLUTE_ENCODER_CONFIGURATION);
+            }
+        };
+    }
+
+    public static StatusFrameConfiguration leadingAbsoluteEncoder() {
+        return new StatusFrameConfiguration() {
+            private static final int[] LEADING_ABSOLUTE_ENCODER_CONFIGURATION = { 1, 20, 20, 1000, 1000, 20, 1000 };
+
+            @Override
+            public void apply(CANSparkMax motor) {
+                StatusFrameConfiguration.apply(motor, LEADING_ABSOLUTE_ENCODER_CONFIGURATION);
             }
         };
     }

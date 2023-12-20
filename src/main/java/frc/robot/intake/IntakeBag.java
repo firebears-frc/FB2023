@@ -5,13 +5,18 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+
+import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
+import frc.robot.util.sparkmax.SparkMaxConfiguration;
+import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
 public class IntakeBag extends Intake {
     public static final class Constants {
-        public static final int STALL_CURRENT_LIMIT = 10;
-        public static final int FREE_CURRENT_LIMIT = 10;
-        public static final double SECONDARY_CURRENT_LIMIT = 20.0;
+        public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+                false,
+                IdleMode.kBrake,
+                new ComplexCurrentLimitConfiguration(10, 10, 10, 20.0),
+                StatusFrameConfiguration.normal());
 
         public static final double INTAKE_SPEED = 0.7;
         public static final double HOLD_SPEED = 0.3;
@@ -24,22 +29,7 @@ public class IntakeBag extends Intake {
 
     public IntakeBag() {
         motor = new CANSparkMax(Intake.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
-        motor.restoreFactoryDefaults();
-        motor.setInverted(false);
-        motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        motor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-
-        motor.burnFlash();
-
-        // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
+        Constants.CONFIG.apply(motor);
 
         speed = 0;
     }

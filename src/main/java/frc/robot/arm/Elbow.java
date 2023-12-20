@@ -6,7 +6,6 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +17,7 @@ public class Elbow extends Ligament {
     private static final class Constants {
         public static final int PORT = 7;
 
-        public static SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+        public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
             true,
             IdleMode.kBrake,
             new ComplexCurrentLimitConfiguration(40, 20, 10, 45.0),

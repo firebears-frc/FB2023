@@ -8,12 +8,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
+import frc.robot.util.sparkmax.SparkMaxConfiguration;
+import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
 public class SwerveModule {
     private static final class Constants {
@@ -37,11 +39,11 @@ public class SwerveModule {
             public static final double MIN = -1.0;
             public static final double MAX = 1.0;
 
-            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
-
-            public static final int STALL_CURRENT_LIMIT = 50;
-            public static final int FREE_CURRENT_LIMIT = 20;
-            public static final double SECONDARY_CURRENT_LIMIT = 60.0;
+            public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+                false,
+                IdleMode.kBrake,
+                new ComplexCurrentLimitConfiguration(50, 20, 10, 60.0),
+                StatusFrameConfiguration.normal());
         }
 
         private static class Turning {
@@ -59,11 +61,11 @@ public class SwerveModule {
             public static final double MIN = -1.0;
             public static final double MAX = 1.0;
 
-            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
-
-            public static final int STALL_CURRENT_LIMIT = 20;
-            public static final int FREE_CURRENT_LIMIT = 10;
-            public static final double SECONDARY_CURRENT_LIMIT = 30.0;
+            public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+                false,
+                IdleMode.kBrake,
+                new ComplexCurrentLimitConfiguration(20, 10, 10, 30.0),
+                StatusFrameConfiguration.absoluteEncoder());
         }
     }
 
@@ -83,10 +85,7 @@ public class SwerveModule {
 
     public SwerveModule(SwerveModuleConfiguration configuration) {
         drivingMotor = new CANSparkMax(configuration.drivingID, MotorType.kBrushless);
-        drivingMotor.restoreFactoryDefaults();
-        drivingMotor.setIdleMode(Constants.Driving.IDLE_MODE);
-        drivingMotor.setSmartCurrentLimit(Constants.Driving.STALL_CURRENT_LIMIT, Constants.Driving.FREE_CURRENT_LIMIT);
-        drivingMotor.setSecondaryCurrentLimit(Constants.Driving.SECONDARY_CURRENT_LIMIT);
+        Constants.Driving.CONFIG.apply(drivingMotor);
         drivingEncoder = drivingMotor.getEncoder();
         drivingEncoder.setPositionConversionFactor(Constants.Driving.POSITION_FACTOR);
         drivingEncoder.setVelocityConversionFactor(Constants.Driving.VELOCITY_FACTOR);
@@ -100,10 +99,7 @@ public class SwerveModule {
         drivingController.setOutputRange(Constants.Driving.MIN, Constants.Driving.MAX);
 
         turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
-        turningMotor.restoreFactoryDefaults();
-        turningMotor.setIdleMode(Constants.Turning.IDLE_MODE);
-        turningMotor.setSmartCurrentLimit(Constants.Turning.STALL_CURRENT_LIMIT, Constants.Turning.FREE_CURRENT_LIMIT);
-        turningMotor.setSecondaryCurrentLimit(Constants.Turning.SECONDARY_CURRENT_LIMIT);
+        Constants.Turning.CONFIG.apply(turningMotor);
         turningEncoder = turningMotor.getAbsoluteEncoder(Type.kDutyCycle);
         turningEncoder.setPositionConversionFactor(Constants.Turning.POSITION_FACTOR);
         turningEncoder.setVelocityConversionFactor(Constants.Turning.VELOCITY_FACTOR);
@@ -122,25 +118,6 @@ public class SwerveModule {
         angleOffset = configuration.angleOffset;
         name = configuration.name;
         desiredState = new SwerveModuleState(0.0, new Rotation2d(turningEncoder.getPosition()));
-
-        drivingMotor.burnFlash();
-        turningMotor.burnFlash();
-
-        // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
-        drivingMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-        turningMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
     }
 
     public void setDesiredState(SwerveModuleState state) {
