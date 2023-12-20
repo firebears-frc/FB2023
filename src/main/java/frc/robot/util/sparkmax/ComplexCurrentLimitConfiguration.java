@@ -2,21 +2,20 @@ package frc.robot.util.sparkmax;
 
 import com.revrobotics.CANSparkMax;
 
-public class ComplexCurrentLimitConfiguration {
-    private final int smartLimitMin, smartLimitMax, smartLimitCutoff;
+public class ComplexCurrentLimitConfiguration implements CurrentLimitConfiguration {
+    private final int stallLimit, freeLimit, rpmCutoff;
     private final double secondaryLimit;
 
-    public ComplexCurrentLimitConfiguration(int smartLimitMin, int smartLimitMax, int smartLimitCutoff,
-            double secondaryLimit) {
-        this.smartLimitMin = smartLimitMin;
-        this.smartLimitMax = smartLimitMax;
-        this.smartLimitCutoff = smartLimitCutoff;
+    public ComplexCurrentLimitConfiguration(int stallLimit, int freeLimit, int rpmCutoff, double secondaryLimit) {
+        this.stallLimit = stallLimit;
+        this.freeLimit = freeLimit;
+        this.rpmCutoff = rpmCutoff;
         this.secondaryLimit = secondaryLimit;
     }
 
-    void apply(CANSparkMax motor) {
-        Util.configure(config -> motor.setSmartCurrentLimit(config.smartLimitMin, config.smartLimitMax,
-                config.smartLimitCutoff), this, "smartCurrentLimit");
+    public void apply(CANSparkMax motor) {
+        Util.configure(config -> motor.setSmartCurrentLimit(config.stallLimit, config.freeLimit, config.rpmCutoff),
+                this, "smartCurrentLimit");
         Util.configure(motor::setSecondaryCurrentLimit, secondaryLimit, "secondaryCurrentLimit");
     }
 }

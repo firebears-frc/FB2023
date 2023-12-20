@@ -10,14 +10,20 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
+import frc.robot.util.sparkmax.SparkMaxConfiguration;
+import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
 public class Elbow extends Ligament {
     private static final class Constants {
         public static final int PORT = 7;
 
-        public static final int STALL_CURRENT_LIMIT = 40;
-        public static final int FREE_CURRENT_LIMIT = 20;
-        public static final double SECONDARY_CURRENT_LIMIT = 45.0;
+        public static SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+            true,
+            IdleMode.kBrake,
+            new ComplexCurrentLimitConfiguration(40, 20, 10, 45.0),
+            StatusFrameConfiguration.absoluteEncoder()
+        );
 
         public static final double P = 0.01;
         public static final double I = 0.0;
@@ -30,13 +36,9 @@ public class Elbow extends Ligament {
 
     public Elbow() {
         motor = new CANSparkMax(Constants.PORT, MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
-        motor.setInverted(true);
-        motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        motor.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
+        Constants.CONFIG.apply(motor);
         encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
-        encoder.setPositionConversionFactor(360); // degrees\
+        encoder.setPositionConversionFactor(360); // degrees
         encoder.setInverted(true);
         pid = motor.getPIDController();
         pid.setFeedbackDevice(encoder);
@@ -48,15 +50,6 @@ public class Elbow extends Ligament {
         pid.setD(Constants.D, 0);
 
         motor.burnFlash();
-
-        // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-        motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
 
         name = "Elbow";
     }
