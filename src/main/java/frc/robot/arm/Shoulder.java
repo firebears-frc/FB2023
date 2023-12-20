@@ -6,23 +6,34 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.util.sparkmax.ClosedLoopConfiguration;
+import frc.robot.util.sparkmax.CurrentLimitConfiguration;
+import frc.robot.util.sparkmax.FeedbackConfiguration;
+import frc.robot.util.sparkmax.FollowingConfiguration;
+import frc.robot.util.sparkmax.SparkMaxConfiguration;
+import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
 public class Shoulder extends Ligament {
     private static final class Constants {
         public static final int RIGHT_CAN_ID = 8;
         public static final int LEFT_CAN_ID = 9;
 
-        public static final int STALL_CURRENT_LIMIT = 30;
-        public static final int FREE_CURRENT_LIMIT = 20;
-        public static final double SECONDARY_CURRENT_LIMIT = 35.0;
-
-        public static final double P = 0.0175;
-        public static final double I = 0.0;
-        public static final double D = 0.005;
+        public static final SparkMaxConfiguration CONFIG_RIGHT = new SparkMaxConfiguration(
+                true,
+                IdleMode.kBrake,
+                CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
+                StatusFrameConfiguration.leadingAbsoluteEncoder(),
+                ClosedLoopConfiguration.wrapping(0.0175, 0.0, 0.005, 0.0, 0, 360),
+                FeedbackConfiguration.absoluteEncoder(true, 360));
+        public static final SparkMaxConfiguration CONFIG_LEFT = new SparkMaxConfiguration(
+                false,
+                IdleMode.kBrake,
+                CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
+                StatusFrameConfiguration.normal(),
+                FollowingConfiguration.sparkMax(RIGHT_CAN_ID, true));
     }
 
     private final CANSparkMax motorRight;
@@ -32,49 +43,12 @@ public class Shoulder extends Ligament {
 
     public Shoulder() {
         motorRight = new CANSparkMax(Constants.RIGHT_CAN_ID, MotorType.kBrushless);
-        motorRight.restoreFactoryDefaults();
-        motorRight.setInverted(true);
-        motorRight.setIdleMode(IdleMode.kBrake);
-        motorRight.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        motorRight.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-        encoder = motorRight.getAbsoluteEncoder(Type.kDutyCycle);
-        encoder.setPositionConversionFactor(360); // degrees
-        encoder.setInverted(true);
-        pid = motorRight.getPIDController();
-        pid.setFeedbackDevice(encoder);
-        pid.setPositionPIDWrappingEnabled(true);
-        pid.setPositionPIDWrappingMinInput(0);
-        pid.setPositionPIDWrappingMaxInput(360);
-        pid.setP(Constants.P, 0);
-        pid.setI(Constants.I, 0);
-        pid.setD(Constants.D, 0);
-
         motorLeft = new CANSparkMax(Constants.LEFT_CAN_ID, MotorType.kBrushless);
-        motorLeft.restoreFactoryDefaults();
-        motorLeft.setInverted(false);
-        motorLeft.setIdleMode(IdleMode.kBrake);
-        motorLeft.setSmartCurrentLimit(Constants.STALL_CURRENT_LIMIT, Constants.FREE_CURRENT_LIMIT);
-        motorLeft.setSecondaryCurrentLimit(Constants.SECONDARY_CURRENT_LIMIT);
-        motorLeft.follow(motorRight, true);
+        encoder = motorRight.getAbsoluteEncoder(Type.kDutyCycle);
+        pid = motorRight.getPIDController();
 
-        motorRight.burnFlash();
-        motorLeft.burnFlash();
-
-        // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 1);
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-        motorRight.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1000);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1000);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 1000);
-        motorLeft.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 1000);
+        Constants.CONFIG_RIGHT.apply(motorRight);
+        Constants.CONFIG_LEFT.apply(motorLeft);
 
         name = "Shoulder";
     }
