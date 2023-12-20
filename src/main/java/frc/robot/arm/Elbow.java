@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.util.sparkmax.ClosedLoopConfiguration;
 import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
@@ -21,12 +22,9 @@ public class Elbow extends Ligament {
             true,
             IdleMode.kBrake,
             new ComplexCurrentLimitConfiguration(40, 20, 10, 45.0),
-            StatusFrameConfiguration.absoluteEncoder()
+            StatusFrameConfiguration.absoluteEncoder(),
+            ClosedLoopConfiguration.wrapping(0.01, 0.0, 0.005, 0.0, 0, 360)
         );
-
-        public static final double P = 0.01;
-        public static final double I = 0.0;
-        public static final double D = 0.005;
     }
 
     private final CANSparkMax motor;
@@ -41,14 +39,6 @@ public class Elbow extends Ligament {
         encoder.setInverted(true);
         pid = motor.getPIDController();
         pid.setFeedbackDevice(encoder);
-        pid.setPositionPIDWrappingEnabled(true);
-        pid.setPositionPIDWrappingMinInput(0);
-        pid.setPositionPIDWrappingMaxInput(360);
-        pid.setP(Constants.P, 0);
-        pid.setI(Constants.I, 0);
-        pid.setD(Constants.D, 0);
-
-        motor.burnFlash();
 
         name = "Elbow";
     }

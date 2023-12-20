@@ -13,6 +13,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.util.sparkmax.ClosedLoopConfiguration;
 import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
@@ -32,18 +33,12 @@ public class SwerveModule {
             public static final double POSITION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO; // meters
             public static final double VELOCITY_FACTOR = POSITION_FACTOR / 60.0; // meters per second
 
-            public static final double P = 0.04;
-            public static final double I = 0.0;
-            public static final double D = 0.0;
-            public static final double FF = 1.0 / FREE_SPEED;
-            public static final double MIN = -1.0;
-            public static final double MAX = 1.0;
-
             public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
                 new ComplexCurrentLimitConfiguration(50, 20, 10, 60.0),
-                StatusFrameConfiguration.normal());
+                StatusFrameConfiguration.normal(),
+                ClosedLoopConfiguration.simple(0.04, 0.0, 0.0, 1.0 / FREE_SPEED));
         }
 
         private static class Turning {
@@ -51,21 +46,13 @@ public class SwerveModule {
 
             public static final double POSITION_FACTOR = 2 * Math.PI; // radians
             public static final double VELOCITY_FACTOR = POSITION_FACTOR / 60.0; // radians per second
-            public static final double WRAPPING_MIN = 0; // radians
-            public static final double WRAPPING_MAX = POSITION_FACTOR; // radians
-
-            public static final double P = 1.0;
-            public static final double I = 0.0;
-            public static final double D = 0.0;
-            public static final double FF = 0.0;
-            public static final double MIN = -1.0;
-            public static final double MAX = 1.0;
 
             public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
                 new ComplexCurrentLimitConfiguration(20, 10, 10, 30.0),
-                StatusFrameConfiguration.absoluteEncoder());
+                StatusFrameConfiguration.absoluteEncoder(),
+                ClosedLoopConfiguration.wrapping(2.5, 0.0, 0.0, 0.0, 0, POSITION_FACTOR));
         }
     }
 
@@ -92,11 +79,6 @@ public class SwerveModule {
         drivingEncoder.setPosition(0);
         drivingController = drivingMotor.getPIDController();
         drivingController.setFeedbackDevice(drivingEncoder);
-        drivingController.setP(Constants.Driving.P);
-        drivingController.setI(Constants.Driving.I);
-        drivingController.setD(Constants.Driving.D);
-        drivingController.setFF(Constants.Driving.FF);
-        drivingController.setOutputRange(Constants.Driving.MIN, Constants.Driving.MAX);
 
         turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
         Constants.Turning.CONFIG.apply(turningMotor);
@@ -106,14 +88,6 @@ public class SwerveModule {
         turningEncoder.setInverted(Constants.Turning.ENCODER_INVERTED);
         turningController = turningMotor.getPIDController();
         turningController.setFeedbackDevice(turningEncoder);
-        turningController.setPositionPIDWrappingEnabled(true);
-        turningController.setPositionPIDWrappingMinInput(Constants.Turning.WRAPPING_MIN);
-        turningController.setPositionPIDWrappingMaxInput(Constants.Turning.WRAPPING_MAX);
-        turningController.setP(Constants.Turning.P);
-        turningController.setI(Constants.Turning.I);
-        turningController.setD(Constants.Turning.D);
-        turningController.setFF(Constants.Turning.FF);
-        turningController.setOutputRange(Constants.Turning.MIN, Constants.Turning.MAX);
 
         angleOffset = configuration.angleOffset;
         name = configuration.name;

@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import frc.robot.util.sparkmax.ClosedLoopConfiguration;
 import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
@@ -19,13 +20,10 @@ public class IntakeNeo550 extends Intake {
                 false,
                 IdleMode.kBrake,
                 new ComplexCurrentLimitConfiguration(20, 20, 10, 25.0),
-                StatusFrameConfiguration.normal());
+                StatusFrameConfiguration.normal(),
+                ClosedLoopConfiguration.simple(3.0, 0.0, 0.0, 0.0));
 
         public static final double INTAKE_SPEED = 0.01; // rotations per cycle
-
-        public static final double P = 3.0;
-        public static final double I = 0.0;
-        public static final double D = 0.0;
     }
 
     private final CANSparkMax motor;
@@ -44,9 +42,6 @@ public class IntakeNeo550 extends Intake {
         Constants.CONFIG.apply(motor);
         encoder = motor.getEncoder();
         pid = motor.getPIDController();
-        pid.setP(Constants.P);
-        pid.setI(Constants.I);
-        pid.setD(Constants.D);
 
         motor.burnFlash();
     }

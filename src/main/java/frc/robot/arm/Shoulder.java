@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.util.sparkmax.ClosedLoopConfiguration;
 import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
@@ -22,16 +23,13 @@ public class Shoulder extends Ligament {
                 true,
                 IdleMode.kBrake,
                 new ComplexCurrentLimitConfiguration(30, 20, 10, 35.0),
-                StatusFrameConfiguration.leadingAbsoluteEncoder());
+                StatusFrameConfiguration.leadingAbsoluteEncoder(),
+                ClosedLoopConfiguration.wrapping(0.0175, 0.0, 0.005, 0.0, 0, 360));
         public static final SparkMaxConfiguration CONFIG_LEFT = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
                 new ComplexCurrentLimitConfiguration(30, 20, 10, 35.0),
                 StatusFrameConfiguration.normal());
-
-        public static final double P = 0.0175;
-        public static final double I = 0.0;
-        public static final double D = 0.005;
     }
 
     private final CANSparkMax motorRight;
@@ -47,12 +45,6 @@ public class Shoulder extends Ligament {
         encoder.setInverted(true);
         pid = motorRight.getPIDController();
         pid.setFeedbackDevice(encoder);
-        pid.setPositionPIDWrappingEnabled(true);
-        pid.setPositionPIDWrappingMinInput(0);
-        pid.setPositionPIDWrappingMaxInput(360);
-        pid.setP(Constants.P, 0);
-        pid.setI(Constants.I, 0);
-        pid.setD(Constants.D, 0);
 
         motorLeft = new CANSparkMax(Constants.LEFT_CAN_ID, MotorType.kBrushless);
         Constants.CONFIG_LEFT.apply(motorLeft);
