@@ -1,6 +1,8 @@
 package frc.robot.util.sparkmax;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.MotorFeedbackSensor;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 public class SparkMaxConfiguration {
@@ -9,6 +11,7 @@ public class SparkMaxConfiguration {
     private final CurrentLimitConfiguration currentLimits;
     private final StatusFrameConfiguration statusFrames;
     private final ClosedLoopConfiguration closedLoop;
+    private final FeedbackConfiguration feedback;
 
     public SparkMaxConfiguration(boolean inverted, IdleMode idleMode, CurrentLimitConfiguration currentLimits,
             StatusFrameConfiguration statusFrames) {
@@ -17,15 +20,17 @@ public class SparkMaxConfiguration {
         this.currentLimits = currentLimits;
         this.statusFrames = statusFrames;
         this.closedLoop = null;
+        this.feedback = null;
     }
 
     public SparkMaxConfiguration(boolean inverted, IdleMode idleMode, CurrentLimitConfiguration currentLimits,
-            StatusFrameConfiguration statusFrames, ClosedLoopConfiguration closedLoop) {
+            StatusFrameConfiguration statusFrames, ClosedLoopConfiguration closedLoop, FeedbackConfiguration feedback) {
         this.inverted = inverted;
         this.idleMode = idleMode;
         this.currentLimits = currentLimits;
         this.statusFrames = statusFrames;
         this.closedLoop = closedLoop;
+        this.feedback = feedback;
     }
 
     public void apply(CANSparkMax motor) {
@@ -34,8 +39,11 @@ public class SparkMaxConfiguration {
         Util.configureCheckAndVerify(motor::setIdleMode, motor::getIdleMode, idleMode, "idleMode");
         currentLimits.apply(motor);
         statusFrames.apply(motor);
-        if (closedLoop != null)
-            closedLoop.apply(motor.getPIDController());
+        if (closedLoop != null && feedback != null) {
+            SparkMaxPIDController pid = closedLoop.apply(motor);
+            MotorFeedbackSensor sensor = feedback.apply(motor);
+            pid.setFeedbackDevice(sensor);
+        }
         Util.burnFlash(motor);
     }
 }

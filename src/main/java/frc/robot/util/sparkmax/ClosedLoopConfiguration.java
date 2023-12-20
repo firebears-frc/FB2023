@@ -1,5 +1,6 @@
 package frc.robot.util.sparkmax;
 
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 
 public class ClosedLoopConfiguration {
@@ -17,7 +18,8 @@ public class ClosedLoopConfiguration {
         return new ClosedLoopConfiguration(p, i, d, ff, -1.0, 1.0, wrappingMin, wrappingMax, null, null, null);
     }
 
-    public static ClosedLoopConfiguration outputConstraints(double p, double i, double d, double ff, double minOutput, double maxOutput) {
+    public static ClosedLoopConfiguration outputConstraints(double p, double i, double d, double ff, double minOutput,
+            double maxOutput) {
         return new ClosedLoopConfiguration(p, i, d, ff, minOutput, maxOutput, null, null, null, null, null);
     }
 
@@ -36,7 +38,8 @@ public class ClosedLoopConfiguration {
         this.maxIAccum = maxIAccum;
     }
 
-    public void apply(SparkMaxPIDController pid) {
+    public SparkMaxPIDController apply(CANSparkMax motor) {
+        SparkMaxPIDController pid = motor.getPIDController();
         Util.configureCheckAndVerify(pid::setP, pid::getP, p, "p");
         Util.configureCheckAndVerify(pid::setI, pid::getI, i, "i");
         Util.configureCheckAndVerify(pid::setD, pid::getD, d, "d");
@@ -58,5 +61,6 @@ public class ClosedLoopConfiguration {
         if (maxIAccum != null)
             Util.configureCheckAndVerify(setting -> pid.setIMaxAccum(setting, 0), () -> pid.getIMaxAccum(0), maxIAccum,
                     "maxIAccum");
+        return pid;
     }
 }

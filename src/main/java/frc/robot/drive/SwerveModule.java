@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.sparkmax.ClosedLoopConfiguration;
 import frc.robot.util.sparkmax.CurrentLimitConfiguration;
+import frc.robot.util.sparkmax.FeedbackConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
@@ -31,28 +32,24 @@ public class SwerveModule {
             private static final double FREE_SPEED = NEO_FREE_SPEED * WHEEL_CIRCUMFERENCE / GEAR_RATIO; // meters per
                                                                                                         // second
             public static final double POSITION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO; // meters
-            public static final double VELOCITY_FACTOR = POSITION_FACTOR / 60.0; // meters per second
 
             public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
-                false,
-                IdleMode.kBrake,
-                CurrentLimitConfiguration.complex(50, 20, 10, 60.0),
-                StatusFrameConfiguration.normal(),
-                ClosedLoopConfiguration.simple(0.04, 0.0, 0.0, 1.0 / FREE_SPEED));
+                    false,
+                    IdleMode.kBrake,
+                    CurrentLimitConfiguration.complex(50, 20, 10, 60.0),
+                    StatusFrameConfiguration.normal(),
+                    ClosedLoopConfiguration.simple(0.04, 0.0, 0.0, 1.0 / FREE_SPEED),
+                    FeedbackConfiguration.relativeEncoder(false, POSITION_FACTOR));
         }
 
         private static class Turning {
-            public static final boolean ENCODER_INVERTED = true;
-
-            public static final double POSITION_FACTOR = 2 * Math.PI; // radians
-            public static final double VELOCITY_FACTOR = POSITION_FACTOR / 60.0; // radians per second
-
             public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
-                false,
-                IdleMode.kBrake,
-                CurrentLimitConfiguration.complex(20, 10, 10, 30.0),
-                StatusFrameConfiguration.absoluteEncoder(),
-                ClosedLoopConfiguration.wrapping(2.5, 0.0, 0.0, 0.0, 0, POSITION_FACTOR));
+                    false,
+                    IdleMode.kBrake,
+                    CurrentLimitConfiguration.complex(20, 10, 10, 30.0),
+                    StatusFrameConfiguration.absoluteEncoder(),
+                    ClosedLoopConfiguration.wrapping(2.5, 0.0, 0.0, 0.0, 0, 2 * Math.PI),
+                    FeedbackConfiguration.absoluteEncoder(true, 2 * Math.PI));
         }
     }
 
@@ -72,23 +69,17 @@ public class SwerveModule {
 
     public SwerveModule(SwerveModuleConfiguration configuration) {
         drivingMotor = new CANSparkMax(configuration.drivingID, MotorType.kBrushless);
-        Constants.Driving.CONFIG.apply(drivingMotor);
         drivingEncoder = drivingMotor.getEncoder();
-        drivingEncoder.setPositionConversionFactor(Constants.Driving.POSITION_FACTOR);
-        drivingEncoder.setVelocityConversionFactor(Constants.Driving.VELOCITY_FACTOR);
-        drivingEncoder.setPosition(0);
         drivingController = drivingMotor.getPIDController();
-        drivingController.setFeedbackDevice(drivingEncoder);
 
         turningMotor = new CANSparkMax(configuration.turningID, MotorType.kBrushless);
-        Constants.Turning.CONFIG.apply(turningMotor);
         turningEncoder = turningMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        turningEncoder.setPositionConversionFactor(Constants.Turning.POSITION_FACTOR);
-        turningEncoder.setVelocityConversionFactor(Constants.Turning.VELOCITY_FACTOR);
-        turningEncoder.setInverted(Constants.Turning.ENCODER_INVERTED);
         turningController = turningMotor.getPIDController();
-        turningController.setFeedbackDevice(turningEncoder);
 
+        Constants.Driving.CONFIG.apply(drivingMotor);
+        Constants.Turning.CONFIG.apply(turningMotor);
+
+        drivingEncoder.setPosition(0);
         angleOffset = configuration.angleOffset;
         name = configuration.name;
         desiredState = new SwerveModuleState(0.0, new Rotation2d(turningEncoder.getPosition()));
