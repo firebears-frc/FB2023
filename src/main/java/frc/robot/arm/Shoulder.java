@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.util.sparkmax.ClosedLoopConfiguration;
 import frc.robot.util.sparkmax.CurrentLimitConfiguration;
 import frc.robot.util.sparkmax.FeedbackConfiguration;
+import frc.robot.util.sparkmax.FollowingConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
@@ -31,7 +32,8 @@ public class Shoulder extends Ligament {
                 false,
                 IdleMode.kBrake,
                 CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
-                StatusFrameConfiguration.normal());
+                StatusFrameConfiguration.normal(),
+                FollowingConfiguration.sparkMax(RIGHT_CAN_ID, true));
     }
 
     private final CANSparkMax motorRight;
@@ -44,8 +46,6 @@ public class Shoulder extends Ligament {
         motorLeft = new CANSparkMax(Constants.LEFT_CAN_ID, MotorType.kBrushless);
         encoder = motorRight.getAbsoluteEncoder(Type.kDutyCycle);
         pid = motorRight.getPIDController();
-
-        motorLeft.follow(motorRight, true);
 
         Constants.CONFIG_RIGHT.apply(motorRight);
         Constants.CONFIG_LEFT.apply(motorLeft);

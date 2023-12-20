@@ -35,11 +35,11 @@ public interface FeedbackConfiguration {
         };
     }
 
-    public static FeedbackConfiguration relativeEncoder(boolean inverted, double conversionFactor) {
-        return relativeEncoder(inverted, conversionFactor, null, null);
+    public static FeedbackConfiguration builtInEncoder(boolean inverted, double conversionFactor) {
+        return builtInEncoder(inverted, conversionFactor, null, null);
     }
 
-    public static FeedbackConfiguration relativeEncoder(boolean inverted, double conversionFactor, Integer averageDepth,
+    public static FeedbackConfiguration builtInEncoder(boolean inverted, double conversionFactor, Integer averageDepth,
             Integer measurementPeriod) {
         return new FeedbackConfiguration() {
             @Override

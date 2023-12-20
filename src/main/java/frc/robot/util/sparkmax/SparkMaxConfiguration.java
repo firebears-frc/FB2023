@@ -12,6 +12,7 @@ public class SparkMaxConfiguration {
     private final StatusFrameConfiguration statusFrames;
     private final ClosedLoopConfiguration closedLoop;
     private final FeedbackConfiguration feedback;
+    private final FollowingConfiguration following;
 
     public SparkMaxConfiguration(boolean inverted, IdleMode idleMode, CurrentLimitConfiguration currentLimits,
             StatusFrameConfiguration statusFrames) {
@@ -21,6 +22,7 @@ public class SparkMaxConfiguration {
         this.statusFrames = statusFrames;
         this.closedLoop = null;
         this.feedback = null;
+        this.following = null;
     }
 
     public SparkMaxConfiguration(boolean inverted, IdleMode idleMode, CurrentLimitConfiguration currentLimits,
@@ -31,6 +33,18 @@ public class SparkMaxConfiguration {
         this.statusFrames = statusFrames;
         this.closedLoop = closedLoop;
         this.feedback = feedback;
+        this.following = null;
+    }
+
+    public SparkMaxConfiguration(boolean inverted, IdleMode idleMode, CurrentLimitConfiguration currentLimits,
+            StatusFrameConfiguration statusFrames, FollowingConfiguration following) {
+        this.inverted = inverted;
+        this.idleMode = idleMode;
+        this.currentLimits = currentLimits;
+        this.statusFrames = statusFrames;
+        this.closedLoop = null;
+        this.feedback = null;
+        this.following = following;
     }
 
     public void apply(CANSparkMax motor) {
@@ -43,6 +57,8 @@ public class SparkMaxConfiguration {
             SparkMaxPIDController pid = closedLoop.apply(motor);
             MotorFeedbackSensor sensor = feedback.apply(motor);
             pid.setFeedbackDevice(sensor);
+        } else if (following != null) {
+            following.apply(motor);
         }
         Util.burnFlash(motor);
     }
