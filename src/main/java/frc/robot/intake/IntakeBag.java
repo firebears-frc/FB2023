@@ -29,6 +29,7 @@ public class IntakeBag extends Intake {
 
     public IntakeBag() {
         motor = new CANSparkMax(Intake.Constants.MOTOR_CAN_ID, MotorType.kBrushed);
+
         Constants.CONFIG.apply(motor);
 
         speed = 0;
