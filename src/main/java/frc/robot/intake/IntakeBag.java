@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
+import frc.robot.util.sparkmax.CurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
@@ -15,7 +15,7 @@ public class IntakeBag extends Intake {
         public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
-                new ComplexCurrentLimitConfiguration(10, 10, 10, 20.0),
+                CurrentLimitConfiguration.complex(10, 10, 10, 20.0),
                 StatusFrameConfiguration.normal());
 
         public static final double INTAKE_SPEED = 0.7;

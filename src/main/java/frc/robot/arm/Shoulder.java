@@ -10,7 +10,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.util.sparkmax.ClosedLoopConfiguration;
-import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
+import frc.robot.util.sparkmax.CurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
@@ -22,13 +22,13 @@ public class Shoulder extends Ligament {
         public static final SparkMaxConfiguration CONFIG_RIGHT = new SparkMaxConfiguration(
                 true,
                 IdleMode.kBrake,
-                new ComplexCurrentLimitConfiguration(30, 20, 10, 35.0),
+                CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
                 StatusFrameConfiguration.leadingAbsoluteEncoder(),
                 ClosedLoopConfiguration.wrapping(0.0175, 0.0, 0.005, 0.0, 0, 360));
         public static final SparkMaxConfiguration CONFIG_LEFT = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
-                new ComplexCurrentLimitConfiguration(30, 20, 10, 35.0),
+                CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
                 StatusFrameConfiguration.normal());
     }
 

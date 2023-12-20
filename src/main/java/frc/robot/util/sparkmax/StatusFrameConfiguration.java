@@ -5,7 +5,7 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 public interface StatusFrameConfiguration {
     // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames
-    void apply(CANSparkMax motor);
+    public void apply(CANSparkMax motor);
 
     public static StatusFrameConfiguration normal() {
         return new StatusFrameConfiguration() {

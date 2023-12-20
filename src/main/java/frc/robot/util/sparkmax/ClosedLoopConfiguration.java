@@ -36,7 +36,7 @@ public class ClosedLoopConfiguration {
         this.maxIAccum = maxIAccum;
     }
 
-    void apply(SparkMaxPIDController pid) {
+    public void apply(SparkMaxPIDController pid) {
         Util.configureCheckAndVerify(pid::setP, pid::getP, p, "p");
         Util.configureCheckAndVerify(pid::setI, pid::getI, i, "i");
         Util.configureCheckAndVerify(pid::setD, pid::getD, d, "d");

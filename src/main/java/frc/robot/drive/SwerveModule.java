@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.sparkmax.ClosedLoopConfiguration;
-import frc.robot.util.sparkmax.ComplexCurrentLimitConfiguration;
+import frc.robot.util.sparkmax.CurrentLimitConfiguration;
 import frc.robot.util.sparkmax.SparkMaxConfiguration;
 import frc.robot.util.sparkmax.StatusFrameConfiguration;
 
@@ -36,7 +36,7 @@ public class SwerveModule {
             public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
-                new ComplexCurrentLimitConfiguration(50, 20, 10, 60.0),
+                CurrentLimitConfiguration.complex(50, 20, 10, 60.0),
                 StatusFrameConfiguration.normal(),
                 ClosedLoopConfiguration.simple(0.04, 0.0, 0.0, 1.0 / FREE_SPEED));
         }
@@ -50,7 +50,7 @@ public class SwerveModule {
             public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
                 false,
                 IdleMode.kBrake,
-                new ComplexCurrentLimitConfiguration(20, 10, 10, 30.0),
+                CurrentLimitConfiguration.complex(20, 10, 10, 30.0),
                 StatusFrameConfiguration.absoluteEncoder(),
                 ClosedLoopConfiguration.wrapping(2.5, 0.0, 0.0, 0.0, 0, POSITION_FACTOR));
         }
