@@ -24,14 +24,14 @@ public class Chassis {
 
     private static final class Constants {
         public static final SwerveModuleConfiguration MODULES[] = {
-                new SwerveModuleConfiguration(26, 27, -Math.PI / 2, new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                        "Front Left"),
-                new SwerveModuleConfiguration(21, 20, 0, new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                        "Front Right"),
-                new SwerveModuleConfiguration(24, 25, Math.PI, new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                        "Rear Left"),
-                new SwerveModuleConfiguration(23, 22, Math.PI / 2, new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                        "Rear Right")
+                new SwerveModuleConfiguration(26, 27, Rotation2d.fromDegrees(-90),
+                        new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), "Front Left"),
+                new SwerveModuleConfiguration(21, 20, Rotation2d.fromDegrees(0),
+                        new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Front Right"),
+                new SwerveModuleConfiguration(24, 25, Rotation2d.fromDegrees(180),
+                        new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), "Rear Left"),
+                new SwerveModuleConfiguration(23, 22, Rotation2d.fromDegrees(90),
+                        new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), "Rear Right")
         };
     }
 

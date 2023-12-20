@@ -48,8 +48,8 @@ public class SwerveModule {
                     IdleMode.kBrake,
                     CurrentLimitConfiguration.complex(20, 10, 10, 30.0),
                     StatusFrameConfiguration.absoluteEncoder(),
-                    ClosedLoopConfiguration.wrapping(2.5, 0.0, 0.0, 0.0, 0, 2 * Math.PI),
-                    FeedbackConfiguration.absoluteEncoder(true, 2 * Math.PI));
+                    ClosedLoopConfiguration.wrapping(2.5, 0.0, 0.0, 0.0, 0, 360),
+                    FeedbackConfiguration.absoluteEncoder(true, 360));
         }
     }
 
@@ -61,7 +61,7 @@ public class SwerveModule {
     private final AbsoluteEncoder turningEncoder;
     private final SparkMaxPIDController turningController;
 
-    private final double angleOffset;
+    private final Rotation2d angleOffset;
     private final String name;
 
     @AutoLogOutput(key = "Drive/Modules/{name}/Target")
@@ -86,11 +86,11 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState state) {
-        state.angle = state.angle.plus(Rotation2d.fromRadians(angleOffset));
+        state.angle = state.angle.plus(angleOffset);
         state = SwerveModuleState.optimize(state, new Rotation2d(turningEncoder.getPosition()));
 
         drivingController.setReference(state.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
-        turningController.setReference(state.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+        turningController.setReference(state.angle.getDegrees(), CANSparkMax.ControlType.kPosition);
 
         desiredState = state;
     }
@@ -99,13 +99,13 @@ public class SwerveModule {
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 drivingEncoder.getPosition(),
-                new Rotation2d(turningEncoder.getPosition() - angleOffset));
+                Rotation2d.fromDegrees(turningEncoder.getPosition()).minus(angleOffset));
     }
 
     @AutoLogOutput(key = "Drive/Modules/{name}/Actual")
     public SwerveModuleState getState() {
         return new SwerveModuleState(
                 drivingEncoder.getVelocity(),
-                new Rotation2d(turningEncoder.getPosition() - angleOffset));
+                Rotation2d.fromDegrees(turningEncoder.getPosition()).minus(angleOffset));
     }
 }
