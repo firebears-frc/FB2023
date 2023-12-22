@@ -11,7 +11,8 @@
         "x": 0.3535533905932738,
         "y": 3.353553390593274
       },
-      "isLocked": true
+      "isLocked": true,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -26,7 +27,8 @@
         "x": 1.5,
         "y": 4.0
       },
-      "isLocked": true
+      "isLocked": true,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -41,7 +43,8 @@
         "x": 2.5,
         "y": 2.0
       },
-      "isLocked": true
+      "isLocked": true,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -53,17 +56,20 @@
         "y": 2.646446609406726
       },
       "nextControl": null,
-      "isLocked": true
+      "isLocked": true,
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": 60.0
+      "rotationDegrees": 60.0,
+      "rotateFast": false
     },
     {
       "waypointRelativePos": 2.0,
-      "rotationDegrees": 120.0
+      "rotationDegrees": 120.0,
+      "rotateFast": false
     }
   ],
   "constraintZones": [],
@@ -95,7 +101,7 @@
             {
               "type": "named",
               "data": {
-                "name": "place"
+                "name": "armMid"
               }
             }
           ]
@@ -112,7 +118,7 @@
             {
               "type": "named",
               "data": {
-                "name": "prepCube"
+                "name": "armStow"
               }
             }
           ]
@@ -145,12 +151,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 180.0,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
-  }
+  },
+  "useDefaultConstraints": false
 }
