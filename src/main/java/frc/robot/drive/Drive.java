@@ -3,10 +3,13 @@ package frc.robot.drive;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -51,6 +54,15 @@ public class Drive extends SubsystemBase {
                 chassis::driveRobotRelative,
                 Constants.CONFIG,
                 this);
+
+        Pathfinding.setPathfinder(new LocalADStarAK());
+        PathPlannerLogging.setLogTargetPoseCallback(pose -> Logger.recordOutput("Drive/Path/TargetPose", pose));
+        PathPlannerLogging.setLogActivePathCallback(poses -> {
+            Logger.recordOutput("Drive/Path/Poses", poses);
+            Logger.recordOutput("Drive/Path/Start", poses.get(0));
+            Logger.recordOutput("Drive/Path/Middle", poses.get(poses.size() / 2));
+            Logger.recordOutput("Drive/Path/End", poses.get(poses.size()));
+        });
     }
 
     private void setPose(Pose2d pose) {
