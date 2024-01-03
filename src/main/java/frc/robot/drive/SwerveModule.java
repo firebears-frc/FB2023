@@ -16,7 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.spark.ClosedLoopConfiguration;
 import frc.robot.util.spark.CurrentLimitConfiguration;
 import frc.robot.util.spark.FeedbackConfiguration;
-import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.SparkConfiguration;
 import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class SwerveModule {
@@ -33,7 +33,7 @@ public class SwerveModule {
                                                                                                         // second
             public static final double POSITION_FACTOR = WHEEL_CIRCUMFERENCE / GEAR_RATIO; // meters
 
-            public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+            public static final SparkConfiguration CONFIG = new SparkConfiguration(
                     false,
                     IdleMode.kBrake,
                     CurrentLimitConfiguration.complex(50, 20, 10, 60.0),
@@ -43,7 +43,7 @@ public class SwerveModule {
         }
 
         private static class Turning {
-            public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+            public static final SparkConfiguration CONFIG = new SparkConfiguration(
                     false,
                     IdleMode.kBrake,
                     CurrentLimitConfiguration.complex(20, 10, 10, 30.0),

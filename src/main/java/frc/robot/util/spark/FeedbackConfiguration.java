@@ -1,13 +1,13 @@
 package frc.robot.util.spark;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 public interface FeedbackConfiguration {
-    public MotorFeedbackSensor apply(CANSparkMax motor);
+    public MotorFeedbackSensor apply(CANSparkBase motor);
 
     public static FeedbackConfiguration absoluteEncoder(boolean inverted, double conversionFactor) {
         return absoluteEncoder(inverted, conversionFactor, null, null);
@@ -17,7 +17,7 @@ public interface FeedbackConfiguration {
             Integer averageDepth) {
         return new FeedbackConfiguration() {
             @Override
-            public MotorFeedbackSensor apply(CANSparkMax motor) {
+            public MotorFeedbackSensor apply(CANSparkBase motor) {
                 AbsoluteEncoder encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
                 Util.configureCheckAndVerify(encoder::setInverted, encoder::getInverted, inverted, "inverted");
                 Util.configureCheckAndVerify(encoder::setPositionConversionFactor, encoder::getPositionConversionFactor,
@@ -43,7 +43,7 @@ public interface FeedbackConfiguration {
             Integer measurementPeriod) {
         return new FeedbackConfiguration() {
             @Override
-            public MotorFeedbackSensor apply(CANSparkMax motor) {
+            public MotorFeedbackSensor apply(CANSparkBase motor) {
                 RelativeEncoder encoder = motor.getEncoder();
                 Util.configureCheckAndVerify(encoder::setInverted, encoder::getInverted, inverted, "inverted");
                 Util.configureCheckAndVerify(encoder::setPositionConversionFactor, encoder::getPositionConversionFactor,

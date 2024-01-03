@@ -12,14 +12,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.util.spark.ClosedLoopConfiguration;
 import frc.robot.util.spark.CurrentLimitConfiguration;
 import frc.robot.util.spark.FeedbackConfiguration;
-import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.SparkConfiguration;
 import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class Elbow extends Ligament {
     private static final class Constants {
         public static final int PORT = 7;
 
-        public static final SparkMaxConfiguration CONFIG = new SparkMaxConfiguration(
+        public static final SparkConfiguration CONFIG = new SparkConfiguration(
                 true,
                 IdleMode.kBrake,
                 CurrentLimitConfiguration.complex(40, 20, 10, 45.0),

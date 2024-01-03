@@ -13,7 +13,7 @@ import frc.robot.util.spark.ClosedLoopConfiguration;
 import frc.robot.util.spark.CurrentLimitConfiguration;
 import frc.robot.util.spark.FeedbackConfiguration;
 import frc.robot.util.spark.FollowingConfiguration;
-import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.SparkConfiguration;
 import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class Shoulder extends Ligament {
@@ -21,19 +21,19 @@ public class Shoulder extends Ligament {
         public static final int RIGHT_CAN_ID = 8;
         public static final int LEFT_CAN_ID = 9;
 
-        public static final SparkMaxConfiguration CONFIG_RIGHT = new SparkMaxConfiguration(
+        public static final SparkConfiguration CONFIG_RIGHT = new SparkConfiguration(
                 true,
                 IdleMode.kBrake,
                 CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
                 StatusFrameConfiguration.leadingAbsoluteEncoder(),
                 ClosedLoopConfiguration.wrapping(0.0175, 0.0, 0.005, 0.0, 0, 360),
                 FeedbackConfiguration.absoluteEncoder(true, 360));
-        public static final SparkMaxConfiguration CONFIG_LEFT = new SparkMaxConfiguration(
+        public static final SparkConfiguration CONFIG_LEFT = new SparkConfiguration(
                 false,
                 IdleMode.kBrake,
                 CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
                 StatusFrameConfiguration.normal(),
-                FollowingConfiguration.sparkMax(RIGHT_CAN_ID, true));
+                FollowingConfiguration.spark(RIGHT_CAN_ID, true));
     }
 
     private final CANSparkMax motorRight;
