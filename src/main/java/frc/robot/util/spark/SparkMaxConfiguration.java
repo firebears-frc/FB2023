@@ -1,9 +1,9 @@
-package frc.robot.util.sparkmax;
+package frc.robot.util.spark;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 public class SparkMaxConfiguration {
     private final boolean inverted;
@@ -54,7 +54,7 @@ public class SparkMaxConfiguration {
         currentLimits.apply(motor);
         statusFrames.apply(motor);
         if (closedLoop != null && feedback != null) {
-            SparkMaxPIDController pid = closedLoop.apply(motor);
+            SparkPIDController pid = closedLoop.apply(motor);
             MotorFeedbackSensor sensor = feedback.apply(motor);
             pid.setFeedbackDevice(sensor);
         } else if (following != null) {

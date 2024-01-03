@@ -1,19 +1,19 @@
 package frc.robot.arm;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.util.sparkmax.ClosedLoopConfiguration;
-import frc.robot.util.sparkmax.CurrentLimitConfiguration;
-import frc.robot.util.sparkmax.FeedbackConfiguration;
-import frc.robot.util.sparkmax.SparkMaxConfiguration;
-import frc.robot.util.sparkmax.StatusFrameConfiguration;
+import frc.robot.util.spark.ClosedLoopConfiguration;
+import frc.robot.util.spark.CurrentLimitConfiguration;
+import frc.robot.util.spark.FeedbackConfiguration;
+import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class Elbow extends Ligament {
     private static final class Constants {
@@ -29,8 +29,8 @@ public class Elbow extends Ligament {
     }
 
     private final CANSparkMax motor;
-    private final SparkMaxAbsoluteEncoder encoder;
-    private final SparkMaxPIDController pid;
+    private final SparkAbsoluteEncoder encoder;
+    private final SparkPIDController pid;
 
     public Elbow() {
         motor = new CANSparkMax(Constants.PORT, MotorType.kBrushless);

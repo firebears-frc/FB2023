@@ -1,9 +1,9 @@
-package frc.robot.util.sparkmax;
+package frc.robot.util.spark;
 
 import java.util.Map;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 
 public interface StatusFrameConfiguration {
     // https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames

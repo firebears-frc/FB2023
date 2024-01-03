@@ -3,12 +3,12 @@ package frc.robot.intake;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import frc.robot.util.sparkmax.CurrentLimitConfiguration;
-import frc.robot.util.sparkmax.SparkMaxConfiguration;
-import frc.robot.util.sparkmax.StatusFrameConfiguration;
+import frc.robot.util.spark.CurrentLimitConfiguration;
+import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class IntakeBag extends Intake {
     public static final class Constants {
