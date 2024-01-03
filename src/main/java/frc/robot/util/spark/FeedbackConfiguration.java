@@ -1,10 +1,10 @@
-package frc.robot.util.sparkmax;
+package frc.robot.util.spark;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 public interface FeedbackConfiguration {
     public MotorFeedbackSensor apply(CANSparkMax motor);

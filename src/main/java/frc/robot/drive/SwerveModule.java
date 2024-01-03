@@ -5,19 +5,19 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.util.sparkmax.ClosedLoopConfiguration;
-import frc.robot.util.sparkmax.CurrentLimitConfiguration;
-import frc.robot.util.sparkmax.FeedbackConfiguration;
-import frc.robot.util.sparkmax.SparkMaxConfiguration;
-import frc.robot.util.sparkmax.StatusFrameConfiguration;
+import frc.robot.util.spark.ClosedLoopConfiguration;
+import frc.robot.util.spark.CurrentLimitConfiguration;
+import frc.robot.util.spark.FeedbackConfiguration;
+import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class SwerveModule {
     private static final class Constants {
@@ -55,11 +55,11 @@ public class SwerveModule {
 
     private final CANSparkMax drivingMotor;
     private final RelativeEncoder drivingEncoder;
-    private final SparkMaxPIDController drivingController;
+    private final SparkPIDController drivingController;
 
     private final CANSparkMax turningMotor;
     private final AbsoluteEncoder turningEncoder;
-    private final SparkMaxPIDController turningController;
+    private final SparkPIDController turningController;
 
     private final Rotation2d angleOffset;
     private final String name;

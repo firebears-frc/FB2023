@@ -4,16 +4,16 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import frc.robot.util.sparkmax.ClosedLoopConfiguration;
-import frc.robot.util.sparkmax.CurrentLimitConfiguration;
-import frc.robot.util.sparkmax.FeedbackConfiguration;
-import frc.robot.util.sparkmax.SparkMaxConfiguration;
-import frc.robot.util.sparkmax.StatusFrameConfiguration;
+import frc.robot.util.spark.ClosedLoopConfiguration;
+import frc.robot.util.spark.CurrentLimitConfiguration;
+import frc.robot.util.spark.FeedbackConfiguration;
+import frc.robot.util.spark.SparkMaxConfiguration;
+import frc.robot.util.spark.StatusFrameConfiguration;
 
 public class IntakeNeo550 extends Intake {
     public static final class Constants {
@@ -30,7 +30,7 @@ public class IntakeNeo550 extends Intake {
 
     private final CANSparkMax motor;
     private final RelativeEncoder encoder;
-    private final SparkMaxPIDController pid;
+    private final SparkPIDController pid;
 
     @AutoLogOutput(key = "Intake/Speed")
     private double speed;
