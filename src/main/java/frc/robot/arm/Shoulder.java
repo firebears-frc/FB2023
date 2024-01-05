@@ -25,7 +25,7 @@ public class Shoulder extends Ligament {
                 true,
                 IdleMode.kBrake,
                 CurrentLimitConfiguration.complex(30, 20, 10, 35.0),
-                StatusFrameConfiguration.leadingAbsoluteEncoder(),
+                StatusFrameConfiguration.absoluteEncoderLeader(),
                 ClosedLoopConfiguration.wrapping(0.0175, 0.0, 0.005, 0.0, 0, 360),
                 FeedbackConfiguration.absoluteEncoder(true, 360));
         public static final SparkConfiguration CONFIG_LEFT = new SparkConfiguration(
