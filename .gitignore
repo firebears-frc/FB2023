@@ -172,5 +172,10 @@ out/
 src/main/java/frc/robot/BuildConstants.java
 
 # Simulation GUI and other tools window save file
-sysid/sysid_data*.json
 *-window.json
+
+# Simulation data log directory
+logs/
+
+# Folder that has CTRE Phoenix Sim device config storage
+ctre_sim/
