@@ -168,6 +168,9 @@ out/
 # Fleet
 .fleet
 
+# Git info
+src/main/java/frc/robot/BuildConstants.java
+
 # Simulation GUI and other tools window save file
 *-window.json
 
