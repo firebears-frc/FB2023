@@ -15,6 +15,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,12 +54,19 @@ public class Drive extends SubsystemBase {
                 chassis::getSpeeds,
                 chassis::driveRobotRelative,
                 Constants.CONFIG,
+                () -> {
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent())
+                        return alliance.get() == DriverStation.Alliance.Red;
+
+                    return false;
+                },
                 this);
 
         Pathfinding.setPathfinder(new LocalADStarAK());
         PathPlannerLogging.setLogTargetPoseCallback(pose -> Logger.recordOutput("Drive/Path/TargetPose", pose));
         PathPlannerLogging.setLogActivePathCallback(poses -> {
-            Logger.recordOutput("Drive/Path/Poses", poses);
+            //Logger.recordOutput("Drive/Path/Poses", poses);
             Logger.recordOutput("Drive/Path/Start", poses.get(0));
             Logger.recordOutput("Drive/Path/Middle", poses.get(poses.size() / 2));
             Logger.recordOutput("Drive/Path/End", poses.get(poses.size()));
