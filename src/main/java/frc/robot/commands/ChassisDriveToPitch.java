@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class ChassisDriveToPitch extends CommandBase {
+public class ChassisDriveToPitch extends Command {
     /** Creates a new DriveToPositionCommand. */
     private double pitch;
     private double speed;

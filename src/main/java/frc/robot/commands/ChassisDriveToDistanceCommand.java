@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class ChassisDriveToDistanceCommand extends CommandBase {
+public class ChassisDriveToDistanceCommand extends Command {
     /** Creates a new DriveToPositionCommand. */
     private double distance;
     private DriveSubsystem m_chassis;

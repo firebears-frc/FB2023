@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class BalanceTake2Command extends CommandBase {
+public class BalanceTake2Command extends Command {
 
     DriveSubsystem m_chassis;
     double speed;
