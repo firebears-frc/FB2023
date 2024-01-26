@@ -3,13 +3,13 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Translation2d;
 
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import static frc.robot.Constants.*;
 
@@ -27,10 +27,10 @@ public class Arm extends SubsystemBase {
     private CANSparkMax elbowMotor;
     private CANSparkMax shoulderMotorRight;
     private CANSparkMax shoulderMotorLeft;
-    private static SparkMaxAbsoluteEncoder elbowEncoder;
-    private static SparkMaxAbsoluteEncoder shoulderEncoder;
-    private static SparkMaxPIDController elbowPID;
-    private SparkMaxPIDController shoulderPID;
+    private static SparkAbsoluteEncoder elbowEncoder;
+    private static SparkAbsoluteEncoder shoulderEncoder;
+    private static SparkPIDController elbowPID;
+    private SparkPIDController shoulderPID;
     private double elbowSetpoint;
     private double shoulderSetpoint;
 
@@ -187,16 +187,15 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger logger = Logger.getInstance();
-        logger.recordOutput("Arm/Shoulder/Angle", getShoulderAngle());
-        logger.recordOutput("Arm/Shoulder/Setpoint", shoulderSetpoint);
-        logger.recordOutput("Arm/Shoulder/LeftOutput", shoulderMotorRight.getAppliedOutput());
-        logger.recordOutput("Arm/Shoulder/RightOutput", shoulderMotorLeft.getAppliedOutput());
-        logger.recordOutput("Arm/X", getArmPosition(getShoulderAngle(), getElbowAngle()).getX());
-        logger.recordOutput("Arm/Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
-        logger.recordOutput("Arm/Elbow/Angle", getElbowAngle());
-        logger.recordOutput("Arm/Elbow/Setpoint", elbowSetpoint);
-        logger.recordOutput("Arm/Elbow/Output", elbowMotor.getAppliedOutput());
+        Logger.recordOutput("Arm/Shoulder/Angle", getShoulderAngle());
+        Logger.recordOutput("Arm/Shoulder/Setpoint", shoulderSetpoint);
+        Logger.recordOutput("Arm/Shoulder/LeftOutput", shoulderMotorRight.getAppliedOutput());
+        Logger.recordOutput("Arm/Shoulder/RightOutput", shoulderMotorLeft.getAppliedOutput());
+        Logger.recordOutput("Arm/X", getArmPosition(getShoulderAngle(), getElbowAngle()).getX());
+        Logger.recordOutput("Arm/Y", getArmPosition(getShoulderAngle(), getElbowAngle()).getY());
+        Logger.recordOutput("Arm/Elbow/Angle", getElbowAngle());
+        Logger.recordOutput("Arm/Elbow/Setpoint", elbowSetpoint);
+        Logger.recordOutput("Arm/Elbow/Output", elbowMotor.getAppliedOutput());
 
         elbowPID.setReference(elbowSetpoint, ControlType.kPosition);
         shoulderPID.setReference(shoulderSetpoint, ControlType.kPosition);

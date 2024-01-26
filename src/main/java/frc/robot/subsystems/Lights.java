@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -25,14 +27,11 @@ public class Lights extends SubsystemBase {
     }
 
     public Alliance getTeamColor() {
-        switch (DriverStation.getAlliance()) {
-            case Blue:
-                return Alliance.Blue;
-            case Red:
-            case Invalid:
-            default:
-                return Alliance.Red;
-        }
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        if (!alliance.isPresent())
+            return Alliance.Red;
+
+        return alliance.get();
     }
 
     public void showTeam() {
@@ -43,9 +42,6 @@ public class Lights extends SubsystemBase {
                 break;
             case Red:
                 showRed();
-                break;
-            case Invalid:
-            default:
                 break;
         }
     }

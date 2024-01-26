@@ -36,7 +36,7 @@ public class Vision extends SubsystemBase {
             layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
             poseEstimator = new PhotonPoseEstimator(
                     layout,
-                    PoseStrategy.MULTI_TAG_PNP,
+                    PoseStrategy.MULTI_TAG_PNP_ON_RIO,
                     Camera,
                     new Transform3d(
                             new Translation3d(
